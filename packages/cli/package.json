@@ -5,7 +5,9 @@
   "bin": {
     "coat": "./build/bin/cli.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "commander": "^5.0.0"
+  },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.9.0",
