@@ -1,0 +1,19 @@
+{
+  "author": "Peter Juras <me@peterjuras.com>",
+  "bugs": {
+    "url": "https://github.com/coat-dev/coat/issues"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "lerna": "^3.20.2"
+  },
+  "homepage": "https://github.com/coat-dev/coat#readme",
+  "license": "MIT",
+  "name": "coat",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coat-dev/coat.git"
+  },
+  "version": "0.0.1"
+}
