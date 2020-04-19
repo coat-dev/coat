@@ -1,0 +1,17 @@
+{
+  "name": "@coat/template-ts-package",
+  "version": "0.0.1",
+  "author": "Peter Juras <me@peterjuras.com>",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [
+    "coat",
+    "template",
+    "coat-template",
+    "typescript"
+  ],
+  "peerDependencies": {
+    "@coat/cli": "^0.0.1"
+  },
+  "license": "MIT"
+}
