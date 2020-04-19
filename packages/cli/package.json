@@ -1,0 +1,41 @@
+{
+  "name": "@coat/cli",
+  "version": "0.0.1",
+  "author": "Peter Juras <me@peterjuras.com>",
+  "bin": {
+    "coat": "./build/bin/cli.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/node": "^7.8.7",
+    "@babel/preset-env": "^7.9.5",
+    "@babel/preset-typescript": "^7.9.0",
+    "@typescript-eslint/eslint-plugin": "^2.28.0",
+    "@typescript-eslint/parser": "^2.28.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.0.4",
+    "typescript": "~3.8.3"
+  },
+  "engines": {
+    "node": ">=10"
+  },
+  "keywords": [
+    "coat"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "run-p build:*",
+    "build:babel": "babel src -d build --extensions '.ts,.tsx' --ignore '**/*.d.ts'",
+    "build:typedefs": "tsc -p tsconfig.build.json",
+    "lint": "run-p lint:*",
+    "lint:eslint": "eslint 'src/**/*.ts' --max-warnings 0",
+    "lint:prettier": "prettier --check src",
+    "lint:tsc": "tsc",
+    "prebuild": "rm -rf build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
