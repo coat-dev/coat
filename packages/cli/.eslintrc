@@ -10,6 +10,14 @@
     "prettier",
     "prettier/@typescript-eslint"
   ],
+  "rules": {
+    "@typescript-eslint/explicit-function-return-type": [
+      "warn",
+      {
+        "allowExpressions": true
+      }
+    ]
+  },
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint"]
 }
