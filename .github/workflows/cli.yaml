@@ -1,0 +1,58 @@
+name: "@coat/cli"
+on: push
+
+jobs:
+  build:
+    name: Lint, Test & Build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          npm ci
+          npx --no-install lerna bootstrap
+      - name: Lint
+        run: npm run lint
+        working-directory: ./packages/cli
+      - name: Test
+        run: npm test
+        working-directory: ./packages/cli
+      - name: Build
+        # The pack command does currently not allow to specify an output filename,
+        # however, it does print out the name of the file as the last line.
+        #
+        # In order to always generate the same "coat-cli.tgz" file,
+        # the output file is renamed after npm pack finishes.
+        #
+        # The transpilation and type definition generation are run
+        # automatically with the "prepack" script
+        run: mv "$(npm pack | tail -n 1)" coat-cli.tgz
+        working-directory: ./packages/cli
+      - uses: actions/upload-artifact@v2
+        with:
+          name: coat-cli
+          path: packages/cli/coat-cli.tgz
+  integration-tests:
+    name: Integration tests
+    strategy:
+      matrix:
+        # Integration tests are currently not working on Windows
+        # because individual tests take way too long.
+        #
+        # I want to enable them once I can work out how to resolve
+        # these issues.
+        os: [ubuntu-latest, macos-latest]
+        node: [10, 12, 14]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install dependencies
+        run: |
+          npm ci
+          npx --no-install lerna bootstrap
+      - name: Run all tests
+        run: npm run test:all
+        working-directory: ./packages/cli

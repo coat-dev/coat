@@ -49,16 +49,16 @@
   "license": "MIT",
   "scripts": {
     "build": "run-p build:*",
-    "build:babel": "babel src -d build --extensions '.ts,.ts' --ignore '**/*.d.ts,**/*.test.ts'",
+    "build:babel": "babel src -d build --extensions \".ts,.ts\" --ignore \"**/*.d.ts,**/*.test.ts\"",
     "build:typedefs": "tsc -p tsconfig.build.json",
     "lint": "run-p lint:*",
-    "lint:eslint": "eslint '{src,test}/**/*{.ts,.js}' --max-warnings 0",
+    "lint:eslint": "eslint \"{src,test}/**/*{.ts,.js}\" --max-warnings 0",
     "lint:prettier": "prettier --check src test",
     "lint:tsc": "tsc",
     "prebuild": "rm -rf build",
     "prepack": "npm run build",
-    "test": "cross-env JEST_PROJECT='Unit tests' jest",
-    "test:integration": "cross-env JEST_PROJECT='Integration tests' jest --coverage=false",
+    "test": "cross-env JEST_PROJECT=\"Unit tests\" jest",
+    "test:integration": "cross-env JEST_PROJECT=\"Integration tests\" jest --coverage=false",
     "test:all": "jest"
   }
 }
