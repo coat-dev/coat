@@ -1,5 +1,5 @@
 {
-  "conventionalCommits.scopes": [
-    "cli"
-  ]
+  "files.exclude": {
+    "packages": true
+  }
 }

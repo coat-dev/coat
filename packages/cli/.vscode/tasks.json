@@ -1,0 +1,38 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "lint:tsc",
+      "problemMatcher": ["$tsc"],
+      "label": "Lint (tsc)",
+      "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    },
+    {
+      "type": "npm",
+      "script": "lint:eslint",
+      "problemMatcher": ["$eslint-stylish"],
+      "label": "Lint (eslint)",
+      "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    },
+    {
+      "label": "Lint",
+      "dependsOn": ["Lint (tsc)", "Lint (eslint)"],
+      "problemMatcher": []
+    }
+  ]
+}

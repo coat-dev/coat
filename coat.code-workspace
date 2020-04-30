@@ -1,0 +1,35 @@
+{
+  "folders": [
+    {
+      "name": "✨ coat",
+      "path": "."
+    },
+    {
+      "name": "📦 @coat/cli",
+      "path": "packages/cli"
+    },
+    {
+      "name": "📦 @coat/template-ts-package",
+      "path": "packages/template-ts-package"
+    }
+  ],
+  "settings": {
+    "conventionalCommits.scopes": ["cli", "template-ts-package"],
+    "jest.disabledWorkspaceFolders": [
+      "✨ coat",
+      "📦 @coat/template-ts-package"
+    ],
+    "jest.enableCodeLens": false,
+    "task.quickOpen.history": 0
+  },
+  "extensions": {
+    "recommendations": [
+      "Orta.vscode-jest",
+      "kavod-io.vscode-jest-test-adapter",
+      "vivaxy.vscode-conventional-commits",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "folke.vscode-monorepo-workspace"
+    ]
+  }
+}
