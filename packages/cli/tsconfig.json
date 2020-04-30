@@ -8,10 +8,9 @@
     "noEmit": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "rootDir": "src",
-    "outDir": "build",
+    "resolveJsonModule": true,
     "strict": true,
     "target": "esnext"
   },
-  "include": ["src"]
+  "include": ["src", "test"]
 }

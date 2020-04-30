@@ -1,0 +1,11 @@
+/.vscode
+/coverage
+/__mocks__
+/test
+/src
+
+.babelrc
+.eslintrc
+jest.config.js
+tsconfig.json
+tsconfig.build.json

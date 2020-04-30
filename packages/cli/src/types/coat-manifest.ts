@@ -1,3 +1,4 @@
-export interface DependencyMap {
-  [dependency: string]: string;
+export interface CoatManifest {
+  name: string;
+  extends?: string | string[];
 }

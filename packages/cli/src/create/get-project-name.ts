@@ -14,6 +14,20 @@ function createProjectNameErrorMessage(
   ].join(", ")}`;
 }
 
+/**
+ * Returns true when a project name is valid for coat.
+ * If it is invalid, then a string is returned which can be used as
+ * the error message to the user. This format is chosen to be
+ * compatible with the inquirer validation methods.
+ */
+function validateProjectName(projectName: string): string | true {
+  const npmValidation = validateNpmPackageName(projectName);
+  if (npmValidation.validForNewPackages) {
+    return true;
+  }
+  return createProjectNameErrorMessage(npmValidation);
+}
+
 export async function getProjectName(
   projectNameInput: string | undefined
 ): Promise<string> {
@@ -25,11 +39,11 @@ export async function getProjectName(
   // Also see validate-npm-package-name: https://github.com/npm/validate-npm-package-name
   if (projectNameInput) {
     const sanitizedProjectNameInput = sanitizeProjectName(projectNameInput);
-    const validation = validateNpmPackageName(sanitizedProjectNameInput);
-    if (validation.validForNewPackages) {
+    const validationResult = validateProjectName(sanitizedProjectNameInput);
+    if (validationResult === true) {
       projectName = sanitizedProjectNameInput;
     } else {
-      console.warn(createProjectNameErrorMessage(validation));
+      console.warn(validationResult);
     }
   }
 
@@ -42,13 +56,7 @@ export async function getProjectName(
         message: "Enter the name of your new project",
         filter: sanitizeProjectName,
         default: projectNameInput,
-        validate: (input) => {
-          const validation = validateNpmPackageName(input);
-          if (!validation.validForNewPackages) {
-            return createProjectNameErrorMessage(validation);
-          }
-          return true;
-        },
+        validate: validateProjectName,
       },
     ]);
     projectName = answers.projectName;

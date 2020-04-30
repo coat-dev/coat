@@ -1,27 +1,18 @@
 import { promises as fs } from "fs";
+import fsExtra from "fs-extra";
 import path from "path";
-import mkdirp from "mkdirp";
 import execa from "execa";
 import { setup } from "../setup";
 import { sync } from "../sync";
 import { getProjectName } from "./get-project-name";
-import { retrieveTemplateInfo } from "./retrieve-template-info";
-import { handlePromise } from "../util/delayed-promise";
+import { getTemplateInfo } from "./get-template-info";
+import { COAT_CLI_VERSION } from "../constants";
 
 export async function create(
   template: string,
   projectNameInput?: string,
   directoryInput?: string
 ): Promise<void> {
-  // Kick off the request to retrieve information about the template
-  // already, since the user still might be asked for a project name.
-  // This way the time until the user entered the project name can be
-  // used to already retrieve all necessary information to proceed with
-  // creating the project.
-  const retrieveTemplateInfoPromise = handlePromise(
-    retrieveTemplateInfo(template)
-  );
-
   const projectName = await getProjectName(projectNameInput);
 
   // Use the directoryInput from the cli argument or the project name if
@@ -32,11 +23,18 @@ export async function create(
   // The cli argument from directoryInput is allowed to include path separators,
   // to enable more flexibility and the creation of projects in absolute paths,
   // inside nested folders or outside the current root directory.
-  const targetDirectory =
-    directoryInput || (projectName.split("/").pop() as string);
+  let targetDirectoryIsInferred: boolean;
+  let targetDirectory: string;
+  if (directoryInput) {
+    targetDirectoryIsInferred = false;
+    targetDirectory = directoryInput;
+  } else {
+    targetDirectoryIsInferred = true;
+    targetDirectory = projectName.split("/").pop() as string;
+  }
 
   // Create the directory/directories if necessary
-  await mkdirp(targetDirectory);
+  await fs.mkdir(targetDirectory, { recursive: true });
 
   // Check and throw an error if the target directory already contains any files.
   // This is in order to prevent accidental file loss and overwrites of any existing
@@ -45,63 +43,131 @@ export async function create(
   // an error
   const directoryEntries = await fs.readdir(targetDirectory);
   if (directoryEntries.length) {
-    throw new Error(
-      "Warning! The specified target diretory is not empty. Aborting to prevent accidental file loss or override."
-    );
+    throw "Warning! The specified target diretory is not empty. Aborting to prevent accidental file loss or override.";
   }
 
-  // Retrieve the package information of the coat template
-  // from the npm registry in order to ensure that it exists and
-  // get the correctly resolved version for the template for cases
-  // where no specific version tag has been supplied.
-  //
-  // Peer dependencies of the template will also be added
-  // to the devDependencies of the new project.
-  const {
-    name: templateName,
-    version: templateVersion,
-    peerDependencies,
-  } = await retrieveTemplateInfoPromise;
-
-  const coatManifest = {
-    name: projectName,
-    extends: template,
-  };
   const packageJson = {
     name: projectName,
     version: "1.0.0",
-    devDependencies: {
-      [templateName]: templateVersion,
-      ...peerDependencies,
-    },
   };
+  // Create the package.json file inside the
+  // target directory.
+  await fs.writeFile(
+    path.join(targetDirectory, "package.json"),
+    // package.json does not need to be styled, since npm
+    // will alter and format it while installing dependencies
+    JSON.stringify(packageJson)
+  );
 
-  // Create the coat.json and package.json files inside the target
-  // directory.
-  //
-  // TODO: Use the polish methods of the coat JSON file type once
-  // the sync command is implemented.
-  await Promise.all([
-    fs.writeFile(
-      path.join(targetDirectory, "package.json"),
-      `${JSON.stringify(packageJson, null, 2)}\n`
-    ),
-    fs.writeFile(
+  let targetCwd: string;
+  if (path.isAbsolute(targetDirectory)) {
+    targetCwd = targetDirectory;
+  } else {
+    targetCwd = path.join(process.cwd(), targetDirectory);
+  }
+
+  try {
+    // Run npm install to install the template and its dependencies
+    console.log("Running npm install in the project directory");
+    await execa("npm", ["install", "--save-exact", "--save-dev", template], {
+      cwd: targetCwd,
+      stdio: "inherit",
+    });
+
+    // Templates should have a peerDependency on @coat/cli which could
+    // differ from the version which is currently being run.
+    // In order to run setup and sync with the correct @coat/cli version
+    // peerDependencies of the template should be retrieved and installed
+    // as devDependencies in the project
+    const templateInfo = await getTemplateInfo(targetCwd);
+    const peerDependenciesEntries = Object.entries(
+      templateInfo.peerDependencies || {}
+    );
+    if (peerDependenciesEntries.length) {
+      const peerDependencyPackages = peerDependenciesEntries.map(
+        ([packageName, packageVersion]) => `${packageName}@${packageVersion}`
+      );
+      await execa("npm", ["install", "--save-dev", ...peerDependencyPackages], {
+        cwd: targetCwd,
+        stdio: "inherit",
+      });
+    } else {
+      // TODO: Warn that templates should have a peerDependency on @coat/cli
+    }
+
+    // Write the coat manifest file
+    const coatManifest = {
+      name: projectName,
+      extends: templateInfo.name,
+    };
+    // TODO: Use the polish method of the coat JSON file type once
+    // the sync command is implemented to style the coat.json file
+    await fs.writeFile(
       path.join(targetDirectory, "coat.json"),
       `${JSON.stringify(coatManifest, null, 2)}\n`
-    ),
-  ]);
+    );
+  } catch (error) {
+    // Remove created project files and the created directory to enable the user
+    // to easily re-run the coat create command again in case
+    // this was a network issue or it should be re-run with fixed
+    // arguments.
+    //
+    // The target directory will only be removed in case it has been
+    // inferred from the project name, if it has been supplied
+    // by the user it is not removed since it might lead to data loss
+    // depending on the provided path. (e.g. when specifying ../a/b/c or
+    // an absolute path as the target directory it should be up to the
+    // user to decide what happens with intermediate directories which might
+    // have been created
+    if (targetDirectoryIsInferred) {
+      await fsExtra.remove(targetCwd);
+    } else {
+      // If the target directory has been specified from the user
+      // it should still be cleaned out to allow the user to run
+      // coat create again without throwing an error due to
+      // existing files in the target directory.
+      // This operation is safe until the check for existing files
+      // above is in place. In case that check gets removed, cleaning
+      // out the target directory should be re-evaluated.
+      await fsExtra.emptyDir(targetCwd);
+    }
 
-  const targetCwd = path.join(process.cwd(), targetDirectory);
-  // Run npm install to install the template and its dependencies
-  // in the target folder to be able to run the setup & sync commands.
-  console.log("Running npm install in the project directory");
-  await execa("npm", ["install"], {
-    cwd: targetCwd,
-    stdio: "inherit",
-  });
+    // Re-throw error to provide feedback to the user
+    throw error;
+  }
 
   // Run setup and sync commands in the project directory
-  await setup(targetCwd);
-  await sync(targetCwd);
+  //
+  // Check whether @coat/cli is installed locally in the project
+  const localCoatVersionTask = await execa(
+    "npx",
+    ["--no-install", "coat", "--version"],
+    { cwd: targetCwd, reject: false }
+  );
+  if (localCoatVersionTask.exitCode === 0) {
+    // Log a message if the locally installed coat version differs
+    // from the current version in case an error occurs to make
+    // potential troubleshooting more straightforward
+    const localCoatVersion = localCoatVersionTask.stdout;
+    if (localCoatVersion !== COAT_CLI_VERSION) {
+      console.log(
+        "Running coat setup and coat sync with @coat/cli version %s",
+        localCoatVersion
+      );
+    }
+
+    await execa("npx", ["--no-install", "coat", "setup"], {
+      cwd: targetCwd,
+      stdio: "inherit",
+    });
+    await execa("npx", ["--no-install", "coat", "sync"], {
+      cwd: targetCwd,
+      stdio: "inherit",
+    });
+  } else {
+    // Run setup and sync directly with the currently running
+    // @coat/cli version
+    await setup();
+    await sync();
+  }
 }
