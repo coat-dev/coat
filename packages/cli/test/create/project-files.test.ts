@@ -5,7 +5,7 @@ import { PackageJson } from "type-fest";
 import { CoatManifest } from "../../src/types/coat-manifest";
 import { cleanupTmpDirs } from "../utils/get-tmp-dir";
 
-jest.setTimeout(30000);
+jest.setTimeout(60000);
 
 afterAll(() => {
   cleanupTmpDirs();
@@ -43,37 +43,34 @@ describe("coat create - project files", () => {
       test("should add the template as a devDependency", () => {
         expect(
           packageJson.devDependencies?.["@coat/integration-test-template"]
-        ).toBe("2.0.0");
+        ).toBe("2.1.0");
       });
 
       test("should add peerDependencies as devDependencies", () => {
-        expect(packageJson.devDependencies?.["@coat/cli"]).toBe("0.0.1");
+        expect(packageJson.devDependencies?.["@coat/cli"]).toBe("0.0.2");
       });
     });
 
-    test.concurrent(
-      "should add the template with GitHub url as devDependency",
-      async () => {
-        const projectName = "project-name";
-        const { cwd, task } = runCli([
-          "create",
-          "coat-dev/cli-integration-tests-template",
-          projectName,
-        ]);
-        await task;
+    test("should add the template with GitHub url as devDependency", async () => {
+      const projectName = "project-name";
+      const { cwd, task } = runCli([
+        "create",
+        "coat-dev/cli-integration-tests-template",
+        projectName,
+      ]);
+      await task;
 
-        const packageJsonRaw = await fs.readFile(
-          path.join(cwd, projectName, "package.json"),
-          "utf8"
-        );
-        const packageJson = JSON.parse(packageJsonRaw);
-        expect(packageJson.devDependencies).toEqual({
-          "@coat/integration-test-template":
-            "github:coat-dev/cli-integration-tests-template",
-          "@coat/cli": "0.0.1",
-        });
-      }
-    );
+      const packageJsonRaw = await fs.readFile(
+        path.join(cwd, projectName, "package.json"),
+        "utf8"
+      );
+      const packageJson = JSON.parse(packageJsonRaw);
+      expect(packageJson.devDependencies).toEqual({
+        "@coat/integration-test-template":
+          "github:coat-dev/cli-integration-tests-template",
+        "@coat/cli": "0.0.2",
+      });
+    });
   });
 
   describe("coat.json", () => {
@@ -85,7 +82,7 @@ describe("coat create - project files", () => {
         const projectName = "project-name";
         const { cwd, task } = runCli([
           "create",
-          "@coat/template-ts-package",
+          "@coat/integration-test-template",
           projectName,
         ]);
         await task;
@@ -107,59 +104,50 @@ describe("coat create - project files", () => {
       });
     });
 
-    test.concurrent(
-      "should extend specified template name if no version specified",
-      async () => {
-        const { task, cwd } = runCli([
-          "create",
-          "@coat/template-ts-package",
-          "project-name",
-        ]);
-        await task;
-        const coatManifestRaw = await fs.readFile(
-          path.join(cwd, "project-name", "coat.json"),
-          "utf8"
-        );
-        const coatManifest = JSON.parse(coatManifestRaw);
-        expect(coatManifest.extends).toBe("@coat/template-ts-package");
-      }
-    );
+    test("should extend specified template name if no version specified", async () => {
+      const { task, cwd } = runCli([
+        "create",
+        "@coat/integration-test-template",
+        "project-name",
+      ]);
+      await task;
+      const coatManifestRaw = await fs.readFile(
+        path.join(cwd, "project-name", "coat.json"),
+        "utf8"
+      );
+      const coatManifest = JSON.parse(coatManifestRaw);
+      expect(coatManifest.extends).toBe("@coat/integration-test-template");
+    });
 
-    test.concurrent(
-      "should extend template base name if a version is specified",
-      async () => {
-        const { task, cwd } = runCli([
-          "create",
-          "@coat/template-ts-package@0.0.1",
-          "project-name",
-        ]);
-        await task;
-        const coatManifestRaw = await fs.readFile(
-          path.join(cwd, "project-name", "coat.json"),
-          "utf8"
-        );
-        const coatManifest = JSON.parse(coatManifestRaw);
-        expect(coatManifest.extends).toBe("@coat/template-ts-package");
-      }
-    );
+    test("should extend template base name if a version is specified", async () => {
+      const { task, cwd } = runCli([
+        "create",
+        "@coat/integration-test-template@2.1.0",
+        "project-name",
+      ]);
+      await task;
+      const coatManifestRaw = await fs.readFile(
+        path.join(cwd, "project-name", "coat.json"),
+        "utf8"
+      );
+      const coatManifest = JSON.parse(coatManifestRaw);
+      expect(coatManifest.extends).toBe("@coat/integration-test-template");
+    });
 
-    test.concurrent(
-      "should extend template name from package.json if GitHub URL is specified",
-      async () => {
-        const { task, cwd } = runCli([
-          "create",
-          "coat-dev/cli-integration-tests-template",
-          "project-name",
-        ]);
-        await task;
-        const coatManifestRaw = await fs.readFile(
-          path.join(cwd, "project-name", "coat.json"),
-          "utf8"
-        );
-        const coatManifest = JSON.parse(coatManifestRaw);
-        expect(coatManifest.extends).toBe("@coat/integration-test-template");
-      }
-    );
+    test("should extend template name from package.json if GitHub URL is specified", async () => {
+      const { task, cwd } = runCli([
+        "create",
+        "coat-dev/cli-integration-tests-template",
+        "project-name",
+      ]);
+      await task;
+      const coatManifestRaw = await fs.readFile(
+        path.join(cwd, "project-name", "coat.json"),
+        "utf8"
+      );
+      const coatManifest = JSON.parse(coatManifestRaw);
+      expect(coatManifest.extends).toBe("@coat/integration-test-template");
+    });
   });
 
   describe("other files", () => {
@@ -169,7 +157,7 @@ describe("coat create - project files", () => {
       const projectName = "project-name";
       const { cwd, task } = runCli([
         "create",
-        "@coat/template-ts-package",
+        "@coat/integration-test-template",
         projectName,
       ]);
       await task;
