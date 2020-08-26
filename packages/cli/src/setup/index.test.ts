@@ -2,7 +2,7 @@ import { setup } from ".";
 
 describe("setup", () => {
   test("TODO", async () => {
-    // TODO!
+    // TODO: See #8
     await setup();
   });
 });

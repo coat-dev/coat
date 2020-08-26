@@ -20,7 +20,8 @@
       "📦 @coat/template-ts-package"
     ],
     "jest.enableCodeLens": false,
-    "task.quickOpen.history": 0
+    "task.quickOpen.history": 0,
+    "typescript.tsdk": "📦 @coat/cli/node_modules/typescript/lib"
   },
   "extensions": {
     "recommendations": [

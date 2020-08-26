@@ -262,18 +262,18 @@ describe("create", () => {
     );
 
     test.each`
-      name       | fn
-      ${"setup"} | ${setup}
-      ${"sync"}  | ${sync}
+      name       | fn       | args
+      ${"setup"} | ${setup} | ${undefined}
+      ${"sync"}  | ${sync}  | ${"/absolute/test/path/project-name"}
     `(
       "should call the coat $name function directly if the local @coat/cli package doesn't exist",
-      async ({ fn }) => {
+      async ({ args, fn }) => {
         fn.mockClear();
-        execaMock.mockImplementation((cmd, args) => {
+        execaMock.mockImplementation((cmd, innerArgs) => {
           if (
             cmd === "npx" &&
-            args.includes("coat") &&
-            args.includes("--version")
+            innerArgs.includes("coat") &&
+            innerArgs.includes("--version")
           ) {
             return {
               exitCode: 1,
@@ -285,9 +285,17 @@ describe("create", () => {
           };
         });
 
-        await create("template", "project-name");
+        await create(
+          "template",
+          "project-name",
+          "/absolute/test/path/project-name"
+        );
         expect(fn).toHaveBeenCalledTimes(1);
-        expect(fn).toHaveBeenCalledWith();
+        if (args) {
+          expect(fn).toHaveBeenCalledWith(args);
+        } else {
+          expect(fn).toHaveBeenCalledWith();
+        }
       }
     );
   });

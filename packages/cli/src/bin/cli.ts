@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { Command, CommandConstructor } from "commander";
-import { create } from "../create";
 import { COAT_CLI_VERSION } from "../constants";
+import { create } from "../create";
+import { sync } from "../sync";
 
 export function createProgram(): InstanceType<CommandConstructor> {
   const program = new Command("coat");
@@ -16,6 +17,17 @@ export function createProgram(): InstanceType<CommandConstructor> {
     )
     .action(create);
 
+  program
+    .command("sync")
+    .description("Generates all files of the current coat project.")
+    .helpOption(
+      undefined,
+      '\n\nGathers all files of the extended templates, merges them and places them in the project directory.\n\nGenerated files can be extended by placing a file next to it with the "-custom.js" suffix and exporting a function that returns the customized content.'
+    )
+    .action(async () => {
+      await sync(process.cwd());
+    });
+
   return program;
 }
 
@@ -25,6 +37,9 @@ export function createProgram(): InstanceType<CommandConstructor> {
 // Integration tests in /tests will run this code
 // since they spawn a new process which requires
 // this file as the main module
+//
+// TODO: See #14
+// Run local version of coat if installed in a project
 /* istanbul ignore next */
 if (require.main === module) {
   createProgram()

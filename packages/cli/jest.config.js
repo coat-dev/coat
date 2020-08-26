@@ -1,4 +1,7 @@
-const sharedConfig = {};
+const sharedConfig = {
+  testEnvironment: "node",
+  testRunner: "jest-circus/runner",
+};
 
 const unitTestsProject = {
   ...sharedConfig,
@@ -27,4 +30,14 @@ module.exports = {
   collectCoverage: true,
   collectCoverageFrom: ["src/**/*.ts", "!src/**/*.test.ts"],
   coverageReporters: ["text"],
+
+  // Workaround to test integration tests
+  // with VSCode test explorer jest test adapter:
+  //
+  // globalSetup and globalTeardown are only considered
+  // if they are top-level properties and not inside projects.
+  // In order to test the integration tests with these extensions
+  // uncomment these lines below:
+  // globalSetup: "./test/utils/integration-setup.ts",
+  // globalTeardown: "./test/utils/integration-teardown.ts",
 };

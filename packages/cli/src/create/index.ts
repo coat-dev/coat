@@ -6,7 +6,12 @@ import { setup } from "../setup";
 import { sync } from "../sync";
 import { getProjectName } from "./get-project-name";
 import { getTemplateInfo } from "./get-template-info";
-import { COAT_CLI_VERSION } from "../constants";
+import {
+  COAT_CLI_VERSION,
+  PACKAGE_JSON_FILENAME,
+  COAT_MANIFEST_FILENAME,
+} from "../constants";
+import { polish as jsonPolish } from "../file-types/json";
 
 export async function create(
   template: string,
@@ -53,7 +58,7 @@ export async function create(
   // Create the package.json file inside the
   // target directory.
   await fs.writeFile(
-    path.join(targetDirectory, "package.json"),
+    path.join(targetDirectory, PACKAGE_JSON_FILENAME),
     // package.json does not need to be styled, since npm
     // will alter and format it while installing dependencies
     JSON.stringify(packageJson)
@@ -92,7 +97,8 @@ export async function create(
         stdio: "inherit",
       });
     } else {
-      // TODO: Warn that templates should have a peerDependency on @coat/cli
+      // TODO: See #15
+      // Warn that templates should have a peerDependency on @coat/cli
     }
 
     // Write the coat manifest file
@@ -100,11 +106,9 @@ export async function create(
       name: projectName,
       extends: templateInfo.name,
     };
-    // TODO: Use the polish method of the coat JSON file type once
-    // the sync command is implemented to style the coat.json file
     await fs.writeFile(
-      path.join(targetDirectory, "coat.json"),
-      `${JSON.stringify(coatManifest, null, 2)}\n`
+      path.join(targetDirectory, COAT_MANIFEST_FILENAME),
+      jsonPolish(coatManifest, COAT_MANIFEST_FILENAME)
     );
   } catch (error) {
     // Remove created project files and the created directory to enable the user
@@ -168,6 +172,7 @@ export async function create(
     // Run setup and sync directly with the currently running
     // @coat/cli version
     await setup();
-    await sync();
+
+    await sync(targetCwd);
   }
 }
