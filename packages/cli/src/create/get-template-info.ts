@@ -2,6 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import importFrom from "import-from";
 import { PackageJson } from "type-fest";
+import { PACKAGE_JSON_FILENAME } from "../constants";
 
 // Retrieves the package.json of a freshly installed
 // template in a project folder. This function should
@@ -9,9 +10,8 @@ import { PackageJson } from "type-fest";
 // devDependency, since that dependency is assumed to be the
 // template of the coat project
 export async function getTemplateInfo(cwd: string): Promise<PackageJson> {
-  const packageJsonFileName = "package.json";
   // Retrieve the template from package.json
-  const projectPackageJsonPath = path.join(cwd, packageJsonFileName);
+  const projectPackageJsonPath = path.join(cwd, PACKAGE_JSON_FILENAME);
   const projectPackageJsonRaw = await fs.readFile(
     projectPackageJsonPath,
     "utf8"
@@ -27,6 +27,6 @@ export async function getTemplateInfo(cwd: string): Promise<PackageJson> {
   // Import the package.json file of the template package
   return importFrom(
     cwd,
-    `${templatePackageName}/${packageJsonFileName}`
+    `${templatePackageName}/${PACKAGE_JSON_FILENAME}`
   ) as PackageJson;
 }

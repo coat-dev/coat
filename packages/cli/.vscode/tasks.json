@@ -33,6 +33,41 @@
       "label": "Lint",
       "dependsOn": ["Lint (tsc)", "Lint (eslint)"],
       "problemMatcher": []
+    },
+    {
+      "label": "Build (Watch)",
+      "dependsOn": ["Build (Watch typedefs)", "Build (Watch babel)"],
+      "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "watch-build:babel",
+      "problemMatcher": [],
+      "label": "Build (Watch babel)",
+      "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "isBackground": true
+    },
+    {
+      "type": "npm",
+      "script": "watch-build:typedefs",
+      "problemMatcher": ["$tsc-watch"],
+      "label": "Build (Watch typedefs)",
+      "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "isBackground": true
     }
   ]
 }

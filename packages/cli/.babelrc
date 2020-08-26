@@ -9,5 +9,11 @@
         }
       }
     ]
-  ]
+  ],
+  "sourceMaps": "both",
+  "env": {
+    "production": {
+      "sourceMaps": false
+    }
+  }
 }

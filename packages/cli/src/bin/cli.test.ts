@@ -1,8 +1,9 @@
 import { version } from "../../package.json";
 import { createProgram } from "./cli";
 import { create } from "../create";
+import { sync } from "../sync";
 
-jest.mock("../create");
+jest.mock("../create").mock("../sync");
 
 describe("coat cli", () => {
   test("should print out version", async () => {
@@ -42,4 +43,14 @@ describe("coat cli", () => {
       expect(create).toHaveBeenCalledWith(...args, {});
     }
   );
+
+  test("should call sync function with current working directory", async () => {
+    jest.spyOn(process, "cwd").mockImplementationOnce(() => "mock-cwd");
+    const program = createProgram();
+
+    await program.parseAsync(["sync"], { from: "user" });
+
+    expect(sync).toHaveBeenCalledTimes(1);
+    expect(sync).toHaveBeenLastCalledWith("mock-cwd");
+  });
 });

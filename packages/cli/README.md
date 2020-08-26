@@ -1,3 +1,3 @@
 # @coat/cli
 
-TODO
+TODO: See #3

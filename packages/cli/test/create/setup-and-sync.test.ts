@@ -22,7 +22,7 @@ describe("coat create - setup & sync", () => {
       expect(result.stdout).toContain("[MOCK CLI] called with: setup");
     });
 
-    // Add test once setup functionality is added (see #8)
+    // Add test once setup functionality is added (See #8)
     test.todo(
       "should run setup directly if @coat/cli was not installed in the package"
     );

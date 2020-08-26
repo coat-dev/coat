@@ -2,7 +2,7 @@ import path from "path";
 import execa from "execa";
 import { getTmpDir } from "./get-tmp-dir";
 
-interface RunCliResult {
+export interface RunCliResult {
   task: execa.ExecaChildProcess<string>;
   cwd: string;
 }
