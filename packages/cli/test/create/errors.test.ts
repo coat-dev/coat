@@ -3,7 +3,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { getTmpDir, cleanupTmpDirs } from "../utils/get-tmp-dir";
 
-jest.setTimeout(60000);
+jest.setTimeout(120000);
 
 afterAll(() => {
   cleanupTmpDirs();

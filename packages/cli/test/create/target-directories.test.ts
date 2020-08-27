@@ -4,7 +4,7 @@ import { runCli } from "../utils/run-cli";
 import { getTmpDir, cleanupTmpDirs } from "../utils/get-tmp-dir";
 import { enterPrompts, KeyboardInput } from "../utils/enter-prompts";
 
-jest.setTimeout(60000);
+jest.setTimeout(120000);
 
 afterAll(() => {
   cleanupTmpDirs();

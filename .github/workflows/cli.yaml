@@ -4,7 +4,7 @@ on: push
 jobs:
   build:
     name: Lint, Test & Build
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
@@ -15,7 +15,7 @@ jobs:
         run: npm run lint
         working-directory: ./packages/cli
       - name: Test
-        run: npm test
+        run: npm test -- --ci --no-cache --runInBand
         working-directory: ./packages/cli
       - name: Build
         # The pack command does currently not allow to specify an output filename,
@@ -49,5 +49,5 @@ jobs:
           npm ci
           npx --no-install lerna bootstrap
       - name: Run all tests
-        run: npm run test:all
+        run: npm run test:all -- --ci --no-cache --runInBand
         working-directory: ./packages/cli

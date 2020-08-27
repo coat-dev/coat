@@ -9,7 +9,7 @@ import execa from "execa";
 import { getPackageVersion } from "../utils/get-package-version";
 import { runCli } from "../utils/run-cli";
 
-jest.setTimeout(60000);
+jest.setTimeout(120000);
 
 afterAll(() => {
   cleanupTmpDirs();

@@ -5,7 +5,7 @@ import { PackageJson } from "type-fest";
 import { CoatManifest } from "../../src/types/coat-manifest";
 import { cleanupTmpDirs } from "../utils/get-tmp-dir";
 
-jest.setTimeout(60000);
+jest.setTimeout(120000);
 
 afterAll(() => {
   cleanupTmpDirs();

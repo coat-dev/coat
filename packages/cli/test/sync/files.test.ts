@@ -8,7 +8,7 @@ import {
   CoatManifestFileContentTypesMap,
 } from "../../src/types/coat-manifest-file";
 
-jest.setTimeout(60000);
+jest.setTimeout(120000);
 
 afterAll(() => {
   cleanupTmpDirs();

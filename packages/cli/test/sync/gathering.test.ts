@@ -8,7 +8,7 @@ import { runCli } from "../utils/run-cli";
 import execa from "execa";
 import fromPairs from "lodash/fromPairs";
 
-jest.setTimeout(60000);
+jest.setTimeout(120000);
 
 afterAll(() => {
   cleanupTmpDirs();
