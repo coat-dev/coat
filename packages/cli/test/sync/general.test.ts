@@ -6,6 +6,8 @@ import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
 import { PACKAGE_JSON_FILENAME } from "../../src/constants";
 import { cleanupTmpDirs } from "../utils/get-tmp-dir";
 
+jest.setTimeout(120000);
+
 afterAll(() => {
   cleanupTmpDirs();
 });
