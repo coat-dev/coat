@@ -18,6 +18,19 @@
       }
     ]
   },
+  "overrides": [
+    {
+      "files": ["**/*.test.ts"],
+      "env": {
+        "jest": true
+      },
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": {
+          "ts-expect-error": false
+        }
+      }
+    }
+  ],
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint"]
 }
