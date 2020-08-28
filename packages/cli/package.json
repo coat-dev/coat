@@ -6,7 +6,7 @@
     "coat": "./build/bin/cli.js"
   },
   "dependencies": {
-    "commander": "5.1.0",
+    "commander": "6.1.0",
     "execa": "4.0.3",
     "fs-extra": "9.0.1",
     "import-from": "3.0.0",
