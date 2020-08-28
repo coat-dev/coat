@@ -1,11 +1,4 @@
-import { cleanupTmpDirs } from "../utils/get-tmp-dir";
 import { runCli } from "../utils/run-cli";
-
-jest.setTimeout(120000);
-
-afterAll(() => {
-  cleanupTmpDirs();
-});
 
 describe("coat create - setup & sync", () => {
   describe("setup", () => {

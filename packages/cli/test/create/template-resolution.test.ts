@@ -1,13 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { runCli } from "../utils/run-cli";
-import { cleanupTmpDirs } from "../utils/get-tmp-dir";
-
-jest.setTimeout(120000);
-
-afterAll(() => {
-  cleanupTmpDirs();
-});
 
 describe("coat create - template resolution", () => {
   const defaultProjectName = "project-name";

@@ -1,13 +1,7 @@
 import { runCli } from "../utils/run-cli";
 import { promises as fs } from "fs";
 import path from "path";
-import { getTmpDir, cleanupTmpDirs } from "../utils/get-tmp-dir";
-
-jest.setTimeout(120000);
-
-afterAll(() => {
-  cleanupTmpDirs();
-});
+import { getTmpDir } from "../utils/get-tmp-dir";
 
 describe("coat create - errors", () => {
   test("should throw error if no template is specified", async () => {

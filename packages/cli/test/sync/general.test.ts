@@ -4,13 +4,6 @@ import { runSyncTest, prepareSyncTest } from "../utils/run-sync-test";
 import { runCli } from "../utils/run-cli";
 import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
 import { PACKAGE_JSON_FILENAME } from "../../src/constants";
-import { cleanupTmpDirs } from "../utils/get-tmp-dir";
-
-jest.setTimeout(120000);
-
-afterAll(() => {
-  cleanupTmpDirs();
-});
 
 describe("coat sync - general", () => {
   test("should output help text correctly", async () => {

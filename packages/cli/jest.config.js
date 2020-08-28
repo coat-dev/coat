@@ -15,6 +15,7 @@ const integrationTestsProject = {
   testPathIgnorePatterns: ["/node_modules/", "<rootDir>/src/"],
   globalSetup: "./test/utils/integration-setup.ts",
   globalTeardown: "./test/utils/integration-teardown.ts",
+  setupFilesAfterEnv: ["./test/utils/integration-setup-test-env.ts"],
 };
 
 let projectsToRun = [unitTestsProject, integrationTestsProject];
@@ -30,6 +31,7 @@ module.exports = {
   collectCoverage: true,
   collectCoverageFrom: ["src/**/*.ts", "!src/**/*.test.ts"],
   coverageReporters: ["text"],
+  verbose: true,
 
   // Workaround to test integration tests
   // with VSCode test explorer jest test adapter:

@@ -1,18 +1,11 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { cleanupTmpDirs } from "../utils/get-tmp-dir";
 import { runSyncTest, prepareSyncTest } from "../utils/run-sync-test";
 import { runCli } from "../utils/run-cli";
 import {
   CoatManifestFileType,
   CoatManifestFileContentTypesMap,
 } from "../../src/types/coat-manifest-file";
-
-jest.setTimeout(120000);
-
-afterAll(() => {
-  cleanupTmpDirs();
-});
 
 describe("coat sync - files", () => {
   const testPackagesPath = path.join(__dirname, "..", "utils", "test-packages");

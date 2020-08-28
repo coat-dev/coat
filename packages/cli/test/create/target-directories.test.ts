@@ -1,15 +1,9 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { runCli } from "../utils/run-cli";
-import { getTmpDir, cleanupTmpDirs } from "../utils/get-tmp-dir";
+import { getTmpDir } from "../utils/get-tmp-dir";
 import { enterPrompts, KeyboardInput } from "../utils/enter-prompts";
 import { PackageJson } from "type-fest";
-
-jest.setTimeout(120000);
-
-afterAll(() => {
-  cleanupTmpDirs();
-});
 
 describe("coat create - target directories", () => {
   const defaultTemplate = "@coat/integration-test-template@2.1.0";
