@@ -3,6 +3,7 @@ import path from "path";
 import { runCli } from "../utils/run-cli";
 import { getTmpDir, cleanupTmpDirs } from "../utils/get-tmp-dir";
 import { enterPrompts, KeyboardInput } from "../utils/enter-prompts";
+import { PackageJson } from "type-fest";
 
 jest.setTimeout(120000);
 
@@ -24,8 +25,8 @@ describe("coat create - target directories", () => {
   defaultEntries.sort();
   function createPackageJsonResult(
     projectName: string,
-    devDependencies: object
-  ): object {
+    devDependencies: Record<string, string>
+  ): PackageJson {
     return {
       name: projectName,
       version: "1.0.0",
