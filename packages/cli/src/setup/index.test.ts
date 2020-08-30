@@ -1,8 +1,7 @@
 import { setup } from ".";
 
 describe("setup", () => {
-  test("TODO", async () => {
-    // TODO: See #8
+  test.todo("See #8", async () => {
     await setup();
   });
 });

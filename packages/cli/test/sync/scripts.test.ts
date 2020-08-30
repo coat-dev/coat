@@ -1,15 +1,10 @@
 import { promises as fs } from "fs";
 import path from "path";
 import fsExtra from "fs-extra";
-import { cleanupTmpDirs } from "../utils/get-tmp-dir";
 import { runSyncTest, prepareSyncTest } from "../utils/run-sync-test";
 import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
 import { PACKAGE_JSON_FILENAME } from "../../src/constants";
 import { runCli } from "../utils/run-cli";
-
-afterAll(() => {
-  cleanupTmpDirs();
-});
 
 describe("coat sync - scripts", () => {
   test("should work with a template with an empty scripts entry", async () => {

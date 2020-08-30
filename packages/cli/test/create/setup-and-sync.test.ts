@@ -16,9 +16,9 @@ describe("coat create - setup & sync", () => {
     });
 
     // Add test once setup functionality is added (See #8)
-    test.todo(
-      "should run setup directly if @coat/cli was not installed in the package"
-    );
+    test.todo(`See #8
+      should run setup directly if @coat/cli was not installed in the package
+    `);
   });
 
   describe("sync", () => {
@@ -36,8 +36,8 @@ describe("coat create - setup & sync", () => {
     });
 
     // Add test once setup functionality is added (see #5)
-    test.todo(
-      "should run sync directly if @coat/cli was not installed in the package"
-    );
+    test.todo(`See #5
+      should run sync directly if @coat/cli was not installed in the package
+    `);
   });
 });

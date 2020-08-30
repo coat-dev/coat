@@ -46,6 +46,7 @@ describe("coat sync - files", () => {
         "b.txt",
         "c.txt",
         "coat.json",
+        "coat.lock",
         "package.json",
       ]
     `);

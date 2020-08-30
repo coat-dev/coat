@@ -11,6 +11,7 @@ describe("util/get-normalized-file-path", () => {
         name: "hi",
       }),
       packageJson: {},
+      coatLockfile: undefined,
     };
   }
 

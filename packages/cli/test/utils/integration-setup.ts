@@ -1,7 +1,7 @@
 import path from "path";
 import execa from "execa";
+import tmp from "tmp";
 import { version } from "../../package.json";
-import { getTmpDir } from "./get-tmp-dir";
 
 // Packs and installs the cli in
 // a temporary directory in order to run
@@ -10,7 +10,7 @@ import { getTmpDir } from "./get-tmp-dir";
 // environment
 export default async (): Promise<void> => {
   const packageRootDir = path.join(__dirname, "..", "..");
-  const tmpDir = getTmpDir();
+  const tmpDir = tmp.dirSync({ unsafeCleanup: true }).name;
 
   // Build and pack package
   console.log("\nPackaging @coat/cli");

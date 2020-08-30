@@ -15,6 +15,7 @@ describe("sync/polish-files", () => {
       name: "test",
     }),
     packageJson: {},
+    coatLockfile: undefined,
   };
 
   test("should throw an error for unknown file types", () => {
