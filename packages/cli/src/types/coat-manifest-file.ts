@@ -3,11 +3,13 @@ import { JsonObject, ValueOf } from "type-fest";
 export enum CoatManifestFileType {
   Json = "JSON",
   Text = "TEXT",
+  Yaml = "YAML",
 }
 
 export interface CoatManifestFileContentTypesMap {
   [CoatManifestFileType.Json]: JsonObject;
   [CoatManifestFileType.Text]: string;
+  [CoatManifestFileType.Yaml]: JsonObject;
 }
 
 export type CoatManifestFileContentType = ValueOf<
