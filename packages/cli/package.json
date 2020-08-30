@@ -69,6 +69,7 @@
     "test:all": "jest",
     "watch-build": "run-p watch-build:*",
     "watch-build:babel": "npm run build:babel -- --watch",
-    "watch-build:typedefs": "npm run build:typedefs -- --watch"
+    "watch-build:typedefs": "npm run build:typedefs -- --watch",
+    "watch-lint:tsc": "npm run lint:tsc -- --watch"
   }
 }
