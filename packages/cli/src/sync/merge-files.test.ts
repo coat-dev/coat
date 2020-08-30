@@ -520,4 +520,77 @@ describe("sync/merge-files", () => {
       ]);
     });
   });
+
+  describe("yaml files", () => {
+    test("should merge multiple yaml files", async () => {
+      const files: CoatManifestFile[][] = [
+        [
+          {
+            type: CoatManifestFileType.Yaml,
+            content: {
+              firstProp: true,
+            },
+            file: "file.yaml",
+          },
+          {
+            type: CoatManifestFileType.Yaml,
+            content: {
+              secondProp: {
+                second: true,
+              },
+            },
+            file: "file.yaml",
+          },
+        ],
+        [
+          {
+            type: CoatManifestFileType.Yaml,
+            content: {
+              firstProp: false,
+              thirdProp: [1, 2, 3],
+            },
+            file: "folder-1/../file.yaml",
+          },
+        ],
+      ];
+      const result = await mergeFiles(files, testContext);
+      expect(result).toEqual([
+        {
+          type: CoatManifestFileType.Yaml,
+          file: path.join(testCwd, "file.yaml"),
+          content: {
+            firstProp: false,
+            secondProp: {
+              second: true,
+            },
+            thirdProp: [1, 2, 3],
+          },
+        },
+      ]);
+    });
+
+    test("should merge value from customization file into resulting file", async () => {
+      importFromMock.mockImplementationOnce(() => ({ customProp: true }));
+      const files: CoatManifestFile[][] = [
+        [
+          {
+            type: CoatManifestFileType.Yaml,
+            content: { firstProp: true },
+            file: "file.yaml",
+          },
+        ],
+      ];
+      // Place empty file to trick mergeFiles into believing a customization file exists
+      await fsExtra.outputFile("/test-cwd/file.yaml-custom.js", "");
+
+      const result = await mergeFiles(files, testContext);
+      expect(result).toEqual([
+        {
+          file: path.join("/test-cwd", "file.yaml"),
+          type: CoatManifestFileType.Yaml,
+          content: { firstProp: true, customProp: true },
+        },
+      ]);
+    });
+  });
 });

@@ -269,7 +269,9 @@ describe("sync/polish-files", () => {
         a: 1,
       };
       const formatSpy = jest.fn(() => "formatted");
-      importFromSilentMock.mockImplementation(() => ({ format: formatSpy }));
+      importFromSilentMock.mockImplementationOnce(() => ({
+        format: formatSpy,
+      }));
       const polished = polishFiles(
         [
           {
@@ -340,6 +342,104 @@ describe("sync/polish-files", () => {
         "Text content
         "
       `);
+    });
+  });
+
+  describe("yaml", () => {
+    test("should sort properties alphabetically", () => {
+      const content = {
+        z: 1,
+        na: {
+          c: 1,
+          a: 1,
+        },
+        a: 1,
+      };
+      const polished = polishFiles(
+        [
+          {
+            content,
+            type: CoatManifestFileType.Yaml,
+            file: "name.yaml",
+          },
+        ],
+        testContext
+      );
+      expect(polished[0].content).toMatchInlineSnapshot(`
+        "a: 1
+        na:
+          a: 1
+          c: 1
+        z: 1
+        "
+      `);
+    });
+
+    test("should format files with prettier with that have non-yaml extensions", () => {
+      const content = {
+        z: 1,
+        b: {
+          c: [1, 2],
+        },
+        a: 1,
+      };
+      const polished = polishFiles(
+        [
+          {
+            content,
+            type: CoatManifestFileType.Yaml,
+            file: ".graphqlconfig",
+          },
+          {
+            content,
+            type: CoatManifestFileType.Yaml,
+            file: "file.config",
+          },
+        ],
+        testContext
+      );
+
+      expect(polished[0].content).toMatchInlineSnapshot(`
+        "a: 1
+        b:
+          c:
+            - 1
+            - 2
+        z: 1
+        "
+      `);
+      expect(polished[1].content).toMatchInlineSnapshot(`
+        "a: 1
+        b:
+          c:
+            - 1
+            - 2
+        z: 1
+        "
+      `);
+    });
+
+    test("should use local prettier version if available", () => {
+      const content = {
+        a: 1,
+      };
+      const formatSpy = jest.fn(() => "formatted");
+      importFromSilentMock.mockImplementationOnce(() => ({
+        format: formatSpy,
+      }));
+      const polished = polishFiles(
+        [
+          {
+            content,
+            file: "file.yaml",
+            type: CoatManifestFileType.Yaml,
+          },
+        ],
+        testContext
+      );
+      expect(polished[0].content).toMatchInlineSnapshot(`"formatted"`);
+
+      expect(formatSpy).toHaveBeenCalledTimes(1);
     });
   });
 });

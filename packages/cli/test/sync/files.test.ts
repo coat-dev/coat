@@ -260,6 +260,16 @@ describe("coat sync - files", () => {
         ],
       },
       [CoatManifestFileType.Text]: "Some Text",
+      [CoatManifestFileType.Yaml]: {
+        bool: true,
+        "short array": [1, 2, 3],
+        "long array": [
+          { x: 1, y: 2 },
+          { x: 2, y: 1 },
+          { x: 1, y: 1 },
+          { x: 2, y: 2 },
+        ],
+      },
     };
 
     const { task, cwd } = await runSyncTest({
@@ -281,15 +291,21 @@ describe("coat sync - files", () => {
             content: "Text with multiple trailing newlines\n\n\n",
             type: CoatManifestFileType.Text,
           },
+          {
+            file: "d.yaml",
+            content: files[CoatManifestFileType.Yaml],
+            type: CoatManifestFileType.Yaml,
+          },
         ],
       },
     });
     await task;
 
-    const [aJson, bTxt, cTxt] = await Promise.all([
+    const [aJson, bTxt, cTxt, dYaml] = await Promise.all([
       fs.readFile(path.join(cwd, "a.json"), "utf8"),
       fs.readFile(path.join(cwd, "b.txt"), "utf8"),
       fs.readFile(path.join(cwd, "c.txt"), "utf8"),
+      fs.readFile(path.join(cwd, "d.yaml"), "utf8"),
     ]);
 
     // JSON files are formatted via prettier
@@ -326,6 +342,25 @@ describe("coat sync - files", () => {
     `);
     expect(cTxt).toMatchInlineSnapshot(`
       "Text with multiple trailing newlines
+      "
+    `);
+
+    // YAML files are formatted via prettier
+    expect(dYaml).toMatchInlineSnapshot(`
+      "bool: true
+      long array:
+        - x: 1
+          \\"y\\": 2
+        - x: 2
+          \\"y\\": 1
+        - x: 1
+          \\"y\\": 1
+        - x: 2
+          \\"y\\": 2
+      short array:
+        - 1
+        - 2
+        - 3
       "
     `);
   });

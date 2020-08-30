@@ -7,6 +7,7 @@ import {
 import { jsonFileFunctions } from "./json";
 import { CoatContext } from "../types/coat-context";
 import { textFileFunctions } from "./text";
+import { yamlFileFunctions } from "./yaml";
 
 export interface FileTypeFunctions<ContentType> {
   merge: (
@@ -29,6 +30,7 @@ type FileTypeRegistry = {
 const fileTypeRegistry: FileTypeRegistry = {
   [CoatManifestFileType.Json]: jsonFileFunctions,
   [CoatManifestFileType.Text]: textFileFunctions,
+  [CoatManifestFileType.Yaml]: yamlFileFunctions,
 };
 
 /**

@@ -2,13 +2,12 @@ import mergeWith from "lodash/mergeWith";
 import uniqWith from "lodash/uniqWith";
 import isEqual from "lodash/isEqual";
 import jsonStableStringify from "json-stable-stringify";
-import importFrom from "import-from";
-import prettierFromCoat from "prettier";
 import { JsonObject } from "type-fest";
 import { FileTypeFunctions } from ".";
 import { CoatContext } from "../types/coat-context";
+import { getPrettier } from "../util/get-prettier";
 
-function merge(
+export function merge(
   source: JsonObject | null | undefined,
   target: JsonObject
 ): JsonObject | null {
@@ -49,19 +48,7 @@ export function polish(
   }
 
   // Format with prettier
-  //
-  // Use whether local prettier version if it exists
-  let prettier = prettierFromCoat;
-  if (context) {
-    const prettierLocal = importFrom.silent(context.cwd, "prettier") as
-      | typeof prettierFromCoat
-      | undefined;
-    if (prettierLocal) {
-      prettier = prettierLocal;
-    }
-  }
-
-  return prettier.format(sortedContent, {
+  return getPrettier(context).format(sortedContent, {
     // Add .json extension to infer json parser in prettier
     // since files might have different extensions
     // (e.g. .babelrc, file.config, etc.)
