@@ -1,4 +1,4 @@
-import { promises as fs } from "fs";
+import fs from "fs-extra";
 import path from "path";
 import execa from "execa";
 import flatten from "lodash/flatten";
@@ -320,5 +320,53 @@ describe("sync", () => {
       // Ignore error
     }
     expect(execa).not.toHaveBeenCalled();
+  });
+
+  test("should delete files that are no longer managed", async () => {
+    const unmanagedFilePath = "unmanaged-path-1.json";
+    getContextMock.mockImplementationOnce(() => ({
+      cwd: testCwd,
+      coatManifest,
+      packageJson,
+      coatLockfile: {
+        version: 1,
+        files: [
+          {
+            path: unmanagedFilePath,
+          },
+        ],
+      },
+    }));
+    // Place file to delete on test file system
+    await fs.outputFile(path.join(testCwd, unmanagedFilePath), "");
+
+    const folderContentBeforeSync = await fs.readdir(testCwd);
+    expect(folderContentBeforeSync).toContain(unmanagedFilePath);
+
+    await sync(testCwd);
+
+    const folderContentAfterSync = await fs.readdir(testCwd);
+    expect(folderContentAfterSync).not.toContain(unmanagedFilePath);
+  });
+
+  test("should not throw any errors if files that are no longer managed have already been deleted", async () => {
+    const unmanagedFilePath = "unmanaged-path-1.json";
+    getContextMock.mockImplementationOnce(() => ({
+      cwd: testCwd,
+      coatManifest,
+      packageJson,
+      coatLockfile: {
+        version: 1,
+        files: [
+          {
+            path: unmanagedFilePath,
+          },
+        ],
+      },
+    }));
+    await sync(testCwd);
+
+    const folderContentAfterSync = await fs.readdir(testCwd);
+    expect(folderContentAfterSync).not.toContain(unmanagedFilePath);
   });
 });

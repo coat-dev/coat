@@ -18,6 +18,8 @@ import isEqual from "lodash/isEqual";
 import { CoatManifestStrict } from "../types/coat-manifest";
 import { getNormalizedFilePath } from "../util/get-normalized-file-path";
 import { generateLockfile } from "../util/generate-lockfile";
+import { getUnmanagedFiles } from "./get-unmanaged-files";
+import { deleteFile } from "../util/delete-file";
 
 export async function sync(cwd: string): Promise<void> {
   // Get coat manifest from cwd
@@ -96,9 +98,14 @@ export async function sync(cwd: string): Promise<void> {
   ];
 
   const polishedFiles = polishFiles(filesToPolish, context);
+  const filesToRemove = getUnmanagedFiles(newLockfile, context);
+
+  await Promise.all([
     // Use fs.outputFile to automatically create any missing directories
-    polishedFiles.map((file) => fs.outputFile(file.file, file.content))
-  );
+    ...polishedFiles.map((file) => fs.outputFile(file.file, file.content)),
+    // Remove files that are no longer managed by coat
+    ...filesToRemove.map(deleteFile),
+  ]);
 
   // Retrieve dependencies after merging to run npm install if they have changed
   //
