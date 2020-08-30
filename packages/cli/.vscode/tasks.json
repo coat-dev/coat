@@ -3,9 +3,9 @@
   "tasks": [
     {
       "type": "npm",
-      "script": "lint:tsc",
-      "problemMatcher": ["$tsc"],
-      "label": "Lint (tsc)",
+      "script": "watch-lint:tsc",
+      "problemMatcher": ["$tsc-watch"],
+      "label": "Lint (tsc Watch)",
       "presentation": {
         "echo": true,
         "reveal": "never",
@@ -13,7 +13,8 @@
         "panel": "shared",
         "showReuseMessage": true,
         "clear": false
-      }
+      },
+      "isBackground": true
     },
     {
       "type": "npm",
@@ -30,11 +31,6 @@
       }
     },
     {
-      "label": "Lint",
-      "dependsOn": ["Lint (tsc)", "Lint (eslint)"],
-      "problemMatcher": []
-    },
-    {
       "label": "Build (Watch)",
       "dependsOn": ["Build (Watch typedefs)", "Build (Watch babel)"],
       "problemMatcher": []
@@ -43,6 +39,11 @@
       "type": "npm",
       "script": "watch-build:babel",
       "problemMatcher": [],
+      "options": {
+        "env": {
+          "NODE_ENV": "development"
+        }
+      },
       "label": "Build (Watch babel)",
       "presentation": {
         "echo": true,
