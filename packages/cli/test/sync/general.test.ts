@@ -1,6 +1,6 @@
 import path from "path";
 import { promises as fs } from "fs";
-import { runSyncTest, prepareSyncTest } from "../utils/run-sync-test";
+import { runSyncTest, prepareCliTest } from "../utils/run-cli-test";
 import { runCli } from "../utils/run-cli";
 import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
 import { PACKAGE_JSON_FILENAME } from "../../src/constants";
@@ -32,7 +32,7 @@ describe("coat sync - general", () => {
 
   test("should not run sync when help function is called", async () => {
     const testFile = "test.json";
-    const tmpDir = await prepareSyncTest({
+    const tmpDir = await prepareCliTest({
       coatManifest: {
         name: "test-project",
         files: [

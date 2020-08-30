@@ -1,7 +1,7 @@
 import jsonStableStringify from "json-stable-stringify";
 import yaml from "js-yaml";
 import { JsonObject } from "type-fest";
-import { merge } from "./json";
+import { jsonFileFunctions } from "./json";
 import { FileTypeFunctions } from ".";
 import { CoatContext } from "../types/coat-context";
 import { getPrettier } from "../util/get-prettier";
@@ -9,7 +9,7 @@ import { getPrettier } from "../util/get-prettier";
 function polish(
   source: JsonObject,
   filePath: string,
-  context?: CoatContext
+  context: CoatContext
 ): string {
   // Sort properties
   const sortedJsonContent = jsonStableStringify(source);
@@ -27,6 +27,6 @@ function polish(
 
 export const yamlFileFunctions: FileTypeFunctions<JsonObject> = {
   // Uses the same merge mechanism as JSON files
-  merge,
+  merge: jsonFileFunctions.merge,
   polish,
 };

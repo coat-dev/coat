@@ -1,6 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { prepareSyncTest, runSyncTest } from "../utils/run-sync-test";
+import { prepareCliTest, runSyncTest } from "../utils/run-cli-test";
 import {
   COAT_MANIFEST_FILENAME,
   PACKAGE_JSON_FILENAME,
@@ -11,7 +11,7 @@ import { testExceptWindows } from "../utils/test-except-windows";
 
 describe("coat sync - errors", () => {
   test("should throw an error if coat manifest is missing", async () => {
-    const tmpDir = await prepareSyncTest();
+    const tmpDir = await prepareCliTest();
     // Delete coat manifest file
     await fs.unlink(path.join(tmpDir, COAT_MANIFEST_FILENAME));
 
@@ -28,7 +28,7 @@ describe("coat sync - errors", () => {
   });
 
   test("should throw an error if package.json is missing", async () => {
-    const tmpDir = await prepareSyncTest();
+    const tmpDir = await prepareCliTest();
     // Delete package.json
     await fs.unlink(path.join(tmpDir, PACKAGE_JSON_FILENAME));
 
@@ -93,7 +93,7 @@ describe("coat sync - errors", () => {
   testExceptWindows(
     "should throw error when coat.json can't be read",
     async () => {
-      const tmpDir = await prepareSyncTest();
+      const tmpDir = await prepareCliTest();
       // Remove coat.json read permissions
       await fs.chmod(path.join(tmpDir, COAT_MANIFEST_FILENAME), "222");
 
@@ -113,7 +113,7 @@ describe("coat sync - errors", () => {
   testExceptWindows(
     "should throw error when package.json can't be read",
     async () => {
-      const tmpDir = await prepareSyncTest();
+      const tmpDir = await prepareCliTest();
       // Remove package.json read permissions
       await fs.chmod(path.join(tmpDir, PACKAGE_JSON_FILENAME), "222");
 
@@ -134,7 +134,7 @@ describe("coat sync - errors", () => {
     "should throw error when file can't be accessed due to missing read permissions for potential customization files",
     async () => {
       const fileFolderName = "some-folder";
-      const tmpDir = await prepareSyncTest({
+      const tmpDir = await prepareCliTest({
         coatManifest: {
           name: "project",
           files: [

@@ -1,5 +1,11 @@
 import { CoatManifest, CoatManifestStrict } from "../types/coat-manifest";
 
+/**
+ * Adds all missing properties to a coat manifest or template file
+ * to access these properties safely in following code.
+ *
+ * @param coatManifest The manifest file that has been read from the disk
+ */
 export function getStrictCoatManifest(
   coatManifest: CoatManifest
 ): CoatManifestStrict {
@@ -24,6 +30,7 @@ export function getStrictCoatManifest(
     files: coatManifest.files ?? [],
     dependencies: coatManifest.dependencies ?? {},
     scripts: coatManifest.scripts ?? [],
+    setup: coatManifest.setup ?? [],
   };
 
   return strictManifest;

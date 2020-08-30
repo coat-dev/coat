@@ -30,6 +30,16 @@ describe("util/get-context", () => {
       extends: [],
       files: [],
       scripts: [],
+      setup: {
+        global: {
+          tasks: [],
+          files: [],
+        },
+        local: {
+          tasks: [],
+          files: [],
+        },
+      },
     };
     const packageJson = {
       name: "hi",
@@ -75,6 +85,7 @@ describe("util/get-context", () => {
       dependencies: {},
       extends: [],
       files: [],
+      setup: [],
     });
   });
 

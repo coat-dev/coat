@@ -6,15 +6,25 @@ import importFrom from "import-from";
 import { mergeFiles } from "./merge-files";
 import { CoatContext } from "../types/coat-context";
 import { getStrictCoatManifest } from "../util/get-strict-coat-manifest";
+import { CoatManifestFileType } from "../types/coat-manifest-file";
 import {
-  CoatManifestFile,
-  CoatManifestFileType,
-} from "../types/coat-manifest-file";
+  getStrictCoatGlobalLockfile,
+  getStrictCoatLocalLockfile,
+} from "../lockfiles/get-strict-coat-lockfiles";
+import {
+  COAT_GLOBAL_LOCKFILE_VERSION,
+  COAT_LOCAL_LOCKFILE_VERSION,
+} from "../constants";
+import { groupFiles } from "./group-files";
 
 jest.mock("fs").mock("import-from");
 
 const statMock = jest.spyOn(fs.promises, "stat");
 const importFromMock = (importFrom as unknown) as jest.Mock;
+
+// Node.js 10 compatibility
+// Use Array.flatMap instead of flatten from lodash
+// once Node 10 is no longer supported
 
 describe("sync/merge-files", () => {
   afterEach(() => {
@@ -29,47 +39,51 @@ describe("sync/merge-files", () => {
       name: "hi",
     }),
     packageJson: {},
-    coatLockfile: undefined,
+    coatGlobalLockfile: getStrictCoatGlobalLockfile({
+      version: COAT_GLOBAL_LOCKFILE_VERSION,
+    }),
+    coatLocalLockfile: getStrictCoatLocalLockfile({
+      version: COAT_LOCAL_LOCKFILE_VERSION,
+    }),
   };
 
-  test("should work with empty array", async () => {
-    const files: CoatManifestFile[][] = [];
-    const result = await mergeFiles(files, testContext);
-    expect(result).toEqual([]);
-  });
-
-  test("should work with an array of empty arrays", async () => {
-    const files: CoatManifestFile[][] = [[], [], []];
-    const result = await mergeFiles(files, testContext);
+  test("should work with empty object", async () => {
+    const result = await mergeFiles({}, testContext);
     expect(result).toEqual([]);
   });
 
   test("should return single file unchanged with a normalized file path", async () => {
-    const files: CoatManifestFile[][] = [
+    const files = groupFiles(
       [
         {
+          file: "folder-1/../file.json",
           type: CoatManifestFileType.Json,
           content: {
             value: 1,
           },
-          file: "folder-1/../file.json",
+          local: false,
+          once: false,
         },
       ],
-    ];
+      testContext
+    );
     const result = await mergeFiles(files, testContext);
     expect(result).toEqual([
       {
         type: CoatManifestFileType.Json,
         file: path.join(testCwd, "file.json"),
+        relativePath: "file.json",
         content: {
           value: 1,
         },
+        once: false,
+        local: false,
       },
     ]);
   });
 
   test("should not place file if an entry exists with null for it afterwards", async () => {
-    const files: CoatManifestFile[][] = [
+    const files = groupFiles(
       [
         {
           type: CoatManifestFileType.Json,
@@ -78,22 +92,20 @@ describe("sync/merge-files", () => {
           },
           file: "path.json",
         },
-      ],
-      [],
-      [
         {
           file: "path.json",
           content: null,
           type: CoatManifestFileType.Json,
         },
       ],
-    ];
+      testContext
+    );
     const result = await mergeFiles(files, testContext);
     expect(result).toEqual([]);
   });
 
   test("should place file if an entry exists after a deleted file", async () => {
-    const files: CoatManifestFile[][] = [
+    const files = groupFiles(
       [
         {
           type: CoatManifestFileType.Json,
@@ -102,9 +114,6 @@ describe("sync/merge-files", () => {
           },
           file: "path.json",
         },
-      ],
-      [],
-      [
         {
           file: "path.json",
           content: null,
@@ -118,50 +127,21 @@ describe("sync/merge-files", () => {
           type: CoatManifestFileType.Json,
         },
       ],
-    ];
+      testContext
+    );
     const result = await mergeFiles(files, testContext);
     expect(result).toEqual([
       {
         file: path.join("/test-cwd", "path.json"),
+        relativePath: "path.json",
         type: CoatManifestFileType.Json,
         content: {
           value2: 3,
         },
+        local: false,
+        once: false,
       },
     ]);
-  });
-
-  test("should throw an error if the same file has mismatching types in entries", async () => {
-    expect.assertions(1);
-    const files: CoatManifestFile[][] = [
-      [
-        {
-          type: CoatManifestFileType.Json,
-          content: {
-            value: 1,
-          },
-          file: "path.json",
-        },
-      ],
-      [],
-      [
-        {
-          file: "path.json",
-          content: {
-            value: 5,
-          },
-          // @ts-expect-error
-          type: "Unknown",
-        },
-      ],
-    ];
-    try {
-      await mergeFiles(files, testContext);
-    } catch (error) {
-      expect(error.message).toMatchInlineSnapshot(
-        `"Mismatching file types for same file path"`
-      );
-    }
   });
 
   test("should call content function with result from previously merged file entries", async () => {
@@ -175,16 +155,13 @@ describe("sync/merge-files", () => {
       ...input,
       value3: 3,
     }));
-    const files: CoatManifestFile[][] = [
+    const files = groupFiles(
       [
         {
           type: CoatManifestFileType.Json,
           content: file1,
           file: "path.json",
         },
-      ],
-      [],
-      [
         {
           file: "path.json",
           content: file2,
@@ -196,7 +173,8 @@ describe("sync/merge-files", () => {
           type: CoatManifestFileType.Json,
         },
       ],
-    ];
+      testContext
+    );
     const result = await mergeFiles(files, testContext);
 
     expect(file1).toHaveBeenCalledTimes(1);
@@ -210,11 +188,14 @@ describe("sync/merge-files", () => {
     expect(result).toEqual([
       {
         file: path.join("/test-cwd", "path.json"),
+        relativePath: "path.json",
         type: CoatManifestFileType.Json,
         content: {
           value2: 2,
           value3: 3,
         },
+        local: false,
+        once: false,
       },
     ]);
   });
@@ -227,16 +208,13 @@ describe("sync/merge-files", () => {
       value2: 2,
     }));
     const file3 = jest.fn(() => null);
-    const files: CoatManifestFile[][] = [
+    const files = groupFiles(
       [
         {
           type: CoatManifestFileType.Json,
           content: file1,
           file: "path.json",
         },
-      ],
-      [],
-      [
         {
           file: "path.json",
           content: file2,
@@ -248,7 +226,8 @@ describe("sync/merge-files", () => {
           type: CoatManifestFileType.Json,
         },
       ],
-    ];
+      testContext
+    );
     const result = await mergeFiles(files, testContext);
 
     expect(file1).toHaveBeenCalledTimes(1);
@@ -264,7 +243,7 @@ describe("sync/merge-files", () => {
 
   test("should throw an error when trying to merge unknown file types", async () => {
     expect.assertions(1);
-    const files: CoatManifestFile[][] = [
+    const files = groupFiles(
       [
         {
           // @ts-expect-error
@@ -272,9 +251,6 @@ describe("sync/merge-files", () => {
           content: { value: 1 },
           file: "path.yml",
         },
-      ],
-      [],
-      [
         {
           file: "path.json",
           content: { value2: 2 },
@@ -282,7 +258,8 @@ describe("sync/merge-files", () => {
           type: "unknown",
         },
       ],
-    ];
+      testContext
+    );
     try {
       await mergeFiles(files, testContext);
     } catch (error) {
@@ -294,7 +271,7 @@ describe("sync/merge-files", () => {
 
   test("should throw error if customization file can't be accessed", async () => {
     expect.assertions(1);
-    const files: CoatManifestFile[][] = [
+    const files = groupFiles(
       [
         {
           type: CoatManifestFileType.Json,
@@ -304,7 +281,8 @@ describe("sync/merge-files", () => {
           file: "file.json",
         },
       ],
-    ];
+      testContext
+    );
 
     statMock.mockImplementationOnce(() => {
       throw new Error("Something went wrong");
@@ -323,7 +301,7 @@ describe("sync/merge-files", () => {
       importFromMock.mockImplementationOnce(() => null);
     }
 
-    const files: CoatManifestFile[][] = [
+    const files = groupFiles(
       [
         {
           type: CoatManifestFileType.Json,
@@ -338,7 +316,8 @@ describe("sync/merge-files", () => {
           file: "file.txt",
         },
       ],
-    ];
+      testContext
+    );
     // Place empty files to trick mergeFiles into believing a customization file exists
     await Promise.all([
       fsExtra.outputFile("/test-cwd/file.json-custom.js", ""),
@@ -349,9 +328,41 @@ describe("sync/merge-files", () => {
     expect(result).toEqual([]);
   });
 
+  test("should not apply customization file if file is only generated once", async () => {
+    const files = groupFiles(
+      [
+        {
+          type: CoatManifestFileType.Json,
+          content: {
+            firstValue: 1,
+          },
+          once: true,
+          file: "file.json",
+        },
+      ],
+      testContext
+    );
+    // Place empty file to trick mergeFiles into believing a customization file exists
+    await fsExtra.outputFile("/test-cwd/file.json-custom.js", "");
+
+    const result = await mergeFiles(files, testContext);
+    expect(result).toEqual([
+      {
+        file: path.join(testCwd, "file.json"),
+        relativePath: "file.json",
+        once: true,
+        local: false,
+        type: "JSON",
+        content: {
+          firstValue: 1,
+        },
+      },
+    ]);
+  });
+
   describe("json files", () => {
     test("should merge multiple json files", async () => {
-      const files: CoatManifestFile[][] = [
+      const files = groupFiles(
         [
           {
             type: CoatManifestFileType.Json,
@@ -372,8 +383,6 @@ describe("sync/merge-files", () => {
             },
             file: "file.json",
           },
-        ],
-        [
           {
             type: CoatManifestFileType.Json,
             content: {
@@ -381,27 +390,31 @@ describe("sync/merge-files", () => {
               value2: 2,
               value3: 1,
               valueDeep: {
-                a: [2, 6, 7],
+                a: [1, 2, 6, 7],
               },
             },
             file: "folder-1/../file.json",
           },
         ],
-      ];
+        testContext
+      );
       const result = await mergeFiles(files, testContext);
       expect(result).toEqual([
         {
           type: CoatManifestFileType.Json,
           file: path.join(testCwd, "file.json"),
+          relativePath: "file.json",
           content: {
             value: 3,
             value2: 2,
             value3: 1,
             valueDeep: {
-              a: [1, 2, 3, 6, 7],
+              a: [1, 2, 6, 7],
             },
             valueIndependent: true,
           },
+          local: false,
+          once: false,
         },
       ]);
     });
@@ -410,7 +423,7 @@ describe("sync/merge-files", () => {
       importFromMock.mockImplementationOnce(() => ({
         value2: 2,
       }));
-      const files: CoatManifestFile[][] = [
+      const files = groupFiles(
         [
           {
             type: CoatManifestFileType.Json,
@@ -420,7 +433,8 @@ describe("sync/merge-files", () => {
             file: "file.json",
           },
         ],
-      ];
+        testContext
+      );
       // Place empty file to trick mergeFiles into believing a customization file exists
       await fsExtra.outputFile("/test-cwd/file.json-custom.js", "");
 
@@ -428,11 +442,14 @@ describe("sync/merge-files", () => {
       expect(result).toEqual([
         {
           file: path.join("/test-cwd", "file.json"),
+          relativePath: "file.json",
           type: CoatManifestFileType.Json,
           content: {
             value: 1,
             value2: 2,
           },
+          once: false,
+          local: false,
         },
       ]);
     });
@@ -442,7 +459,7 @@ describe("sync/merge-files", () => {
       importFromMock.mockImplementationOnce(() => {
         throw new Error("Parsing issue");
       });
-      const files: CoatManifestFile[][] = [
+      const files = groupFiles(
         [
           {
             type: CoatManifestFileType.Json,
@@ -452,7 +469,8 @@ describe("sync/merge-files", () => {
             file: "file.json",
           },
         ],
-      ];
+        testContext
+      );
       // Place empty file to trick mergeFiles into believing a customization file exists
       await fsExtra.outputFile("/test-cwd/file.json-custom.js", "");
 
@@ -466,7 +484,7 @@ describe("sync/merge-files", () => {
 
   describe("text files", () => {
     test("should merge multiple text files", async () => {
-      const files: CoatManifestFile[][] = [
+      const files = groupFiles(
         [
           {
             type: CoatManifestFileType.Text,
@@ -478,28 +496,30 @@ describe("sync/merge-files", () => {
             content: "Second value",
             file: "file.txt",
           },
-        ],
-        [
           {
             type: CoatManifestFileType.Text,
             content: "Third value",
             file: "folder-1/../file.txt",
           },
         ],
-      ];
+        testContext
+      );
       const result = await mergeFiles(files, testContext);
       expect(result).toEqual([
         {
           type: CoatManifestFileType.Text,
           file: path.join(testCwd, "file.txt"),
+          relativePath: "file.txt",
           content: "Third value",
+          local: false,
+          once: false,
         },
       ]);
     });
 
     test("should merge value from customization file into resulting file", async () => {
       importFromMock.mockImplementationOnce(() => "Custom value");
-      const files: CoatManifestFile[][] = [
+      const files = groupFiles(
         [
           {
             type: CoatManifestFileType.Text,
@@ -507,7 +527,8 @@ describe("sync/merge-files", () => {
             file: "file.txt",
           },
         ],
-      ];
+        testContext
+      );
       // Place empty file to trick mergeFiles into believing a customization file exists
       await fsExtra.outputFile("/test-cwd/file.txt-custom.js", "");
 
@@ -515,8 +536,11 @@ describe("sync/merge-files", () => {
       expect(result).toEqual([
         {
           file: path.join("/test-cwd", "file.txt"),
+          relativePath: "file.txt",
           type: CoatManifestFileType.Text,
           content: "Custom value",
+          local: false,
+          once: false,
         },
       ]);
     });
@@ -524,7 +548,7 @@ describe("sync/merge-files", () => {
 
   describe("yaml files", () => {
     test("should merge multiple yaml files", async () => {
-      const files: CoatManifestFile[][] = [
+      const files = groupFiles(
         [
           {
             type: CoatManifestFileType.Yaml,
@@ -542,8 +566,6 @@ describe("sync/merge-files", () => {
             },
             file: "file.yaml",
           },
-        ],
-        [
           {
             type: CoatManifestFileType.Yaml,
             content: {
@@ -553,12 +575,14 @@ describe("sync/merge-files", () => {
             file: "folder-1/../file.yaml",
           },
         ],
-      ];
+        testContext
+      );
       const result = await mergeFiles(files, testContext);
       expect(result).toEqual([
         {
           type: CoatManifestFileType.Yaml,
           file: path.join(testCwd, "file.yaml"),
+          relativePath: "file.yaml",
           content: {
             firstProp: false,
             secondProp: {
@@ -566,13 +590,15 @@ describe("sync/merge-files", () => {
             },
             thirdProp: [1, 2, 3],
           },
+          once: false,
+          local: false,
         },
       ]);
     });
 
     test("should merge value from customization file into resulting file", async () => {
       importFromMock.mockImplementationOnce(() => ({ customProp: true }));
-      const files: CoatManifestFile[][] = [
+      const files = groupFiles(
         [
           {
             type: CoatManifestFileType.Yaml,
@@ -580,7 +606,8 @@ describe("sync/merge-files", () => {
             file: "file.yaml",
           },
         ],
-      ];
+        testContext
+      );
       // Place empty file to trick mergeFiles into believing a customization file exists
       await fsExtra.outputFile("/test-cwd/file.yaml-custom.js", "");
 
@@ -588,7 +615,10 @@ describe("sync/merge-files", () => {
       expect(result).toEqual([
         {
           file: path.join("/test-cwd", "file.yaml"),
+          relativePath: "file.yaml",
           type: CoatManifestFileType.Yaml,
+          local: false,
+          once: false,
           content: { firstProp: true, customProp: true },
         },
       ]);

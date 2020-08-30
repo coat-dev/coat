@@ -125,4 +125,26 @@ describe("util/get-strict-coat-manifest", () => {
       },
     ]);
   });
+
+  test("should create setup array if setup is undefined", () => {
+    const manifest: CoatManifest = {
+      name: "manifest",
+    };
+    const result = getStrictCoatManifest(manifest);
+    expect(result).toHaveProperty("setup", []);
+  });
+
+  test("should leave setup array alone if it's already an Array", () => {
+    const manifest: CoatManifest = {
+      name: "manifest",
+      setup: [
+        {
+          id: "task1",
+          run: () => ({}),
+        },
+      ],
+    };
+    const result = getStrictCoatManifest(manifest);
+    expect(result.setup).toBe(manifest.setup);
+  });
 });

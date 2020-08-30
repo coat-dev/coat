@@ -1,38 +1,40 @@
 import fs from "fs-extra";
 import path from "path";
 import execa from "execa";
-import flatten from "lodash/flatten";
 import { vol } from "memfs";
+import yaml from "js-yaml";
 import { sync } from ".";
-import { gatherExtendedTemplates } from "./gather-extended-templates";
+import { gatherExtendedTemplates } from "../util/gather-extended-templates";
 import { getContext } from "../util/get-context";
-import { polishFiles } from "./polish-files";
 import {
-  CoatManifestMergedFile,
   CoatManifestFile,
+  CoatManifestFileType,
 } from "../types/coat-manifest-file";
-import { mergeFiles } from "./merge-files";
-import { mergeScripts } from "./merge-scripts";
-import { mergeDependencies } from "./merge-dependencies";
-import { getNormalizedFilePath } from "../util/get-normalized-file-path";
+import * as mergeFilesImport from "./merge-files";
+import * as mergeScriptsImport from "./merge-scripts";
+import * as mergeDependenciesImport from "./merge-dependencies";
+import * as setupImport from "../setup";
+import * as updateLockfilesImport from "../lockfiles/update-lockfiles";
 import { getStrictCoatManifest } from "../util/get-strict-coat-manifest";
-import { COAT_LOCKFILE_FILENAME, PACKAGE_JSON_FILENAME } from "../constants";
+import {
+  COAT_GLOBAL_LOCKFILE_PATH,
+  PACKAGE_JSON_FILENAME,
+  COAT_LOCAL_LOCKFILE_VERSION,
+  COAT_MANIFEST_FILENAME,
+  COAT_LOCAL_LOCKFILE_PATH,
+} from "../constants";
+import { CoatManifest } from "../types/coat-manifest";
+import { groupFiles } from "./group-files";
+import { flatten } from "lodash";
 
-jest
-  .mock("fs")
-  .mock("execa")
-  .mock("../util/get-context")
-  .mock("./gather-extended-templates")
-  .mock("./merge-files")
-  .mock("./merge-scripts")
-  .mock("./merge-dependencies")
-  .mock("./polish-files");
+jest.mock("fs").mock("execa").mock("../util/gather-extended-templates");
 
 const platformRoot = path.parse(process.cwd()).root;
 const testCwd = path.join(platformRoot, "test");
 
-const templates = [
+const templates: CoatManifest[] = [
   {
+    name: "template-1",
     files: [],
     dependencies: {
       dependencies: {
@@ -48,11 +50,17 @@ const templates = [
     ],
   },
   {
+    name: "template-2",
     files: [
       {
         file: "some-folder/deep-folder/template2x.json",
         content: { template2: true },
-        type: "JSON",
+        type: CoatManifestFileType.Json as const,
+      },
+      {
+        file: "local-file.json",
+        content: { local2: true },
+        type: CoatManifestFileType.Json as const,
       },
     ],
     dependencies: {},
@@ -64,13 +72,18 @@ const templates = [
       },
     ],
   },
-];
+].map((template) => getStrictCoatManifest(template));
 
-const coatManifest = {
+const gatherExtendedTemplatesMock = (gatherExtendedTemplates as unknown) as jest.Mock;
+gatherExtendedTemplatesMock.mockImplementation(() => templates);
+
+const coatManifest: CoatManifest = {
+  name: "test-manifest",
+  extends: templates.map((_, index) => `./template-${index}.js`),
   files: [
     {
       file: "manifestA.json",
-      type: "JSON",
+      type: CoatManifestFileType.Json,
       content: { a: true },
     },
   ],
@@ -103,68 +116,39 @@ const packageJson = {
   ...currentDependencies,
 };
 
-const getContextMock = getContext as jest.Mock;
-getContextMock.mockImplementation(() => ({
-  cwd: testCwd,
-  coatManifest,
-  packageJson,
-}));
-
-const gatherExtendedTemplatesMock = gatherExtendedTemplates as jest.Mock;
-gatherExtendedTemplatesMock.mockImplementation(() => templates);
-
-const mergeScriptsMock = mergeScripts as jest.Mock;
-mergeScriptsMock.mockImplementation(() => ({
-  lint: "test",
-  build: "test",
-}));
-
-const mergeDependenciesMock = mergeDependencies as jest.Mock;
-mergeDependenciesMock.mockImplementation(() => ({
-  dependencies: {
-    mergedA: "1.0.0",
-  },
-  devDependencies: {
-    mergedB: "1.0.0",
-  },
-  optionalDependencies: {
-    mergedC: "1.0.0",
-  },
-  peerDependencies: {
-    mergedD: "1.0.0",
-  },
-}));
-
-const mergeFilesMock = mergeFiles as jest.Mock;
-function mergeFilesMockImplementation(
-  input: CoatManifestFile[][]
-): CoatManifestFile[] {
-  return flatten<CoatManifestFile>(input).map((file) => ({
-    ...file,
-    // Prepend testCwd to mocked mergeFiles function, since
-    // mergeFiles returns normalized paths
-    file: getNormalizedFilePath(file.file, {
-      cwd: testCwd,
-      coatManifest: getStrictCoatManifest({ name: "test-project" }),
-      packageJson: {},
-      coatLockfile: undefined,
-    }),
-  }));
-}
-mergeFilesMock.mockImplementation(mergeFilesMockImplementation);
-
-const polishFilesMock = polishFiles as jest.Mock;
-polishFilesMock.mockImplementation((input) =>
-  input.map((file: CoatManifestMergedFile) => ({
-    file: file.file,
-    content: JSON.stringify(file.content),
-  }))
-);
-
 describe("sync", () => {
+  let mergeScriptsSpy: jest.SpyInstance;
+  let mergeDependenciesSpy: jest.SpyInstance;
+  let mergeFilesSpy: jest.SpyInstance;
+  let setupSpy: jest.SpyInstance;
+  let updateLockfilesSpy: jest.SpyInstance;
+
   afterEach(() => {
     vol.reset();
     jest.clearAllMocks();
+  });
+
+  beforeEach(async () => {
+    mergeScriptsSpy = jest.spyOn(mergeScriptsImport, "mergeScripts");
+    mergeDependenciesSpy = jest.spyOn(
+      mergeDependenciesImport,
+      "mergeDependencies"
+    );
+    mergeFilesSpy = jest.spyOn(mergeFilesImport, "mergeFiles");
+    setupSpy = jest.spyOn(setupImport, "setup");
+    updateLockfilesSpy = jest.spyOn(updateLockfilesImport, "updateLockfiles");
+
+    // Place template files
+    await Promise.all([
+      fs.outputFile(
+        path.join(testCwd, COAT_MANIFEST_FILENAME),
+        JSON.stringify(coatManifest)
+      ),
+      fs.outputFile(
+        path.join(testCwd, PACKAGE_JSON_FILENAME),
+        JSON.stringify(packageJson)
+      ),
+    ]);
   });
 
   test("should be exported correctly", () => {
@@ -173,11 +157,11 @@ describe("sync", () => {
 
   test("should call mergeScripts with extended templates and current coat manifest", async () => {
     await sync(testCwd);
-    expect(mergeScriptsMock).toBeCalledTimes(1);
+    expect(mergeScriptsSpy).toBeCalledTimes(1);
 
     const templateScripts = templates.map((template) => template.scripts);
     const coatManifestScripts = coatManifest.scripts;
-    expect(mergeScriptsMock).toHaveBeenCalledWith([
+    expect(mergeScriptsSpy).toHaveBeenLastCalledWith([
       ...templateScripts,
       // Scripts from coat manifest are applied last to override templates
       coatManifestScripts,
@@ -186,11 +170,11 @@ describe("sync", () => {
 
   test("should call mergeDependencies with current dependencies, extended templates and deps from the current coat manifest", async () => {
     await sync(testCwd);
-    expect(mergeDependencies).toHaveBeenCalledTimes(1);
+    expect(mergeDependenciesSpy).toHaveBeenCalledTimes(1);
 
     const templateDeps = templates.map((template) => template.dependencies);
     const coatManifestDeps = coatManifest.dependencies;
-    expect(mergeDependencies).toHaveBeenCalledWith([
+    expect(mergeDependenciesSpy).toHaveBeenCalledWith([
       currentDependencies,
       ...templateDeps,
       coatManifestDeps,
@@ -198,26 +182,35 @@ describe("sync", () => {
   });
 
   test("should add entry for package.json and current coatManifest files to the mergeFiles call", async () => {
+    const testContext = await getContext(testCwd);
     await sync(testCwd);
-    expect(mergeFiles).toHaveBeenCalledTimes(1);
+    expect(mergeFilesSpy).toHaveBeenCalledTimes(1);
 
     const packageJsonFileEntry = {
-      type: "JSON",
+      type: CoatManifestFileType.Json,
       file: "package.json",
       content: {
         ...packageJson,
-        ...mergeDependenciesMock.mock.results[0].value,
+        ...mergeDependenciesSpy.mock.results[0].value,
         scripts: {
           ...packageJson.scripts,
-          ...mergeScriptsMock.mock.results[0].value,
+          ...mergeScriptsSpy.mock.results[0].value,
         },
       },
     };
     const templateFiles = templates.map((template) => template.files);
     const coatManifestFiles = coatManifest.files;
-    expect(mergeFiles).toHaveBeenCalledWith(
-      [[packageJsonFileEntry], ...templateFiles, coatManifestFiles],
-      await getContext(testCwd)
+    testContext.packageJson = packageJsonFileEntry.content;
+    expect(mergeFilesSpy).toHaveBeenLastCalledWith(
+      groupFiles(
+        flatten([
+          packageJsonFileEntry,
+          ...templateFiles,
+          ...(coatManifestFiles as CoatManifestFile[]),
+        ]) as CoatManifestFile[],
+        testContext
+      ),
+      testContext
     );
   });
 
@@ -227,6 +220,7 @@ describe("sync", () => {
       fileEntries,
       coatManifestFileRaw,
       templateFileRaw,
+      templateLocalFileRaw,
       packageJsonRaw,
     ] = await Promise.all([
       fs.readdir(testCwd),
@@ -235,14 +229,17 @@ describe("sync", () => {
         path.join(testCwd, "some-folder", "deep-folder", "template2x.json"),
         "utf8"
       ),
+      fs.readFile(path.join(testCwd, "local-file.json"), "utf8"),
       fs.readFile(path.join(testCwd, "package.json"), "utf8"),
     ]);
 
     const expectedFiles = [
       "some-folder",
+      COAT_MANIFEST_FILENAME,
       PACKAGE_JSON_FILENAME,
       "manifestA.json",
-      COAT_LOCKFILE_FILENAME,
+      COAT_GLOBAL_LOCKFILE_PATH,
+      "local-file.json",
     ];
     fileEntries.sort();
     expectedFiles.sort();
@@ -250,6 +247,7 @@ describe("sync", () => {
 
     const coatManifestFileParsed = JSON.parse(coatManifestFileRaw);
     const templateFileParsed = JSON.parse(templateFileRaw);
+    const templateLocalFileParsed = JSON.parse(templateLocalFileRaw);
     const packageJsonParsed = JSON.parse(packageJsonRaw);
 
     expect(coatManifestFileParsed).toMatchInlineSnapshot(`
@@ -262,19 +260,26 @@ describe("sync", () => {
         "template2": true,
       }
     `);
+    expect(templateLocalFileParsed).toMatchInlineSnapshot(`
+      Object {
+        "local2": true,
+      }
+    `);
     expect(packageJsonParsed).toMatchInlineSnapshot(`
       Object {
         "dependencies": Object {
-          "mergedA": "1.0.0",
+          "a": "1.0.0",
+          "coatManifestA": "1.0.0",
+          "template1A": "1.0.0",
         },
         "devDependencies": Object {
-          "mergedB": "1.0.0",
+          "b": "1.0.0",
         },
         "optionalDependencies": Object {
-          "mergedC": "1.0.0",
+          "c": "1.0.0",
         },
         "peerDependencies": Object {
-          "mergedD": "1.0.0",
+          "d": "1.0.0",
         },
         "scripts": Object {
           "build": "test",
@@ -296,20 +301,42 @@ describe("sync", () => {
   });
 
   test("should not run npm install if dependencies are not changed", async () => {
-    mergeDependenciesMock.mockImplementationOnce(() => currentDependencies);
+    const testTemplates = templates.map((template) => ({
+      ...template,
+      dependencies: {},
+    }));
+    gatherExtendedTemplatesMock.mockImplementationOnce(() => testTemplates);
+    gatherExtendedTemplatesMock.mockImplementationOnce(() => testTemplates);
+
+    // Place coat manifest without dependencies entry
+    await fs.outputFile(
+      path.join(testCwd, COAT_MANIFEST_FILENAME),
+      JSON.stringify({
+        ...coatManifest,
+        dependencies: {},
+      })
+    );
     await sync(testCwd);
     expect(execa).not.toHaveBeenCalled();
   });
 
   test("should not run npm install if package.json file is removed", async () => {
-    mergeFilesMock.mockImplementationOnce((input: CoatManifestFile[][]) => {
-      const filterdInput = input.map((templateFiles) =>
-        templateFiles.filter(
-          (file: CoatManifestFile) => file.file !== PACKAGE_JSON_FILENAME
-        )
-      );
-      return mergeFilesMockImplementation(filterdInput);
-    });
+    const testTemplates = [
+      ...templates,
+      getStrictCoatManifest({
+        name: "remove-pjson",
+        files: [
+          {
+            file: PACKAGE_JSON_FILENAME,
+            type: CoatManifestFileType.Json,
+            content: null,
+          },
+        ],
+      }),
+    ];
+    gatherExtendedTemplatesMock.mockImplementationOnce(() => testTemplates);
+    gatherExtendedTemplatesMock.mockImplementationOnce(() => testTemplates);
+
     await sync(testCwd);
     try {
       await fs.stat(path.join(testCwd, PACKAGE_JSON_FILENAME));
@@ -322,23 +349,52 @@ describe("sync", () => {
     expect(execa).not.toHaveBeenCalled();
   });
 
-  test("should delete files that are no longer managed", async () => {
+  test("should delete global files that are no longer managed", async () => {
     const unmanagedFilePath = "unmanaged-path-1.json";
-    getContextMock.mockImplementationOnce(() => ({
-      cwd: testCwd,
-      coatManifest,
-      packageJson,
-      coatLockfile: {
-        version: 1,
-        files: [
-          {
-            path: unmanagedFilePath,
-          },
-        ],
-      },
-    }));
-    // Place file to delete on test file system
-    await fs.outputFile(path.join(testCwd, unmanagedFilePath), "");
+    await Promise.all([
+      // Put unmanaged file into global lockfile
+      fs.outputFile(
+        path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
+        yaml.safeDump({
+          version: 1,
+          files: [
+            {
+              path: unmanagedFilePath,
+            },
+          ],
+        })
+      ),
+      // Place file to delete on test file system
+      fs.outputFile(path.join(testCwd, unmanagedFilePath), ""),
+    ]);
+
+    const folderContentBeforeSync = await fs.readdir(testCwd);
+    expect(folderContentBeforeSync).toContain(unmanagedFilePath);
+
+    await sync(testCwd);
+
+    const folderContentAfterSync = await fs.readdir(testCwd);
+    expect(folderContentAfterSync).not.toContain(unmanagedFilePath);
+  });
+
+  test("should delete local files that are no longer managed", async () => {
+    const unmanagedFilePath = "unmanaged-path-1.json";
+    await Promise.all([
+      // Add unmanaged file to local lockfile
+      fs.outputFile(
+        path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH),
+        yaml.safeDump({
+          version: COAT_LOCAL_LOCKFILE_VERSION,
+          files: [
+            {
+              path: unmanagedFilePath,
+            },
+          ],
+        })
+      ),
+      // Place file to delete on test file system
+      fs.outputFile(path.join(testCwd, unmanagedFilePath), ""),
+    ]);
 
     const folderContentBeforeSync = await fs.readdir(testCwd);
     expect(folderContentBeforeSync).toContain(unmanagedFilePath);
@@ -351,22 +407,124 @@ describe("sync", () => {
 
   test("should not throw any errors if files that are no longer managed have already been deleted", async () => {
     const unmanagedFilePath = "unmanaged-path-1.json";
-    getContextMock.mockImplementationOnce(() => ({
-      cwd: testCwd,
-      coatManifest,
-      packageJson,
-      coatLockfile: {
+
+    // Put unmanaged file into global lockfile
+    await fs.outputFile(
+      path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
+      yaml.safeDump({
         version: 1,
         files: [
           {
             path: unmanagedFilePath,
           },
         ],
-      },
-    }));
+      })
+    );
     await sync(testCwd);
 
     const folderContentAfterSync = await fs.readdir(testCwd);
     expect(folderContentAfterSync).not.toContain(unmanagedFilePath);
+  });
+
+  test("should place files that have once = true only once", async () => {
+    const newTemplates = [
+      ...templates,
+      {
+        name: "once-template",
+        files: [
+          {
+            file: "once-a.json",
+            content: { a: true },
+            type: CoatManifestFileType.Json as const,
+            once: true,
+          },
+          {
+            file: "once-b.json",
+            content: { b: true },
+            type: CoatManifestFileType.Json as const,
+            once: true,
+            local: true,
+          },
+        ],
+      },
+    ].map((template) => getStrictCoatManifest(template));
+    gatherExtendedTemplatesMock.mockImplementationOnce(() => newTemplates);
+    gatherExtendedTemplatesMock.mockImplementationOnce(() => newTemplates);
+
+    await sync(testCwd);
+
+    const [onceARaw, onceBRaw] = await Promise.all([
+      fs.readFile(path.join(testCwd, "once-a.json"), "utf-8"),
+      fs.readFile(path.join(testCwd, "once-b.json"), "utf-8"),
+    ]);
+    expect(JSON.parse(onceARaw)).toEqual({
+      a: true,
+    });
+    expect(JSON.parse(onceBRaw)).toEqual({
+      b: true,
+    });
+
+    // Modify once files
+    await Promise.all([
+      fs.unlink(path.join(testCwd, "once-a.json")),
+      fs.writeFile(
+        path.join(testCwd, "once-b.json"),
+        JSON.stringify({ newB: true })
+      ),
+    ]);
+
+    gatherExtendedTemplatesMock.mockImplementationOnce(() => newTemplates);
+    gatherExtendedTemplatesMock.mockImplementationOnce(() => newTemplates);
+
+    await sync(testCwd);
+
+    await expect(
+      fs.readFile(path.join(testCwd, "once-a.json"), "utf-8")
+    ).rejects.toHaveProperty(
+      "message",
+      expect.stringMatching(
+        /ENOENT: no such file or directory, open '.*once-a.json/
+      )
+    );
+
+    const onceBRaw2 = await fs.readFile(
+      path.join(testCwd, "once-b.json"),
+      "utf-8"
+    );
+
+    expect(JSON.parse(onceBRaw2)).toEqual({
+      newB: true,
+    });
+  });
+
+  test("should call setup with force = false", async () => {
+    await sync(testCwd);
+
+    expect(setupSpy).toHaveBeenCalledTimes(1);
+    expect(setupSpy).toHaveBeenLastCalledWith(testCwd, false);
+  });
+
+  test("should still write files to disk if lockfile updates fail", async () => {
+    updateLockfilesSpy.mockImplementationOnce(async () => {
+      throw new Error("Expected error");
+    });
+
+    await expect(() => sync(testCwd)).rejects.toHaveProperty(
+      "message",
+      "Expected error"
+    );
+
+    const fileEntries = await fs.readdir(testCwd);
+
+    const expectedFiles = [
+      "some-folder",
+      COAT_MANIFEST_FILENAME,
+      PACKAGE_JSON_FILENAME,
+      "manifestA.json",
+      "local-file.json",
+    ];
+    fileEntries.sort();
+    expectedFiles.sort();
+    expect(fileEntries).toEqual(expectedFiles);
   });
 });

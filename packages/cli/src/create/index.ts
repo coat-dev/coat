@@ -2,7 +2,6 @@ import { promises as fs } from "fs";
 import fsExtra from "fs-extra";
 import path from "path";
 import execa from "execa";
-import { setup } from "../setup";
 import { sync } from "../sync";
 import { getProjectName } from "./get-project-name";
 import { getTemplateInfo } from "./get-template-info";
@@ -13,6 +12,13 @@ import {
 } from "../constants";
 import { polish as jsonPolish } from "../file-types/json";
 
+/**
+ * Creates and generates a new coat project.
+ *
+ * @param template The template that should be used for the new project
+ * @param projectNameInput The optional project name that has been provided
+ * @param directoryInput The optional path to the directory that should be used
+ */
 export async function create(
   template: string,
   projectNameInput?: string,
@@ -160,10 +166,7 @@ export async function create(
       );
     }
 
-    await execa("npx", ["--no-install", "coat", "setup"], {
-      cwd: targetCwd,
-      stdio: "inherit",
-    });
+    // setup will be triggered via sync
     await execa("npx", ["--no-install", "coat", "sync"], {
       cwd: targetCwd,
       stdio: "inherit",
@@ -171,8 +174,8 @@ export async function create(
   } else {
     // Run setup and sync directly with the currently running
     // @coat/cli version
-    await setup();
-
+    //
+    // setup will be triggered implicitly via sync
     await sync(targetCwd);
   }
 }

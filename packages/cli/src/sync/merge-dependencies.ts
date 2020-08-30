@@ -4,6 +4,12 @@ import semverIntersects from "semver/ranges/intersects";
 import { CoatManifestStrict } from "../types/coat-manifest";
 import { SemVer } from "semver";
 
+// Eslint errors about reassigning parameters
+// are disabled for this function since it is the
+// functions purpose to add or overwrite dependencies
+// in the target object
+//
+/* eslint-disable no-param-reassign */
 function applyDependencies(
   target: Record<string, string>,
   source: Record<string, string> | undefined
@@ -45,7 +51,23 @@ function applyDependencies(
     }
   });
 }
+/* eslint-enable no-param-reassign */
 
+/**
+ * Merges all dependencies that have been declared in the coat project
+ * and its templates.
+ *
+ * Dependencies are only overriden if the current version doesn't satisfy
+ * a newer declared version.
+ * Example:
+ *
+ * templateA declares a dependency on "package": "^1.0.5"
+ * templateB declares a dependency on "package": "^1.0.1"
+ * templateC declares a dependency on "package": "^1.1.0"
+ * Result: "package": "^1.1.0" (satisfies all three templates)
+ *
+ * @param allDependencies All dependencies of the current coat project
+ */
 export function mergeDependencies(
   allDependencies: CoatManifestStrict["dependencies"][]
 ): CoatManifestStrict["dependencies"] {

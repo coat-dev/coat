@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import fsExtra from "fs-extra";
 import path from "path";
-import { runSyncTest, prepareSyncTest } from "../utils/run-sync-test";
+import { runSyncTest, prepareCliTest } from "../utils/run-cli-test";
 import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
 import { runCli } from "../utils/run-cli";
 import execa from "execa";
@@ -41,7 +41,7 @@ describe("coat sync - gathering", () => {
     // Retrieve a temporary directory
     const projectName = "test-project";
     const templates = ["local-template-1", "local-template-2"];
-    const tmpDir = await prepareSyncTest({
+    const tmpDir = await prepareCliTest({
       coatManifest: {
         name: projectName,
         extends: templates.map((template) => `./${template}`),
@@ -101,7 +101,7 @@ describe("coat sync - gathering", () => {
       "@coat/integration-test-template-sync-4",
       "@coat/integration-test-template-sync-5",
     ];
-    const tmpDir = await prepareSyncTest({
+    const tmpDir = await prepareCliTest({
       coatManifest: {
         name: projectName,
         extends: templates,

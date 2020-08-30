@@ -1,5 +1,5 @@
 module.exports = {
-  name: "local-files-4",
+  name: "local-files-5",
   files: [
     {
       file: "a.json",

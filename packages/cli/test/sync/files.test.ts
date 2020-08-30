@@ -1,6 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { runSyncTest, prepareSyncTest } from "../utils/run-sync-test";
+import { runSyncTest, prepareCliTest } from "../utils/run-cli-test";
 import { runCli } from "../utils/run-cli";
 import {
   CoatManifestFileType,
@@ -100,7 +100,7 @@ describe("coat sync - files", () => {
   });
 
   test("should merge from multiple stages with customization file afterwards - customization function", async () => {
-    const cwd = await prepareSyncTest({
+    const cwd = await prepareCliTest({
       coatManifest: {
         name: "project",
         extends: [
@@ -154,7 +154,7 @@ describe("coat sync - files", () => {
   });
 
   test("should merge from multiple stages with customization file afterwards - customization export", async () => {
-    const cwd = await prepareSyncTest({
+    const cwd = await prepareCliTest({
       coatManifest: {
         name: "project",
         extends: [
@@ -214,7 +214,7 @@ describe("coat sync - files", () => {
   });
 
   test("should merge from multiple stages with no placed file that has a customization file", async () => {
-    const cwd = await prepareSyncTest({
+    const cwd = await prepareCliTest({
       coatManifest: {
         name: "project",
         extends: [
@@ -363,6 +363,51 @@ describe("coat sync - files", () => {
         - 2
         - 3
       "
+    `);
+  });
+
+  test("should not touch files that are only generated once again after they have been placed", async () => {
+    const { cwd, task: firstSyncRun } = await runSyncTest({
+      coatManifest: {
+        name: "test",
+        extends: ["local-files-6", "local-files-7"].map((template) =>
+          path.join(testPackagesPath, template)
+        ),
+      },
+    });
+    await firstSyncRun;
+
+    // Modify files
+    await Promise.all([
+      fs.writeFile(
+        path.join(cwd, "a.json"),
+        JSON.stringify({ modifiedGlobal: true })
+      ),
+      fs.writeFile(
+        path.join(cwd, "b.json"),
+        JSON.stringify({ modifiedLocal: true })
+      ),
+    ]);
+
+    // Run sync again to verify that files will not be changed
+    const { task: secondSyncRun } = runCli(["sync"], cwd);
+    await secondSyncRun;
+
+    // Read files
+    const [aRaw, bRaw] = await Promise.all([
+      fs.readFile(path.join(cwd, "a.json"), "utf-8"),
+      fs.readFile(path.join(cwd, "b.json"), "utf-8"),
+    ]);
+    expect(JSON.parse(aRaw)).toMatchInlineSnapshot(`
+      Object {
+        "modifiedGlobal": true,
+      }
+    `);
+
+    expect(JSON.parse(bRaw)).toMatchInlineSnapshot(`
+      Object {
+        "modifiedLocal": true,
+      }
     `);
   });
 

@@ -2,8 +2,11 @@ import { version } from "../../package.json";
 import { createProgram } from "./cli";
 import { create } from "../create";
 import { sync } from "../sync";
+import { setup } from "../setup";
 
-jest.mock("../create").mock("../sync");
+jest.mock("../create").mock("../sync").mock("../setup");
+
+jest.spyOn(process, "cwd").mockImplementation(() => "mock-cwd");
 
 describe("coat cli", () => {
   test("should print out version", async () => {
@@ -45,12 +48,20 @@ describe("coat cli", () => {
   );
 
   test("should call sync function with current working directory", async () => {
-    jest.spyOn(process, "cwd").mockImplementationOnce(() => "mock-cwd");
     const program = createProgram();
 
     await program.parseAsync(["sync"], { from: "user" });
 
     expect(sync).toHaveBeenCalledTimes(1);
     expect(sync).toHaveBeenLastCalledWith("mock-cwd");
+  });
+
+  test("should call setup function with current working directory & force option", async () => {
+    const program = createProgram();
+
+    await program.parseAsync(["setup"], { from: "user" });
+
+    expect(setup).toHaveBeenCalledTimes(1);
+    expect(setup).toHaveBeenCalledWith("mock-cwd", true);
   });
 });
