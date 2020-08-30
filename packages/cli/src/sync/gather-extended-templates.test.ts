@@ -183,6 +183,7 @@ describe("sync/gather-extended-templates", () => {
         scripts: [],
       },
       packageJson: {},
+      coatLockfile: undefined,
     };
     const templates = gatherExtendedTemplates(coatContext);
     expect(templates).toEqual([testExtendedTemplates[`${testCwd}/template`]]);
@@ -199,6 +200,7 @@ describe("sync/gather-extended-templates", () => {
         scripts: [],
       },
       packageJson: {},
+      coatLockfile: undefined,
     };
     const templates = gatherExtendedTemplates(coatContext);
     expect(templates).toEqual([
@@ -217,6 +219,7 @@ describe("sync/gather-extended-templates", () => {
         scripts: [],
       },
       packageJson: {},
+      coatLockfile: undefined,
     };
 
     gatherExtendedTemplates(coatContext);
@@ -240,6 +243,7 @@ describe("sync/gather-extended-templates", () => {
         scripts: [],
       },
       packageJson: {},
+      coatLockfile: undefined,
     };
 
     const templates = gatherExtendedTemplates(coatContext);
@@ -279,6 +283,7 @@ describe("sync/gather-extended-templates", () => {
         scripts: [],
       },
       packageJson: {},
+      coatLockfile: undefined,
     };
 
     gatherExtendedTemplates(coatContext);

@@ -1,6 +1,5 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { cleanupTmpDirs } from "../utils/get-tmp-dir";
 import { prepareSyncTest, runSyncTest } from "../utils/run-sync-test";
 import {
   COAT_MANIFEST_FILENAME,
@@ -8,12 +7,7 @@ import {
 } from "../../src/constants";
 import { runCli } from "../utils/run-cli";
 import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
-
-afterAll(() => {
-  cleanupTmpDirs();
-});
-
-const testExceptWindows = process.platform === "win32" ? test.skip : test;
+import { testExceptWindows } from "../utils/test-except-windows";
 
 describe("coat sync - errors", () => {
   test("should throw an error if coat manifest is missing", async () => {

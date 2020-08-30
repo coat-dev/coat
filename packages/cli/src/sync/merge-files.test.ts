@@ -29,6 +29,7 @@ describe("sync/merge-files", () => {
       name: "hi",
     }),
     packageJson: {},
+    coatLockfile: undefined,
   };
 
   test("should work with empty array", async () => {

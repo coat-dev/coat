@@ -1,4 +1,5 @@
 import fs from "fs-extra";
+import path from "path";
 import execa from "execa";
 import { getContext } from "../util/get-context";
 import { gatherExtendedTemplates } from "./gather-extended-templates";
@@ -8,13 +9,15 @@ import { mergeDependencies } from "./merge-dependencies";
 import {
   CoatManifestFile,
   CoatManifestFileType,
+  CoatManifestMergedFile,
 } from "../types/coat-manifest-file";
-import { PACKAGE_JSON_FILENAME } from "../constants";
+import { COAT_LOCKFILE_FILENAME, PACKAGE_JSON_FILENAME } from "../constants";
 import { JsonObject, PackageJson } from "type-fest";
 import { polishFiles } from "./polish-files";
 import isEqual from "lodash/isEqual";
 import { CoatManifestStrict } from "../types/coat-manifest";
 import { getNormalizedFilePath } from "../util/get-normalized-file-path";
+import { generateLockfile } from "../util/generate-lockfile";
 
 export async function sync(cwd: string): Promise<void> {
   // Get coat manifest from cwd
@@ -76,9 +79,23 @@ export async function sync(cwd: string): Promise<void> {
     context
   );
 
-  const polishedFiles = polishFiles(mergedFiles, context);
+  // Generate new coat lockfile from merged files
+  const newLockfile = generateLockfile(
+    mergedFiles.map((file) => file.file),
+    context
+  );
 
-  await Promise.all(
+  // Polish all merged files and the coat lockfile
+  const filesToPolish: CoatManifestMergedFile[] = [
+    ...mergedFiles,
+    {
+      file: path.join(context.cwd, COAT_LOCKFILE_FILENAME),
+      content: newLockfile,
+      type: CoatManifestFileType.Yaml,
+    },
+  ];
+
+  const polishedFiles = polishFiles(filesToPolish, context);
     // Use fs.outputFile to automatically create any missing directories
     polishedFiles.map((file) => fs.outputFile(file.file, file.content))
   );

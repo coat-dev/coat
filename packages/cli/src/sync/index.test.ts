@@ -16,7 +16,7 @@ import { mergeScripts } from "./merge-scripts";
 import { mergeDependencies } from "./merge-dependencies";
 import { getNormalizedFilePath } from "../util/get-normalized-file-path";
 import { getStrictCoatManifest } from "../util/get-strict-coat-manifest";
-import { PACKAGE_JSON_FILENAME } from "../constants";
+import { COAT_LOCKFILE_FILENAME, PACKAGE_JSON_FILENAME } from "../constants";
 
 jest
   .mock("fs")
@@ -147,6 +147,7 @@ function mergeFilesMockImplementation(
       cwd: testCwd,
       coatManifest: getStrictCoatManifest({ name: "test-project" }),
       packageJson: {},
+      coatLockfile: undefined,
     }),
   }));
 }
@@ -237,7 +238,12 @@ describe("sync", () => {
       fs.readFile(path.join(testCwd, "package.json"), "utf8"),
     ]);
 
-    const expectedFiles = ["some-folder", "package.json", "manifestA.json"];
+    const expectedFiles = [
+      "some-folder",
+      PACKAGE_JSON_FILENAME,
+      "manifestA.json",
+      COAT_LOCKFILE_FILENAME,
+    ];
     fileEntries.sort();
     expectedFiles.sort();
     expect(fileEntries).toEqual(expectedFiles);

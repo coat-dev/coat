@@ -7,3 +7,6 @@ export const PACKAGE_JSON_FILENAME = "package.json";
 export const COAT_CLI_VERSION = require(`../${PACKAGE_JSON_FILENAME}`).version;
 
 export const COAT_MANIFEST_FILENAME = "coat.json";
+
+export const COAT_LOCKFILE_FILENAME = "coat.lock";
+export const COAT_LOCKFILE_VERSION = 1;

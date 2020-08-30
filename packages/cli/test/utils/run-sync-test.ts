@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import yaml from "js-yaml";
 import { PackageJson } from "type-fest";
 import { CoatManifest } from "../../src/types/coat-manifest";
 import { RunCliResult, runCli } from "./run-cli";
@@ -7,7 +8,9 @@ import { getTmpDir } from "./get-tmp-dir";
 import {
   PACKAGE_JSON_FILENAME,
   COAT_MANIFEST_FILENAME,
+  COAT_LOCKFILE_FILENAME,
 } from "../../src/constants";
+import { CoatLockfile } from "../../src/types/coat-lockfile";
 
 interface RunSyncTestOptions {
   /**
@@ -31,6 +34,13 @@ interface RunSyncTestOptions {
    * }
    */
   coatManifest?: CoatManifest;
+  /**
+   * The coat.lock lockfile that will be
+   * written to the temporary directory.
+   *
+   * Default value: No lockfile
+   */
+  coatLockfile?: CoatLockfile;
 }
 
 const testProjectName = "test-project";
@@ -61,7 +71,7 @@ export async function prepareSyncTest(
   const packageJson = options?.packageJson || defaultPackageJson;
   const coatManifest = options?.coatManifest || defaultCoatManifest;
 
-  await Promise.all([
+  const filePromises = [
     fs.writeFile(
       path.join(tmpDir, PACKAGE_JSON_FILENAME),
       JSON.stringify(packageJson)
@@ -70,7 +80,18 @@ export async function prepareSyncTest(
       path.join(tmpDir, COAT_MANIFEST_FILENAME),
       JSON.stringify(coatManifest)
     ),
-  ]);
+  ];
+
+  if (options?.coatLockfile) {
+    filePromises.push(
+      fs.writeFile(
+        path.join(tmpDir, COAT_LOCKFILE_FILENAME),
+        yaml.safeDump(options.coatLockfile)
+      )
+    );
+  }
+
+  await Promise.all(filePromises);
 
   return tmpDir;
 }
