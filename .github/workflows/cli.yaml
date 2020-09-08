@@ -15,7 +15,18 @@ jobs:
         run: npm run lint
         working-directory: ./packages/cli
       - name: Test
-        run: npm test -- --ci --no-cache --runInBand
+        run: |
+          npm test -- \
+          --ci \
+          --no-cache \
+          --runInBand \
+          --coverageReporters json \
+          --coverageReporters lcov \
+          --coverageReporters text \
+          --coverageReporters clover
+        working-directory: ./packages/cli
+      - name: Upload test coverage information
+        run: bash <(curl -s https://codecov.io/bash)
         working-directory: ./packages/cli
       - name: Build
         # The pack command does currently not allow to specify an output filename,
