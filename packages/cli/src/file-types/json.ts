@@ -1,23 +1,21 @@
-import mergeWith from "lodash/mergeWith";
-import uniqWith from "lodash/uniqWith";
-import isEqual from "lodash/isEqual";
+import lodashMerge from "lodash/merge";
 import jsonStableStringify from "json-stable-stringify";
 import { JsonObject } from "type-fest";
 import { FileTypeFunctions } from ".";
 import { CoatContext } from "../types/coat-context";
 import { getPrettier } from "../util/get-prettier";
 
-export function merge(
+function merge(
   source: JsonObject | null | undefined,
   target: JsonObject
 ): JsonObject | null {
-  return mergeWith({}, source ?? {}, target, (innerTarget, innerSource) => {
-    // Concatenate arrays rather than overwriting them
-    if (Array.isArray(innerTarget) && Array.isArray(innerSource)) {
-      const arrayResult = innerTarget.concat(innerSource);
-      return uniqWith(arrayResult, isEqual);
-    }
-  });
+  // Default object merge behavior is covered by lodash's
+  // merge function. Properties will be merged deeply,
+  // arrays will be merged as well, e.g.:
+  // a1 = [1, 2, 3] ; a2 = [undefined, 4, 3, 5]
+  // will result in:
+  // [1, 4, 3, 5]
+  return lodashMerge({}, source ?? {}, target);
 }
 
 export function polish(

@@ -50,7 +50,7 @@ function getTemplates(
  * deduped in order to preserve any logic that depends on the child template being
  * available before the parent template is evaluated.
  *
- * @param context The coat project context
+ * @param context The context of the current coat project
  */
 export function gatherExtendedTemplates(
   context: CoatContext

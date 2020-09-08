@@ -2,6 +2,14 @@ import path from "path";
 import { getNormalizedFilePath } from "./get-normalized-file-path";
 import { CoatContext } from "../types/coat-context";
 import { getStrictCoatManifest } from "./get-strict-coat-manifest";
+import {
+  getStrictCoatGlobalLockfile,
+  getStrictCoatLocalLockfile,
+} from "../lockfiles/get-strict-coat-lockfiles";
+import {
+  COAT_GLOBAL_LOCKFILE_VERSION,
+  COAT_LOCAL_LOCKFILE_VERSION,
+} from "../constants";
 
 describe("util/get-normalized-file-path", () => {
   function buildTestContext(cwd: string): CoatContext {
@@ -11,7 +19,12 @@ describe("util/get-normalized-file-path", () => {
         name: "hi",
       }),
       packageJson: {},
-      coatLockfile: undefined,
+      coatGlobalLockfile: getStrictCoatGlobalLockfile({
+        version: COAT_GLOBAL_LOCKFILE_VERSION,
+      }),
+      coatLocalLockfile: getStrictCoatLocalLockfile({
+        version: COAT_LOCAL_LOCKFILE_VERSION,
+      }),
     };
   }
 

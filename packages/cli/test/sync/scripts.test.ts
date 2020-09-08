@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import fsExtra from "fs-extra";
-import { runSyncTest, prepareSyncTest } from "../utils/run-sync-test";
+import { runSyncTest, prepareCliTest } from "../utils/run-cli-test";
 import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
 import { PACKAGE_JSON_FILENAME } from "../../src/constants";
 import { runCli } from "../utils/run-cli";
@@ -69,7 +69,7 @@ describe("coat sync - scripts", () => {
       "local-template-sync-scripts-2",
     ];
 
-    const cwd = await prepareSyncTest({
+    const cwd = await prepareCliTest({
       coatManifest: {
         name: "test-project",
         extends: [

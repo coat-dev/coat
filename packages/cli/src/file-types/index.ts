@@ -1,8 +1,8 @@
 import {
   CoatManifestFileType,
   CoatManifestFileContentTypesMap,
-  CoatManifestFile,
   CoatManifestMergedFile,
+  CoatManifestGroupedFile,
 } from "../types/coat-manifest-file";
 import { jsonFileFunctions } from "./json";
 import { CoatContext } from "../types/coat-context";
@@ -38,7 +38,7 @@ const fileTypeRegistry: FileTypeRegistry = {
  * This function is currently necessary to correctly cast the
  * type of the merge function to the correct file type.
  */
-export function getMergeFunction<FileType extends CoatManifestFile>(
+export function getMergeFunction<FileType extends CoatManifestGroupedFile>(
   file: FileType
 ): FileTypeFunctions<
   CoatManifestFileContentTypesMap[FileType["type"]]
@@ -68,7 +68,7 @@ export function getPolishFunction<FileType extends CoatManifestMergedFile>(
 >["polish"] {
   const fileFunctions = fileTypeRegistry[file.type];
   if (!fileFunctions) {
-    throw new Error(`Unknown file type in polish: ${file.type}`);
+    throw new Error(`Cannot polish unknown file type: ${file.type}`);
   }
   return fileFunctions.polish as (
     source: CoatManifestFileContentTypesMap[FileType["type"]],

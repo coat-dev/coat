@@ -28,6 +28,14 @@ function validateProjectName(projectName: string): string | true {
   return createProjectNameErrorMessage(npmValidation);
 }
 
+/**
+ * Gets the project name for the coat project that will be created.
+ *
+ * If no name has been specified via the CLI, the user will be prompted
+ * to enter a new project name
+ *
+ * @param projectNameInput The user CLI input for the project name, if it is available
+ */
 export async function getProjectName(
   projectNameInput: string | undefined
 ): Promise<string> {

@@ -4,11 +4,15 @@ import importFrom from "import-from";
 import { PackageJson } from "type-fest";
 import { PACKAGE_JSON_FILENAME } from "../constants";
 
-// Retrieves the package.json of a freshly installed
-// template in a project folder. This function should
-// only be used for newly installed projects with a single
-// devDependency, since that dependency is assumed to be the
-// template of the coat project
+/**
+ * Retrieves the package.json of a freshly installed
+ * template in a project folder. This function should
+ * only be used for newly installed projects with a single
+ * devDependency, since that dependency is assumed to be the
+ * template of the coat project
+ *
+ * @param cwd The directory of the newly created coat project
+ */
 export async function getTemplateInfo(cwd: string): Promise<PackageJson> {
   // Retrieve the template from package.json
   const projectPackageJsonPath = path.join(cwd, PACKAGE_JSON_FILENAME);

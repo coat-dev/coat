@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import fsExtra from "fs-extra";
 import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
-import { runSyncTest, prepareSyncTest } from "../utils/run-sync-test";
+import { runSyncTest, prepareCliTest } from "../utils/run-cli-test";
 import { PACKAGE_JSON_FILENAME } from "../../src/constants";
 import execa from "execa";
 import { getPackageVersion } from "../utils/get-package-version";
@@ -58,7 +58,7 @@ describe("coat sync - dependencies", () => {
 
   test("should override existing dependencies and run install", async () => {
     const projectName = "test-project";
-    const cwd = await prepareSyncTest({
+    const cwd = await prepareCliTest({
       coatManifest: {
         name: projectName,
         dependencies: {
@@ -208,7 +208,7 @@ describe("coat sync - dependencies", () => {
 
   test("should install dependencies when a dependency is removed", async () => {
     const projectName = "test-project";
-    const cwd = await prepareSyncTest({
+    const cwd = await prepareCliTest({
       coatManifest: {
         name: projectName,
         extends: "./local-template-3",

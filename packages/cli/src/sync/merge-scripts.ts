@@ -2,6 +2,17 @@ import flatten from "lodash/flatten";
 import groupBy from "lodash/groupBy";
 import { CoatManifestStrict } from "../types/coat-manifest";
 
+/**
+ * Merges all scripts of a coat project.
+ *
+ * Scripts are shell commands that are placed as npm scripts in
+ * the package.json file of a coat project.
+ *
+ * If multiple scripts share the same scriptName, they will
+ * be placed to run in parallel.
+ *
+ * @param scripts All scripts that should be merged
+ */
 export function mergeScripts(
   scripts: CoatManifestStrict["scripts"][]
 ): Record<string, string> {
@@ -9,9 +20,9 @@ export function mergeScripts(
   const groupedScripts = groupBy(flatten(scripts), "scriptName");
 
   return Object.entries(groupedScripts).reduce<Record<string, string>>(
-    (result, [scriptName, scripts]) => {
+    (accumulator, [scriptName, scripts]) => {
       if (scripts.length === 1) {
-        result[scriptName] = scripts[0].run;
+        accumulator[scriptName] = scripts[0].run;
       } else {
         // Create sub-scripts which will be run via coat run
         const scriptIdPrefix = `${scriptName}-`;
@@ -23,14 +34,15 @@ export function mergeScripts(
           } else {
             scriptNameToUse += script.id;
           }
-          result[scriptNameToUse] = script.run;
+          accumulator[scriptNameToUse] = script.run;
         });
         // TODO: See #9
         // Run with npm-run-all for now, switch to coat run
         // once #9 is done
-        result[scriptName] = `run-p ${scriptName}:*`;
+        accumulator[scriptName] = `run-p ${scriptName}:*`;
       }
-      return result;
+      return accumulator;
+      /* eslint-enable no-param-reassign */
     },
     {}
   );

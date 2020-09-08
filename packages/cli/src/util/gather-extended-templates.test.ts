@@ -3,6 +3,15 @@ import resolveFrom from "resolve-from";
 import { CoatContext } from "../types/coat-context";
 import importFrom from "import-from";
 import { CoatManifestStrict } from "../types/coat-manifest";
+import { getStrictCoatManifest } from "./get-strict-coat-manifest";
+import {
+  getStrictCoatGlobalLockfile,
+  getStrictCoatLocalLockfile,
+} from "../lockfiles/get-strict-coat-lockfiles";
+import {
+  COAT_GLOBAL_LOCKFILE_VERSION,
+  COAT_LOCAL_LOCKFILE_VERSION,
+} from "../constants";
 
 jest.mock("resolve-from").mock("import-from");
 
@@ -16,20 +25,12 @@ resolveFromMock.mockImplementation(
 const testExtendedTemplates: {
   [template: string]: CoatManifestStrict | (() => CoatManifestStrict);
 } = {
-  [`${testCwd}/template`]: {
+  [`${testCwd}/template`]: getStrictCoatManifest({
     name: "template",
-    dependencies: {},
-    extends: [],
-    files: [],
-    scripts: [],
-  },
-  [`${testCwd}/template-fn-result`]: {
+  }),
+  [`${testCwd}/template-fn-result`]: getStrictCoatManifest({
     name: "template-fn",
-    dependencies: {},
-    extends: [],
-    files: [],
-    scripts: [],
-  },
+  }),
   [`${testCwd}/template-fn`]: jest.fn<CoatManifestStrict, []>(
     () =>
       testExtendedTemplates[
@@ -42,80 +43,56 @@ const testExtendedTemplates: {
   // nested-2-A (fn): nested-2-A-1 (obj), nested-2-A-2 (fn)
   // nested-2-B (obj): nested-common-template (obj)
   // nested-3 (obj): (no extended template)
-  [`${testCwd}/nested`]: {
+  [`${testCwd}/nested`]: getStrictCoatManifest({
     name: "nested",
     extends: ["nested-1", "nested-2", "nested-3"],
-    dependencies: {},
-    files: [],
-    scripts: [],
-  },
-  [`${testCwd}/nested/nested-1`]: {
+  }),
+  [`${testCwd}/nested/nested-1`]: getStrictCoatManifest({
     name: "nested-1",
-    dependencies: {},
     extends: ["nested-1-A", "nested-1-B"],
-    files: [],
-    scripts: [],
-  },
-  [`${testCwd}/nested/nested-1/nested-1-A-result`]: {
+  }),
+  [`${testCwd}/nested/nested-1/nested-1-A-result`]: getStrictCoatManifest({
     name: "nested-1-A",
-    dependencies: {},
-    extends: [],
-    files: [],
-    scripts: [],
-  },
+  }),
   [`${testCwd}/nested/nested-1/nested-1-A`]: jest.fn<CoatManifestStrict, []>(
     () =>
       testExtendedTemplates[
         `${testCwd}/nested/nested-1/nested-1-A-result`
       ] as CoatManifestStrict
   ),
-  [`${testCwd}/nested/nested-1/nested-1-B`]: {
+  [`${testCwd}/nested/nested-1/nested-1-B`]: getStrictCoatManifest({
     name: "nested-1-B",
-    dependencies: {},
-    extends: [],
-    files: [],
-    scripts: [],
-  },
-  [`${testCwd}/nested/nested-2-result`]: {
+  }),
+  [`${testCwd}/nested/nested-2-result`]: getStrictCoatManifest({
     name: "nested-2",
-    dependencies: {},
     extends: ["nested-2-A", "nested-2-B", "nested-common-template"],
-    files: [],
-    scripts: [],
-  },
+  }),
   [`${testCwd}/nested/nested-2`]: jest.fn<CoatManifestStrict, []>(
     () =>
       testExtendedTemplates[
         `${testCwd}/nested/nested-2-result`
       ] as CoatManifestStrict
   ),
-  [`${testCwd}/nested/nested-2/nested-2-A-result`]: {
+  [`${testCwd}/nested/nested-2/nested-2-A-result`]: getStrictCoatManifest({
     name: "nested-2-A",
-    dependencies: {},
     extends: ["nested-2-A-1", "nested-2-A-2"],
-    files: [],
-    scripts: [],
-  },
+  }),
   [`${testCwd}/nested/nested-2/nested-2-A`]: jest.fn<CoatManifestStrict, []>(
     () =>
       testExtendedTemplates[
         `${testCwd}/nested/nested-2/nested-2-A-result`
       ] as CoatManifestStrict
   ),
-  [`${testCwd}/nested/nested-2/nested-2-A/nested-2-A-1`]: {
-    name: "nested-2-A-1",
-    dependencies: {},
-    extends: [],
-    files: [],
-    scripts: [],
-  },
-  [`${testCwd}/nested/nested-2/nested-2-A/nested-2-A-2-result`]: {
-    name: "nested-2-A-2",
-    dependencies: {},
-    extends: [],
-    files: [],
-    scripts: [],
-  },
+  [`${testCwd}/nested/nested-2/nested-2-A/nested-2-A-1`]: getStrictCoatManifest(
+    {
+      name: "nested-2-A-1",
+    }
+  ),
+  [`${testCwd}/nested/nested-2/nested-2-A/nested-2-A-2-result`]: getStrictCoatManifest(
+    {
+      name: "nested-2-A-2",
+    }
+  ),
   [`${testCwd}/nested/nested-2/nested-2-A/nested-2-A-2`]: jest.fn<
     CoatManifestStrict,
     []
@@ -125,42 +102,31 @@ const testExtendedTemplates: {
         `${testCwd}/nested/nested-2/nested-2-A/nested-2-A-2-result`
       ] as CoatManifestStrict
   ),
-  [`${testCwd}/nested/nested-2/nested-2-B`]: {
+  [`${testCwd}/nested/nested-2/nested-2-B`]: getStrictCoatManifest({
     name: "nested-2-B",
-    dependencies: {},
     extends: ["nested-common-template"],
-    files: [],
-    scripts: [],
-  },
-  [`${testCwd}/nested/nested-2/nested-2-B/nested-common-template`]: {
-    name: "nested-common-template",
-    dependencies: {
+  }),
+  [`${testCwd}/nested/nested-2/nested-2-B/nested-common-template`]: getStrictCoatManifest(
+    {
+      name: "nested-common-template",
       dependencies: {
-        "from-2-B": "^1.0.0",
+        dependencies: {
+          "from-2-B": "^1.0.0",
+        },
       },
-    },
-    extends: [],
-    files: [],
-    scripts: [],
-  },
-  [`${testCwd}/nested/nested-2/nested-common-template`]: {
+    }
+  ),
+  [`${testCwd}/nested/nested-2/nested-common-template`]: getStrictCoatManifest({
     name: "nested-common-template",
     dependencies: {
       dependencies: {
         "from-2": "^1.0.0",
       },
     },
-    extends: [],
-    files: [],
-    scripts: [],
-  },
-  [`${testCwd}/nested/nested-3`]: {
+  }),
+  [`${testCwd}/nested/nested-3`]: getStrictCoatManifest({
     name: "nested-3",
-    dependencies: {},
-    extends: [],
-    files: [],
-    scripts: [],
-  },
+  }),
 };
 const importFromMock = (importFrom as unknown) as jest.Mock;
 importFromMock.mockImplementation((cwd, template) => {
@@ -175,15 +141,17 @@ describe("sync/gather-extended-templates", () => {
   test("should retrieve a single extended template exporting a manifest", () => {
     const coatContext: CoatContext = {
       cwd: testCwd,
-      coatManifest: {
+      coatManifest: getStrictCoatManifest({
         name: "testManifest",
         extends: ["template"],
-        dependencies: {},
-        files: [],
-        scripts: [],
-      },
+      }),
       packageJson: {},
-      coatLockfile: undefined,
+      coatGlobalLockfile: getStrictCoatGlobalLockfile({
+        version: COAT_GLOBAL_LOCKFILE_VERSION,
+      }),
+      coatLocalLockfile: getStrictCoatLocalLockfile({
+        version: COAT_LOCAL_LOCKFILE_VERSION,
+      }),
     };
     const templates = gatherExtendedTemplates(coatContext);
     expect(templates).toEqual([testExtendedTemplates[`${testCwd}/template`]]);
@@ -192,15 +160,17 @@ describe("sync/gather-extended-templates", () => {
   test("should retrieve a single extended template exporting a function", () => {
     const coatContext: CoatContext = {
       cwd: testCwd,
-      coatManifest: {
+      coatManifest: getStrictCoatManifest({
         name: "testManifest",
         extends: ["template-fn"],
-        dependencies: {},
-        files: [],
-        scripts: [],
-      },
+      }),
       packageJson: {},
-      coatLockfile: undefined,
+      coatGlobalLockfile: getStrictCoatGlobalLockfile({
+        version: COAT_GLOBAL_LOCKFILE_VERSION,
+      }),
+      coatLocalLockfile: getStrictCoatLocalLockfile({
+        version: COAT_LOCAL_LOCKFILE_VERSION,
+      }),
     };
     const templates = gatherExtendedTemplates(coatContext);
     expect(templates).toEqual([
@@ -211,15 +181,17 @@ describe("sync/gather-extended-templates", () => {
   test("should call templates that export functions with the coatContext", () => {
     const coatContext: CoatContext = {
       cwd: testCwd,
-      coatManifest: {
+      coatManifest: getStrictCoatManifest({
         name: "testManifest",
         extends: ["template-fn"],
-        dependencies: {},
-        files: [],
-        scripts: [],
-      },
+      }),
       packageJson: {},
-      coatLockfile: undefined,
+      coatGlobalLockfile: getStrictCoatGlobalLockfile({
+        version: COAT_GLOBAL_LOCKFILE_VERSION,
+      }),
+      coatLocalLockfile: getStrictCoatLocalLockfile({
+        version: COAT_LOCAL_LOCKFILE_VERSION,
+      }),
     };
 
     gatherExtendedTemplates(coatContext);
@@ -235,15 +207,17 @@ describe("sync/gather-extended-templates", () => {
   test("should resolve nested templates from their own directory to allow for multiple versions of a specific template", () => {
     const coatContext: CoatContext = {
       cwd: testCwd,
-      coatManifest: {
+      coatManifest: getStrictCoatManifest({
         name: "testManifest",
         extends: ["nested"],
-        dependencies: {},
-        files: [],
-        scripts: [],
-      },
+      }),
       packageJson: {},
-      coatLockfile: undefined,
+      coatGlobalLockfile: getStrictCoatGlobalLockfile({
+        version: COAT_GLOBAL_LOCKFILE_VERSION,
+      }),
+      coatLocalLockfile: getStrictCoatLocalLockfile({
+        version: COAT_LOCAL_LOCKFILE_VERSION,
+      }),
     };
 
     const templates = gatherExtendedTemplates(coatContext);
@@ -275,15 +249,17 @@ describe("sync/gather-extended-templates", () => {
   test("should call nested templates that export a function with the coat context", () => {
     const coatContext: CoatContext = {
       cwd: testCwd,
-      coatManifest: {
+      coatManifest: getStrictCoatManifest({
         name: "testManifest",
         extends: ["nested"],
-        dependencies: {},
-        files: [],
-        scripts: [],
-      },
+      }),
       packageJson: {},
-      coatLockfile: undefined,
+      coatGlobalLockfile: getStrictCoatGlobalLockfile({
+        version: COAT_GLOBAL_LOCKFILE_VERSION,
+      }),
+      coatLocalLockfile: getStrictCoatLocalLockfile({
+        version: COAT_LOCAL_LOCKFILE_VERSION,
+      }),
     };
 
     gatherExtendedTemplates(coatContext);

@@ -1,6 +1,18 @@
 import path from "path";
 import { CoatContext } from "../types/coat-context";
 
+/**
+ * Returns the normalized absolute file path for a given path.
+ * Results will always use unix style "/" path separators.
+ *
+ * Example:
+ * folder-1\..\folder-2\file.json
+ * ->
+ * /absolute-path-to-project/folder-2/file.json
+ *
+ * @param filePath The path that shall be normalized
+ * @param context The context of the current coat project
+ */
 export function getNormalizedFilePath(
   filePath: string,
   context: CoatContext
@@ -17,8 +29,8 @@ export function getNormalizedFilePath(
     );
   }
 
-  // Normalize path separators
-  const usableFilePath = filePath.replace(/\//g, path.sep);
+  // Always use linux style path separators
+  const usableFilePath = filePath.split(path.sep).join(path.posix.sep);
 
   // TODO: See #17
   // Disallow paths outside of the repository, throw error if path

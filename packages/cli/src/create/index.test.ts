@@ -5,14 +5,12 @@ import execa from "execa";
 import { create } from ".";
 import { getProjectName } from "./get-project-name";
 import { getTemplateInfo } from "./get-template-info";
-import { setup } from "../setup";
 import { sync } from "../sync";
 import { COAT_CLI_VERSION } from "../constants";
 
 jest
   .mock("fs")
   .mock("execa")
-  .mock("../setup")
   .mock("../sync")
   .mock("./get-template-info")
   .mock("./get-project-name");
@@ -110,7 +108,7 @@ describe("create", () => {
     ((execa as unknown) as jest.Mock).mockClear();
     await create("template", "project-name");
 
-    expect(execa).toHaveBeenCalledTimes(4);
+    expect(execa).toHaveBeenCalledTimes(3);
     expect(execa).toHaveBeenCalledWith(
       "npm",
       ["install", "--save-exact", "--save-dev", "template"],
@@ -132,7 +130,7 @@ describe("create", () => {
     ((execa as unknown) as jest.Mock).mockClear();
     await create("template", "project-name");
 
-    expect(execa).toHaveBeenCalledTimes(5);
+    expect(execa).toHaveBeenCalledTimes(4);
     expect(execa).toHaveBeenCalledWith(
       "npm",
       ["install", "--save-exact", "--save-dev", "template"],
@@ -185,7 +183,7 @@ describe("create", () => {
     }
   });
 
-  describe("setup and sync functions", () => {
+  describe("sync functions", () => {
     afterEach(() => {
       execaMock.mockImplementation(execaMockImplementation);
     });
@@ -238,65 +236,47 @@ describe("create", () => {
       expect(hasLogMessage).toBe(false);
     });
 
-    test.each`
-      name
-      ${"setup"}
-      ${"sync"}
-    `(
-      "should call the coat $name function from the local @coat/cli package",
-      async ({ name }) => {
-        execaMock.mockClear();
-        // Use an absolute path as the target dir to make the assertion below
-        // environment agnostic
-        const targetDir = "/opt/coat-cli/test/target-dir";
-        await create("template", "project-name", targetDir);
-        expect(execaMock).toHaveBeenCalledWith(
-          "npx",
-          ["--no-install", "coat", name],
-          {
-            cwd: targetDir,
-            stdio: "inherit",
-          }
-        );
-      }
-    );
-
-    test.each`
-      name       | fn       | args
-      ${"setup"} | ${setup} | ${undefined}
-      ${"sync"}  | ${sync}  | ${"/absolute/test/path/project-name"}
-    `(
-      "should call the coat $name function directly if the local @coat/cli package doesn't exist",
-      async ({ args, fn }) => {
-        fn.mockClear();
-        execaMock.mockImplementation((cmd, innerArgs) => {
-          if (
-            cmd === "npx" &&
-            innerArgs.includes("coat") &&
-            innerArgs.includes("--version")
-          ) {
-            return {
-              exitCode: 1,
-            };
-          }
-          return {
-            exitCode: 0,
-            stdout: 0,
-          };
-        });
-
-        await create(
-          "template",
-          "project-name",
-          "/absolute/test/path/project-name"
-        );
-        expect(fn).toHaveBeenCalledTimes(1);
-        if (args) {
-          expect(fn).toHaveBeenCalledWith(args);
-        } else {
-          expect(fn).toHaveBeenCalledWith();
+    test("should call the coat sync function from the local @coat/cli package", async () => {
+      execaMock.mockClear();
+      // Use an absolute path as the target dir to make the assertion below
+      // environment agnostic
+      const targetDir = "/opt/coat-cli/test/target-dir";
+      await create("template", "project-name", targetDir);
+      expect(execaMock).toHaveBeenCalledWith(
+        "npx",
+        ["--no-install", "coat", "sync"],
+        {
+          cwd: targetDir,
+          stdio: "inherit",
         }
-      }
-    );
+      );
+    });
+
+    test("should call the coat sync function directly if the local @coat/cli package doesn't exist", async () => {
+      (sync as jest.Mock).mockClear();
+      execaMock.mockImplementation((cmd, innerArgs) => {
+        if (
+          cmd === "npx" &&
+          innerArgs.includes("coat") &&
+          innerArgs.includes("--version")
+        ) {
+          return {
+            exitCode: 1,
+          };
+        }
+        return {
+          exitCode: 0,
+          stdout: 0,
+        };
+      });
+
+      await create(
+        "template",
+        "project-name",
+        "/absolute/test/path/project-name"
+      );
+      expect(sync).toHaveBeenCalledTimes(1);
+      expect(sync).toHaveBeenCalledWith("/absolute/test/path/project-name");
+    });
   });
 });

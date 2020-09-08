@@ -3,5 +3,5 @@ module.exports = {
     d: true,
   },
   thirdProperty: null,
-  arrayProperty: ["d"],
+  arrayProperty: [undefined, "d"],
 };

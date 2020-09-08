@@ -2,8 +2,13 @@
 import { Command, CommandConstructor } from "commander";
 import { COAT_CLI_VERSION } from "../constants";
 import { create } from "../create";
+import { setup } from "../setup";
 import { sync } from "../sync";
 
+/**
+ * Creates a command CLI program to run coat commands
+ * from the cli or programmatically in tests
+ */
 export function createProgram(): InstanceType<CommandConstructor> {
   const program = new Command("coat");
   program.version(COAT_CLI_VERSION).passCommandToAction(false);
@@ -16,6 +21,17 @@ export function createProgram(): InstanceType<CommandConstructor> {
       '\n\nArguments:\ntemplate (required): The name of coat template from the npm registry (e.g. "@coat/template-ts-package")\n\nprojectName (optional): The name of your new project. You will be prompted if no name is provided. The name must be a valid package name inside package.json.\n\ndir (optional): The directory where coat should create the project. The project name is used by default. If the project name contains a slash only the trailing part will be used.'
     )
     .action(create);
+
+  program
+    .command("setup")
+    .description("Runs all setup tasks of the current coat project")
+    .helpOption(
+      undefined,
+      "\n\nGathers all setup tasks of the extended templates and runs them in sequential order."
+    )
+    .action(async () => {
+      await setup(process.cwd(), true);
+    });
 
   program
     .command("sync")
