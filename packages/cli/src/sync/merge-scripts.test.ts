@@ -62,7 +62,7 @@ describe("sync/merge-scripts", () => {
     ]);
     expect(result).toEqual({
       build: "build",
-      test: "coat run 'test:*'",
+      test: 'coat run "test:*"',
       "test:1": "test1",
       "test:3": "test2",
       "test:4": "test4",
@@ -98,7 +98,7 @@ describe("sync/merge-scripts", () => {
     ]);
     expect(result).toEqual({
       build: "build",
-      test: "coat run 'test:*'",
+      test: 'coat run "test:*"',
       "test:1": "test1",
       "test:3": "test2",
       "test:4": "test4",

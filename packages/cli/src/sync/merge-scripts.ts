@@ -39,7 +39,7 @@ export function mergeScripts(
 
         // Merge the script by adding the coat run
         // command to run all scripts in parallel.
-        accumulator[scriptName] = `coat run '${scriptName}:*'`;
+        accumulator[scriptName] = `coat run "${scriptName}:*"`;
       }
       return accumulator;
       /* eslint-enable no-param-reassign */
