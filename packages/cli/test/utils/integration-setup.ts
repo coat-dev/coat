@@ -22,7 +22,8 @@ export default async (): Promise<void> => {
   // Install package into temporary directory
   await execa("npm", ["install", tarPath], { cwd: tmpDir });
 
-  // Set global environment variable which is used in integration tests
-  // for the cli path
+  // Set global environment variables which are used in
+  // integration tests for the cli and tarball path
+  process.env.COAT_CLI_TMP_TARBALL_PATH = tarPath;
   process.env.COAT_CLI_TMP_INTEGRATION_PATH = tmpDir;
 };
