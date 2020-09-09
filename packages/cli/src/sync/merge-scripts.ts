@@ -36,10 +36,10 @@ export function mergeScripts(
           }
           accumulator[scriptNameToUse] = script.run;
         });
-        // TODO: See #9
-        // Run with npm-run-all for now, switch to coat run
-        // once #9 is done
-        accumulator[scriptName] = `run-p ${scriptName}:*`;
+
+        // Merge the script by adding the coat run
+        // command to run all scripts in parallel.
+        accumulator[scriptName] = `coat run "${scriptName}:*"`;
       }
       return accumulator;
       /* eslint-enable no-param-reassign */

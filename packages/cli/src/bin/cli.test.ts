@@ -3,12 +3,17 @@ import { createProgram } from "./cli";
 import { create } from "../create";
 import { sync } from "../sync";
 import { setup } from "../setup";
+import { run } from "../run";
 
-jest.mock("../create").mock("../sync").mock("../setup");
+jest.mock("../create").mock("../sync").mock("../setup").mock("../run");
 
 jest.spyOn(process, "cwd").mockImplementation(() => "mock-cwd");
 
 describe("coat cli", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   test("should print out version", async () => {
     expect.assertions(3);
 
@@ -36,8 +41,6 @@ describe("coat cli", () => {
   `(
     "should call create function with $explanation",
     async ({ input, args }) => {
-      (create as jest.Mock).mockClear();
-
       const program = createProgram();
 
       await program.parseAsync(["create", ...input], { from: "user" });
@@ -63,5 +66,18 @@ describe("coat cli", () => {
 
     expect(setup).toHaveBeenCalledTimes(1);
     expect(setup).toHaveBeenCalledWith("mock-cwd", true);
+  });
+
+  test.each`
+    input                                 | explanation
+    ${["singleScript"]}                   | ${"a single script pattern"}
+    ${["multiple", "script", "patterns"]} | ${"multiple script patterns"}
+  `("should call run function with $explanation", async ({ input }) => {
+    const program = createProgram();
+
+    await program.parseAsync(["run", ...input], { from: "user" });
+
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(run).toHaveBeenCalledWith(input);
   });
 });
