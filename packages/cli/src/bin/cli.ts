@@ -2,6 +2,7 @@
 import { Command, CommandConstructor } from "commander";
 import { COAT_CLI_VERSION } from "../constants";
 import { create } from "../create";
+import { run } from "../run";
 import { setup } from "../setup";
 import { sync } from "../sync";
 
@@ -42,6 +43,17 @@ export function createProgram(): InstanceType<CommandConstructor> {
     )
     .action(async () => {
       await sync(process.cwd());
+    });
+
+  program
+    .command("run <scriptPattern> [otherScriptPatterns...]")
+    .description("Runs one or multiple package.json scripts in parallel")
+    .helpOption(
+      undefined,
+      "\n\nYou can run multiple scripts by specifying a wildcard, e.g. coat run build:* will run all scripts that are prefixed with build: inside the package.json scripts object."
+    )
+    .action(async (scriptPattern, otherScriptPatterns) => {
+      await run([scriptPattern, ...otherScriptPatterns]);
     });
 
   return program;
