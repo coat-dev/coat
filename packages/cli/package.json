@@ -67,6 +67,7 @@
     "lint:prettier": "prettier --check src test",
     "lint:tsc": "tsc",
     "prebuild": "rm -rf build",
+    "prepare": "npm run build",
     "prepack": "cross-env BABEL_ENV=production npm run build",
     "test": "cross-env JEST_PROJECT=\"Unit tests\" jest",
     "test:integration": "cross-env JEST_PROJECT=\"Integration tests\" jest --coverage=false",
