@@ -25,36 +25,11 @@ jobs:
           --coverageReporters clover
       - name: Upload test coverage information
         run: bash <(curl -s https://codecov.io/bash)
-      - name: Build cli
-        # The pack command does currently not allow to specify an output filename,
-        # however, it does print out the name of the file as the last line.
-        #
-        # In order to always generate the same "coat-cli.tgz" file,
-        # the output file is renamed after npm pack finishes.
-        #
-        # The transpilation and type definition generation are run
-        # automatically with the "prepack" script
-        run: mv "$(npm pack | tail -n 1)" coat-cli.tgz
-        working-directory: ./packages/cli
+      - name: Build package artifacts
+        run: npx --no-install lerna exec npm pack
       - uses: actions/upload-artifact@v2
         with:
-          name: coat-cli
-          path: packages/cli/coat-cli.tgz
-      - name: Build template-ts-package
-        # The pack command does currently not allow to specify an output filename,
-        # however, it does print out the name of the file as the last line.
-        #
-        # In order to always generate the same "coat-template-ts-package.tgz" file,
-        # the output file is renamed after npm pack finishes.
-        #
-        # The transpilation and type definition generation are run
-        # automatically with the "prepare" script
-        run: mv "$(npm pack | tail -n 1)" coat-template-ts-package.tgz
-        working-directory: ./packages/template-ts-package
-      - uses: actions/upload-artifact@v2
-        with:
-          name: coat-cli
-          path: packages/cli/coat-template-ts-package.tgz
+          path: packages/*/*.tgz
   integration-tests:
     name: Integration tests
     strategy:
