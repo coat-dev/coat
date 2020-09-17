@@ -1,0 +1,14 @@
+files:
+  - path: .babelrc
+  - path: .eslintrc
+  - path: .gitignore
+  - path: jest.config.js
+  - once: true
+    path: README.md
+  - once: true
+    path: src/index.test.ts
+  - once: true
+    path: src/index.ts
+  - path: tsconfig.build.json
+  - path: tsconfig.json
+version: 1
