@@ -37,6 +37,7 @@
     "@types/json-stable-stringify": "1.0.32",
     "@types/lodash": "4.14.161",
     "@types/semver": "7.3.3",
+    "@types/single-trailing-newline": "^1.0.0",
     "@types/tmp": "0.2.0",
     "@types/validate-npm-package-name": "3.0.0",
     "@typescript-eslint/eslint-plugin": "4.1.0",
