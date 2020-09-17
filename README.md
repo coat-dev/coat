@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img alt="coat" src="coat-logo.png" width="546">
+  <img alt="coat" src="https://github.com/coat-dev/coat/raw/3/initial-readme/coat-logo.png" width="546">
 </p>
 
 <p align="center">
