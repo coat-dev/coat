@@ -29,6 +29,7 @@ jobs:
         run: npx --no-install lerna exec npm pack
       - uses: actions/upload-artifact@v2
         with:
+          name: coat
           path: packages/*/*.tgz
   integration-tests:
     name: Integration tests
