@@ -3,7 +3,7 @@
   "version": "0.0.3",
   "author": "Peter Juras <me@peterjuras.com>",
   "bin": {
-    "coat": "./build/bin/cli.js"
+    "coat": "./bin/coat.js"
   },
   "dependencies": {
     "commander": "6.1.0",
@@ -67,6 +67,7 @@
     "lint:prettier": "prettier --check src test",
     "lint:tsc": "tsc",
     "prebuild": "rm -rf build",
+    "prepare": "npm run build",
     "prepack": "cross-env BABEL_ENV=production npm run build",
     "test": "cross-env JEST_PROJECT=\"Unit tests\" jest",
     "test:integration": "cross-env JEST_PROJECT=\"Integration tests\" jest --coverage=false",

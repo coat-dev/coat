@@ -12,11 +12,10 @@ jobs:
           npm ci
           npx --no-install lerna bootstrap
       - name: Lint
-        run: npm run lint
-        working-directory: ./packages/cli
+        run: npx --no-install lerna run lint --stream
       - name: Test
         run: |
-          npm test -- \
+          npx --no-install lerna run test --stream -- -- \
           --ci \
           --no-cache \
           --runInBand \
@@ -24,25 +23,14 @@ jobs:
           --coverageReporters lcov \
           --coverageReporters text \
           --coverageReporters clover
-        working-directory: ./packages/cli
       - name: Upload test coverage information
         run: bash <(curl -s https://codecov.io/bash)
-        working-directory: ./packages/cli
-      - name: Build
-        # The pack command does currently not allow to specify an output filename,
-        # however, it does print out the name of the file as the last line.
-        #
-        # In order to always generate the same "coat-cli.tgz" file,
-        # the output file is renamed after npm pack finishes.
-        #
-        # The transpilation and type definition generation are run
-        # automatically with the "prepack" script
-        run: mv "$(npm pack | tail -n 1)" coat-cli.tgz
-        working-directory: ./packages/cli
+      - name: Build package artifacts
+        run: npx --no-install lerna exec npm pack
       - uses: actions/upload-artifact@v2
         with:
-          name: coat-cli
-          path: packages/cli/coat-cli.tgz
+          name: coat
+          path: packages/*/*.tgz
   integration-tests:
     name: Integration tests
     strategy:

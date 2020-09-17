@@ -13,15 +13,13 @@ export function runCli(args: string[], cwd?: string): RunCliResult {
       "Environment variable COAT_CLI_TMP_INTEGRATION_PATH must be defined for integration tests. Ensure that jest is running the global setup file."
     );
   }
-
   const binPath = path.join(
     process.env.COAT_CLI_TMP_INTEGRATION_PATH,
     "node_modules",
     "@coat",
     "cli",
-    "build",
     "bin",
-    "cli.js"
+    "coat.js"
   );
   let usableCwd: string;
 

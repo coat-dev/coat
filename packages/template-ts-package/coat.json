@@ -1,0 +1,4 @@
+{
+  "name": "@coat/template-ts-package",
+  "extends": "./build"
+}

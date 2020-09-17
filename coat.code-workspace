@@ -15,12 +15,14 @@
   ],
   "settings": {
     "conventionalCommits.scopes": ["cli", "template-ts-package"],
-    "jest.disabledWorkspaceFolders": [
-      "✨ coat",
-      "📦 @coat/template-ts-package"
-    ],
+    "jest.disabledWorkspaceFolders": ["✨ coat"],
     "jest.enableCodeLens": false,
+    "jest.pathToJest": "npm test --",
+    "jest.enableInlineErrorMessages": true,
     "task.quickOpen.history": 0,
+    "files.exclude": {
+      "packages": true
+    },
     "typescript.tsdk": "📦 @coat/cli/node_modules/typescript/lib"
   },
   "extensions": {

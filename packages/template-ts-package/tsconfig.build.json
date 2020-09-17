@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "isolatedModules": false,
+    "noEmit": false
+  },
+  "exclude": ["**/**/*.test.ts"],
+  "extends": "./tsconfig.json"
+}
