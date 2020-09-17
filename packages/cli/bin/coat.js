@@ -6,8 +6,7 @@
 // While this code is not covered by unit tests
 // and code coverage, integration tests
 // in /tests will run this code since they
-// spawn a new process which requires this
-// file as the main module
+// node with this file as the main module
 //
 // TODO: See #14
 // Run local version of coat if installed in a project
