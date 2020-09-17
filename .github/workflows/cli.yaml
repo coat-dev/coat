@@ -1,5 +1,9 @@
 name: "@coat/cli"
-on: push
+on:
+  push:
+    # TODO: Remove after initial README is done
+    branches-ignore:
+      - 3/initial-readme
 
 jobs:
   build:
