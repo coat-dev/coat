@@ -11,15 +11,11 @@ jobs:
         run: |
           npm ci
           npx --no-install lerna bootstrap
-      - name: Lint cli
-        run: npm run lint
-        working-directory: ./packages/cli
-      - name: Lint template-ts-package
-        run: npm run lint
-        working-directory: ./packages/template-ts-package
+      - name: Lint
+        run: npx --no-install lerna run lint
       - name: Test
         run: |
-          npm test -- \
+          npx --no-install lerna run test -- -- \
           --ci \
           --no-cache \
           --runInBand \
@@ -27,10 +23,8 @@ jobs:
           --coverageReporters lcov \
           --coverageReporters text \
           --coverageReporters clover
-        working-directory: ./packages/cli
       - name: Upload test coverage information
         run: bash <(curl -s https://codecov.io/bash)
-        working-directory: ./packages/cli
       - name: Build cli
         # The pack command does currently not allow to specify an output filename,
         # however, it does print out the name of the file as the last line.
