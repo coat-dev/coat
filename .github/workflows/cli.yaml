@@ -11,9 +11,12 @@ jobs:
         run: |
           npm ci
           npx --no-install lerna bootstrap
-      - name: Lint
+      - name: Lint cli
         run: npm run lint
         working-directory: ./packages/cli
+      - name: Lint template-ts-package
+        run: npm run lint
+        working-directory: ./packages/template-ts-package
       - name: Test
         run: |
           npm test -- \
@@ -28,7 +31,7 @@ jobs:
       - name: Upload test coverage information
         run: bash <(curl -s https://codecov.io/bash)
         working-directory: ./packages/cli
-      - name: Build
+      - name: Build cli
         # The pack command does currently not allow to specify an output filename,
         # however, it does print out the name of the file as the last line.
         #
@@ -43,6 +46,21 @@ jobs:
         with:
           name: coat-cli
           path: packages/cli/coat-cli.tgz
+      - name: Build template-ts-package
+        # The pack command does currently not allow to specify an output filename,
+        # however, it does print out the name of the file as the last line.
+        #
+        # In order to always generate the same "coat-template-ts-package.tgz" file,
+        # the output file is renamed after npm pack finishes.
+        #
+        # The transpilation and type definition generation are run
+        # automatically with the "prepare" script
+        run: mv "$(npm pack | tail -n 1)" coat-template-ts-package.tgz
+        working-directory: ./packages/template-ts-package
+      - uses: actions/upload-artifact@v2
+        with:
+          name: coat-cli
+          path: packages/cli/coat-template-ts-package.tgz
   integration-tests:
     name: Integration tests
     strategy:
