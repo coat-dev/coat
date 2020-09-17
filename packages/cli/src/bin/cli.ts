@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { Command, CommandConstructor } from "commander";
 import { COAT_CLI_VERSION } from "../constants";
 import { create } from "../create";
@@ -57,23 +56,4 @@ export function createProgram(): InstanceType<CommandConstructor> {
     });
 
   return program;
-}
-
-// The following condition is ignored when collecting
-// code coverage, since the cli is started in a different
-// way for unit tests.
-// Integration tests in /tests will run this code
-// since they spawn a new process which requires
-// this file as the main module
-//
-// TODO: See #14
-// Run local version of coat if installed in a project
-/* istanbul ignore next */
-if (require.main === module) {
-  createProgram()
-    .parseAsync(process.argv)
-    .catch((error) => {
-      console.error(error);
-      process.exit(1);
-    });
 }
