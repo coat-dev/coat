@@ -27,7 +27,11 @@ import { CoatManifest } from "../types/coat-manifest";
 import { groupFiles } from "./group-files";
 import { flatten } from "lodash";
 
-jest.mock("fs").mock("execa").mock("../util/gather-extended-templates");
+jest
+  .mock("fs")
+  .mock("execa")
+  .mock("ora")
+  .mock("../util/gather-extended-templates");
 
 const platformRoot = path.parse(process.cwd()).root;
 const testCwd = path.join(platformRoot, "test");
@@ -115,6 +119,8 @@ const packageJson = {
   },
   ...currentDependencies,
 };
+
+const execaMock = (execa as unknown) as jest.Mock;
 
 describe("sync", () => {
   let mergeScriptsSpy: jest.SpyInstance;
@@ -296,8 +302,16 @@ describe("sync", () => {
 
     expect(execa).toHaveBeenCalledWith("npm", ["install"], {
       cwd: testCwd,
-      stdio: "inherit",
     });
+  });
+
+  test("should throw error if npm install fails", async () => {
+    execaMock.mockImplementationOnce(() => {
+      throw new Error("Install error");
+    });
+    await expect(() => sync(testCwd)).rejects.toMatchInlineSnapshot(
+      `[Error: Install error]`
+    );
   });
 
   test("should not run npm install if dependencies are not changed", async () => {

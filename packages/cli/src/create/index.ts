@@ -2,6 +2,7 @@ import { promises as fs } from "fs";
 import fsExtra from "fs-extra";
 import path from "path";
 import execa from "execa";
+import ora from "ora";
 import { sync } from "../sync";
 import { getProjectName } from "./get-project-name";
 import { getTemplateInfo } from "./get-template-info";
@@ -77,12 +78,13 @@ export async function create(
     targetCwd = path.join(process.cwd(), targetDirectory);
   }
 
+  // Run npm install to install the template and its dependencies
+  const installSpinner = ora(
+    "Installing template into project directory"
+  ).start();
   try {
-    // Run npm install to install the template and its dependencies
-    console.log("Running npm install in the project directory");
     await execa("npm", ["install", "--save-exact", "--save-dev", template], {
       cwd: targetCwd,
-      stdio: "inherit",
     });
 
     // Templates should have a peerDependency on @coat/cli which could
@@ -100,12 +102,12 @@ export async function create(
       );
       await execa("npm", ["install", "--save-dev", ...peerDependencyPackages], {
         cwd: targetCwd,
-        stdio: "inherit",
       });
     } else {
       // TODO: See #15
       // Warn that templates should have a peerDependency on @coat/cli
     }
+    installSpinner.succeed();
 
     // Write the coat manifest file
     const coatManifest = {
@@ -117,6 +119,7 @@ export async function create(
       jsonPolish(coatManifest, COAT_MANIFEST_FILENAME)
     );
   } catch (error) {
+    installSpinner.fail();
     // Remove created project files and the created directory to enable the user
     // to easily re-run the coat create command again in case
     // this was a network issue or it should be re-run with fixed

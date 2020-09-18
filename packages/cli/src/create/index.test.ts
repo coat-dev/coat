@@ -11,6 +11,7 @@ import { COAT_CLI_VERSION } from "../constants";
 jest
   .mock("fs")
   .mock("execa")
+  .mock("ora")
   .mock("../sync")
   .mock("./get-template-info")
   .mock("./get-project-name");
@@ -114,7 +115,6 @@ describe("create", () => {
       ["install", "--save-exact", "--save-dev", "template"],
       {
         cwd: path.join(process.cwd(), "project-name"),
-        stdio: "inherit",
       }
     );
   });
@@ -136,7 +136,6 @@ describe("create", () => {
       ["install", "--save-exact", "--save-dev", "template"],
       {
         cwd: path.join(process.cwd(), "project-name"),
-        stdio: "inherit",
       }
     );
     expect(execa).toHaveBeenCalledWith(
@@ -144,7 +143,6 @@ describe("create", () => {
       ["install", "--save-dev", "peer-a@^0.0.1", "peer-b@*"],
       {
         cwd: path.join(process.cwd(), "project-name"),
-        stdio: "inherit",
       }
     );
   });

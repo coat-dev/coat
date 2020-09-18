@@ -33,19 +33,22 @@ describe("coat create - errors", () => {
       throw new Error("Error! Task should have thrown an error");
     } catch (error) {
       // Remove lines that are environment dependent
-      const errorMessages = error.stderr.split("\n").slice(0, 10).join("\n");
+      const errorMessages = error.stderr.split("\n").slice(0, 13).join("\n");
       expect(errorMessages).toMatchInlineSnapshot(`
-          "npm ERR! code E404
-          npm ERR! 404 Not Found - GET https://registry.npmjs.org/@coat%2fnon-existent-package - Not found
-          npm ERR! 404 
-          npm ERR! 404  '@coat/non-existent-package@latest' is not in the npm registry.
-          npm ERR! 404 You should bug the author to publish it (or use the name yourself!)
-          npm ERR! 404 
-          npm ERR! 404 Note that you can also install from a
-          npm ERR! 404 tarball, folder, http url, or git url.
+        "- Installing template into project directory
+        [31m✖[39m Installing template into project directory
+        { Error: Command failed with exit code 1: npm install --save-exact --save-dev @coat/non-existent-package
+        npm ERR! code E404
+        npm ERR! 404 Not Found - GET https://registry.npmjs.org/@coat%2fnon-existent-package - Not found
+        npm ERR! 404 
+        npm ERR! 404  '@coat/non-existent-package@latest' is not in the npm registry.
+        npm ERR! 404 You should bug the author to publish it (or use the name yourself!)
+        npm ERR! 404 
+        npm ERR! 404 Note that you can also install from a
+        npm ERR! 404 tarball, folder, http url, or git url.
 
-          npm ERR! A complete log of this run can be found in:"
-        `);
+        npm ERR! A complete log of this run can be found in:"
+      `);
     }
   });
 

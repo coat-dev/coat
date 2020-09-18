@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import execa from "execa";
+import ora from "ora";
 import flatten from "lodash/flatten";
 import { mergeFiles } from "./merge-files";
 import { mergeScripts } from "./merge-scripts";
@@ -229,7 +230,14 @@ export async function sync(cwd: string): Promise<void> {
     };
 
     if (!isEqual(finalDependencies, currentDependencies)) {
-      await execa("npm", ["install"], { cwd: context.cwd, stdio: "inherit" });
+      const installSpinner = ora("Installing dependencies").start();
+      try {
+        await execa("npm", ["install"], { cwd: context.cwd });
+        installSpinner.succeed();
+      } catch (error) {
+        installSpinner.fail();
+        throw error;
+      }
     }
   }
 }
