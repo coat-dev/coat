@@ -58,7 +58,7 @@ describe("run/unknown-commands", () => {
           {
             id: "test-script",
             scriptName: "test-script",
-            run: "node -e 'process.exit(5)'",
+            run: 'node -e "process.exit(5);"',
           },
         ],
       },
@@ -82,7 +82,7 @@ describe("run/unknown-commands", () => {
           {
             id: "test-script",
             scriptName: "test-script",
-            run: "node -e 'process.exit(5)'",
+            run: 'node -e "process.exit(5);"',
           },
           {
             id: "test-script-2",

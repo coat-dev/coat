@@ -25,13 +25,13 @@ describe("run/run-multiple-scripts", () => {
       1,
       "npm",
       ["run", "--silent", "script1"],
-      { cwd: "/test", env: { FORCE_COLOR: "true" } }
+      { cwd: testCwd, env: { FORCE_COLOR: "true" } }
     );
     expect(execa).toHaveBeenNthCalledWith(
       2,
       "npm",
       ["run", "--silent", "script2"],
-      { cwd: "/test", env: { FORCE_COLOR: "true" } }
+      { cwd: testCwd, env: { FORCE_COLOR: "true" } }
     );
   });
 
@@ -47,13 +47,13 @@ describe("run/run-multiple-scripts", () => {
       1,
       "npm",
       ["run", "--silent", "script1", "--", "--arg1", "--arg2", "arg2Value"],
-      { cwd: "/test", env: { FORCE_COLOR: "true" } }
+      { cwd: testCwd, env: { FORCE_COLOR: "true" } }
     );
     expect(execa).toHaveBeenNthCalledWith(
       2,
       "npm",
       ["run", "--silent", "script2", "--", "--arg1", "--arg2", "arg2Value"],
-      { cwd: "/test", env: { FORCE_COLOR: "true" } }
+      { cwd: testCwd, env: { FORCE_COLOR: "true" } }
     );
   });
 
