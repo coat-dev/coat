@@ -9,9 +9,29 @@ jest.mock("../create").mock("../sync").mock("../setup").mock("../run");
 
 jest.spyOn(process, "cwd").mockImplementation(() => "mock-cwd");
 
+const exitMock = jest.spyOn(process, "exit").mockImplementation(
+  // @ts-expect-error
+  (): never => {
+    // Empty mock function
+  }
+);
+
+const runMock = run as jest.Mock<
+  ReturnType<typeof run>,
+  Parameters<typeof run>
+>;
+
+const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {
+  // Empty mock function
+});
+
 describe("coat cli", () => {
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 
   test("should print out version", async () => {
@@ -69,15 +89,99 @@ describe("coat cli", () => {
   });
 
   test.each`
-    input                                 | explanation
-    ${["singleScript"]}                   | ${"a single script pattern"}
-    ${["multiple", "script", "patterns"]} | ${"multiple script patterns"}
+    input                                                                    | explanation
+    ${["singleScript"]}                                                      | ${"a single script pattern"}
+    ${["singleScript", "--option1", "--option2", "value"]}                   | ${"a single script pattern with options"}
+    ${["multiple", "script", "patterns"]}                                    | ${"multiple script patterns"}
+    ${["multiple", "script", "patterns", "--option1", "--option2", "value"]} | ${"multiple script patterns with options"}
   `("should call run function with $explanation", async ({ input }) => {
     const program = createProgram();
 
     await program.parseAsync(["run", ...input], { from: "user" });
 
     expect(run).toHaveBeenCalledTimes(1);
-    expect(run).toHaveBeenCalledWith(input);
+    expect(run).toHaveBeenCalledWith("mock-cwd", input);
+  });
+
+  test("should exit from run function with correct error code thrown from script", async () => {
+    const program = createProgram();
+
+    runMock.mockImplementationOnce(async () => {
+      const error = new Error("script error");
+      // @ts-expect-error
+      error.exitCode = 5;
+      throw error;
+    });
+
+    await program.parseAsync(["run", "test-script"], { from: "user" });
+
+    expect(exitMock).toHaveBeenCalledTimes(1);
+    expect(exitMock).toHaveBeenLastCalledWith(5);
+  });
+
+  test("should rethrow error from run function if no exitCode is available", async () => {
+    const program = createProgram();
+
+    runMock.mockImplementationOnce(async () => {
+      throw new Error("run error");
+    });
+
+    try {
+      await program.parseAsync(["run", "test-script"], { from: "user" });
+
+      throw new Error("This line should not be reached, run should throw!");
+    } catch (error) {
+      expect(error).toHaveProperty("message", "run error");
+    }
+
+    expect(exitMock).not.toHaveBeenCalled();
+  });
+
+  describe("unknown commands", () => {
+    test("should call run function if no known command is passed to coat", async () => {
+      const program = createProgram();
+
+      await program.parseAsync(["build", "--watch"], { from: "user" });
+      expect(run).toHaveBeenCalledTimes(1);
+      expect(run).toHaveBeenLastCalledWith("mock-cwd", ["build", "--watch"]);
+
+      await program.parseAsync(["test", "--watch"], { from: "user" });
+      expect(run).toHaveBeenCalledTimes(2);
+      expect(run).toHaveBeenLastCalledWith("mock-cwd", ["test", "--watch"]);
+    });
+
+    test("should exit immediately if script is run on unknown command and throws with exitCode", async () => {
+      const program = createProgram();
+
+      runMock.mockImplementationOnce(async () => {
+        const error = new Error("script error");
+        // @ts-expect-error
+        error.exitCode = 5;
+        throw error;
+      });
+
+      await program.parseAsync(["build", "--watch"], { from: "user" });
+
+      expect(exitMock).toHaveBeenCalledTimes(1);
+      expect(exitMock).toHaveBeenLastCalledWith(5);
+    });
+
+    test("should display unknown command error message if any other error occurred during run", async () => {
+      const program = createProgram();
+
+      runMock.mockImplementationOnce(async () => {
+        throw new Error("script error");
+      });
+
+      await program.parseAsync(["build", "--watch"], { from: "user" });
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenLastCalledWith(
+        "error: unknown script or command 'build'. See 'coat --help'"
+      );
+
+      expect(exitMock).toHaveBeenCalledTimes(1);
+      expect(exitMock).toHaveBeenLastCalledWith(1);
+    });
   });
 });

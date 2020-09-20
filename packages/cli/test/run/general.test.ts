@@ -88,4 +88,58 @@ describe("coat run - general", () => {
     expect(result.stdout).toContain("Running test script 2");
     expect(result.stdout).toContain("Running another test script");
   });
+
+  test("should exit with the exitCode from the script if it fails", async () => {
+    const { cwd, task: syncTask } = await runSyncTest({
+      coatManifest: {
+        name: "test",
+        scripts: [
+          {
+            id: "test-script",
+            scriptName: "test-script",
+            run: 'node -e "process.exit(5);"',
+          },
+        ],
+      },
+    });
+    await syncTask;
+
+    const { task: runTask } = runCli(["run", "test-script"], cwd);
+    try {
+      await runTask;
+      throw new Error("should not be reached");
+    } catch (error) {
+      expect(error.exitCode).toBe(5);
+    }
+  });
+
+  test("should fail fast if one of the scripts fails and the other is a long running script", async () => {
+    const { cwd, task: syncTask } = await runSyncTest({
+      coatManifest: {
+        name: "test",
+        scripts: [
+          {
+            id: "test-script",
+            scriptName: "test-script",
+            run: 'node -e "process.exit(5);"',
+          },
+          {
+            id: "test-script-2",
+            scriptName: "test-script",
+            run: "node -e \"setTimeout(() => console.log('Done'), 15000);\"",
+          },
+        ],
+      },
+    });
+    await syncTask;
+
+    const { task: runTask } = runCli(["run", "test-script:*"], cwd);
+    try {
+      await runTask;
+      throw new Error("should not be reached");
+    } catch (error) {
+      expect(error.stdout).not.toContain("Done");
+      expect(error.exitCode).toBe(5);
+    }
+  });
 });
