@@ -11,7 +11,10 @@ import { sync } from "../sync";
  */
 export function createProgram(): InstanceType<CommandConstructor> {
   const program = new Command("coat");
-  program.version(COAT_CLI_VERSION).passCommandToAction(false);
+  program
+    .version(COAT_CLI_VERSION)
+    .passCommandToAction(false)
+    .allowUnknownOption();
 
   program
     .command("create <template> [projectName] [dir]")
@@ -47,13 +50,55 @@ export function createProgram(): InstanceType<CommandConstructor> {
   program
     .command("run <scriptPattern> [otherScriptPatterns...]")
     .description("Runs one or multiple package.json scripts in parallel")
+    .allowUnknownOption()
     .helpOption(
       undefined,
-      "\n\nYou can run multiple scripts by specifying a wildcard, e.g. coat run build:* will run all scripts that are prefixed with build: inside the package.json scripts object."
+      '\n\nYou can run multiple scripts by specifying a wildcard, e.g. coat run build:* will run all scripts that are prefixed with build: inside the package.json scripts object.\n\nAll arguments after the first dash ("-") will be passed to each script, e.g. "coat run build --watch" will call the build script with "--watch"'
     )
     .action(async (scriptPattern, otherScriptPatterns) => {
-      await run([scriptPattern, ...otherScriptPatterns]);
+      try {
+        await run(process.cwd(), [scriptPattern, ...otherScriptPatterns]);
+      } catch (error) {
+        // Exit immediately with the exitCode if a script has thrown an error
+        if (error.exitCode) {
+          process.exit(error.exitCode);
+          return;
+        }
+        // Otherwise rethrow the error directly
+        throw error;
+      }
     });
+
+  // This handler catches all commands which are not
+  // declared above.
+  // If coat is called without a built-in command,
+  // it should be checked whether a script exists that
+  // can be run as a shortcut instead.
+  // Example:
+  // "coat run <script>" -> "coat <script>"
+  program.on("command:*", async (commands, options) => {
+    try {
+      await run(process.cwd(), [...commands, ...options]);
+    } catch (error) {
+      // If the error has an exitCode property, it has
+      // been thrown from a script that has been run.
+      if (error.exitCode) {
+        process.exit(error.exitCode);
+        return;
+      }
+
+      // If there is no exitCode, the error has to be in an earlier
+      // part of the run function, e.g. because no package.json file exists
+      // or the script name is not a part of it.
+      //
+      // Therefore we output the default error message from commander to
+      // let the user know that the command or script was not found.
+      console.error(
+        `error: unknown script or command '${commands[0]}'. See 'coat --help'`
+      );
+      process.exit(1);
+    }
+  });
 
   return program;
 }

@@ -19,6 +19,7 @@ jobs:
           --ci \
           --no-cache \
           --runInBand \
+          --verbose \
           --coverageReporters json \
           --coverageReporters lcov \
           --coverageReporters text \
@@ -55,5 +56,5 @@ jobs:
           echo "::set-env name=npm_config_fetch_retry_mintimeout::50"
           echo "::set-env name=npm_config_fetch_retry_maxtimeout::6000"
       - name: Run all tests
-        run: npm run test:all -- --ci --no-cache --runInBand
+        run: npm run test:all -- --ci --no-cache --runInBand --verbose
         working-directory: ./packages/cli

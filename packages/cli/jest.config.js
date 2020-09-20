@@ -31,7 +31,6 @@ module.exports = {
   collectCoverage: true,
   collectCoverageFrom: ["src/**/*.ts", "!src/**/*.test.ts"],
   coverageReporters: ["text"],
-  verbose: true,
 
   // Workaround to test integration tests
   // with VSCode test explorer jest test adapter:
