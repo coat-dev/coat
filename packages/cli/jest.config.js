@@ -26,6 +26,10 @@ if (projectToRun) {
   projectsToRun = [projectToRun];
 }
 
+// Set npm log level to notice, in case it is silenced
+// by coat run
+process.env.npm_config_loglevel = "notice";
+
 module.exports = {
   projects: projectsToRun,
   collectCoverage: true,

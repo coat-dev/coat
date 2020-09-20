@@ -110,7 +110,7 @@ describe("coat sync - scripts", () => {
       name: "test-project",
       version: "1.0.0",
       scripts: {
-        build: 'coat run "build:*"',
+        build: "coat run build:*",
         "build:babel": "babel",
         "build:typescript": "tsc",
         lint: "eslint",
