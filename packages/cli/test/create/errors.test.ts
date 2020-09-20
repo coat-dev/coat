@@ -81,8 +81,8 @@ describe("coat create - errors", () => {
       // task throws an error
       throw new Error("Error! Task should have thrown an error");
     } catch (error) {
-      expect(error.stderr).toMatchInlineSnapshot(
-        `"Warning! The specified target diretory is not empty. Aborting to prevent accidental file loss or override."`
+      expect(error.stderr).toContain(
+        "Warning! The specified target diretory is not empty. Aborting to prevent accidental file loss or override."
       );
 
       // targetDir should only contain one file

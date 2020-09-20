@@ -55,7 +55,9 @@ export async function create(
   // an error
   const directoryEntries = await fs.readdir(targetDirectory);
   if (directoryEntries.length) {
-    throw "Warning! The specified target diretory is not empty. Aborting to prevent accidental file loss or override.";
+    throw new Error(
+      "Warning! The specified target diretory is not empty. Aborting to prevent accidental file loss or override."
+    );
   }
 
   const packageJson = {
@@ -78,11 +80,14 @@ export async function create(
     targetCwd = path.join(process.cwd(), targetDirectory);
   }
 
-  // Run npm install to install the template and its dependencies
   const installSpinner = ora(
     "Installing template into project directory"
   ).start();
   try {
+    // Initialize a git repository in the target directory
+    await execa("git", ["init"], { cwd: targetCwd });
+
+    // Run npm install to install the template and its dependencies
     await execa("npm", ["install", "--save-exact", "--save-dev", template], {
       cwd: targetCwd,
     });

@@ -36,6 +36,7 @@ const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {
 describe("create", () => {
   afterEach(() => {
     vol.reset();
+    jest.clearAllMocks();
   });
 
   test("should be exported correctly", () => {
@@ -98,18 +99,18 @@ describe("create", () => {
 
     try {
       await create("template", "project-name", "targetDir");
-    } catch (errorMessage) {
-      expect(errorMessage).toMatchInlineSnapshot(
-        `"Warning! The specified target diretory is not empty. Aborting to prevent accidental file loss or override."`
+    } catch (error) {
+      expect(error).toHaveProperty(
+        "message",
+        "Warning! The specified target diretory is not empty. Aborting to prevent accidental file loss or override."
       );
     }
   });
 
   test("should add the template as a devDependency in the target dir", async () => {
-    ((execa as unknown) as jest.Mock).mockClear();
     await create("template", "project-name");
 
-    expect(execa).toHaveBeenCalledTimes(3);
+    expect(execa).toHaveBeenCalledTimes(4);
     expect(execa).toHaveBeenCalledWith(
       "npm",
       ["install", "--save-exact", "--save-dev", "template"],
@@ -117,6 +118,15 @@ describe("create", () => {
         cwd: path.join(process.cwd(), "project-name"),
       }
     );
+  });
+
+  test("should initialize a git repository in the target dir", async () => {
+    await create("template", "project-name");
+
+    expect(execa).toHaveBeenCalledTimes(4);
+    expect(execa).toHaveBeenCalledWith("git", ["init"], {
+      cwd: path.join(process.cwd(), "project-name"),
+    });
   });
 
   test("should add the template and its peerDependencies as devDependencies in the target dir", async () => {
@@ -127,10 +137,9 @@ describe("create", () => {
         "peer-b": "*",
       },
     }));
-    ((execa as unknown) as jest.Mock).mockClear();
     await create("template", "project-name");
 
-    expect(execa).toHaveBeenCalledTimes(4);
+    expect(execa).toHaveBeenCalledTimes(5);
     expect(execa).toHaveBeenCalledWith(
       "npm",
       ["install", "--save-exact", "--save-dev", "template"],
@@ -151,7 +160,10 @@ describe("create", () => {
     expect.assertions(2);
 
     try {
-      ((execa as unknown) as jest.Mock).mockImplementationOnce(() =>
+      execaMock.mockImplementationOnce(() => {
+        // Empty
+      });
+      execaMock.mockImplementationOnce(() =>
         Promise.reject(new Error("Rejected"))
       );
       await create("template", "project-name");
@@ -166,7 +178,10 @@ describe("create", () => {
     expect.assertions(3);
 
     try {
-      ((execa as unknown) as jest.Mock).mockImplementationOnce(() =>
+      execaMock.mockImplementationOnce(() => {
+        // Empty
+      });
+      execaMock.mockImplementationOnce(() =>
         Promise.reject(new Error("Rejected"))
       );
       await create("template", "project-name", "target-dir");

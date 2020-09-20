@@ -11,6 +11,7 @@ describe("coat create - target directories", () => {
   const packageJsonFileName = "package.json";
   const coatManifestFileName = "coat.json";
   const defaultEntries = [
+    ".git",
     coatManifestFileName,
     packageJsonFileName,
     "package-lock.json",
