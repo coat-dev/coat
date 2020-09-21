@@ -193,7 +193,7 @@ describe("coat sync - files", () => {
     expect(JSON.parse(aJson)).toMatchInlineSnapshot(`
       Object {
         "arrayProperty": Array [
-          "a",
+          null,
           "d",
         ],
         "firstProperty": Object {

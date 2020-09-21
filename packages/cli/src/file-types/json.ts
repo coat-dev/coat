@@ -1,9 +1,16 @@
-import lodashMerge from "lodash/merge";
+import mergeWith from "lodash/mergeWith";
 import jsonStableStringify from "json-stable-stringify";
 import { JsonObject } from "type-fest";
 import { FileTypeFunctions } from ".";
 import { CoatContext } from "../types/coat-context";
 import { getPrettier } from "../util/get-prettier";
+
+function mergeWithArrayReplacement(source: unknown, target: unknown): unknown {
+  // Replace arrays rather than merging them
+  if (Array.isArray(target) && Array.isArray(source)) {
+    return target;
+  }
+}
 
 function merge(
   source: JsonObject | null | undefined,
@@ -11,11 +18,8 @@ function merge(
 ): JsonObject | null {
   // Default object merge behavior is covered by lodash's
   // merge function. Properties will be merged deeply,
-  // arrays will be merged as well, e.g.:
-  // a1 = [1, 2, 3] ; a2 = [undefined, 4, 3, 5]
-  // will result in:
-  // [1, 4, 3, 5]
-  return lodashMerge({}, source ?? {}, target);
+  // newer arrays will replace existing ones
+  return mergeWith({}, source ?? {}, target, mergeWithArrayReplacement);
 }
 
 export function polish(
