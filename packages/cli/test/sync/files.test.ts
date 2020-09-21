@@ -33,15 +33,17 @@ describe("coat sync - files", () => {
     });
     await task;
 
-    const [folderContent, aJson, bTxt, cTxt] = await Promise.all([
+    const [folderContent, aJson, bTxt, cTxt, gitignore] = await Promise.all([
       fs.readdir(cwd),
       fs.readFile(path.join(cwd, "a.json"), "utf8"),
       fs.readFile(path.join(cwd, "b.txt"), "utf8"),
       fs.readFile(path.join(cwd, "c.txt"), "utf8"),
+      fs.readFile(path.join(cwd, ".gitignore"), "utf8"),
     ]);
 
     expect(folderContent).toMatchInlineSnapshot(`
       Array [
+        ".gitignore",
         "a.json",
         "b.txt",
         "c.txt",
@@ -69,6 +71,14 @@ describe("coat sync - files", () => {
 
     expect(cTxt).toMatchInlineSnapshot(`
       "Text from local-files-3
+      "
+    `);
+
+    expect(gitignore).toMatchInlineSnapshot(`
+      "node_modules
+
+      # coat local files
+      /.coat
       "
     `);
   });

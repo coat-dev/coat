@@ -10,7 +10,18 @@ import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
 describe("coat sync - lockfile", () => {
   describe("global", () => {
     test("should not generate lockfile if there is no need to write one", async () => {
-      const { cwd, task } = await runSyncTest();
+      const { cwd, task } = await runSyncTest({
+        coatManifest: {
+          name: "test",
+          files: [
+            {
+              file: ".gitignore",
+              content: null,
+              type: CoatManifestFileType.Text,
+            },
+          ],
+        },
+      });
 
       await task;
       await expect(
@@ -59,6 +70,8 @@ describe("coat sync - lockfile", () => {
       );
       expect(lockfileRaw).toMatchInlineSnapshot(`
       "files:
+        - once: true
+          path: .gitignore
         - path: a.json
         - path: b.txt
         - path: c.txt

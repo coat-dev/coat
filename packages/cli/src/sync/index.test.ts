@@ -26,6 +26,7 @@ import {
 import { CoatManifest } from "../types/coat-manifest";
 import { groupFiles } from "./group-files";
 import { flatten } from "lodash";
+import { getDefaultFiles } from "./get-default-files";
 
 jest
   .mock("fs")
@@ -211,6 +212,7 @@ describe("sync", () => {
       groupFiles(
         flatten([
           packageJsonFileEntry,
+          ...getDefaultFiles(),
           ...templateFiles,
           ...(coatManifestFiles as CoatManifestFile[]),
         ]) as CoatManifestFile[],
@@ -228,6 +230,7 @@ describe("sync", () => {
       templateFileRaw,
       templateLocalFileRaw,
       packageJsonRaw,
+      gitignore,
     ] = await Promise.all([
       fs.readdir(testCwd),
       fs.readFile(path.join(testCwd, "manifestA.json"), "utf8"),
@@ -237,9 +240,11 @@ describe("sync", () => {
       ),
       fs.readFile(path.join(testCwd, "local-file.json"), "utf8"),
       fs.readFile(path.join(testCwd, "package.json"), "utf8"),
+      fs.readFile(path.join(testCwd, ".gitignore"), "utf8"),
     ]);
 
     const expectedFiles = [
+      ".gitignore",
       "some-folder",
       COAT_MANIFEST_FILENAME,
       PACKAGE_JSON_FILENAME,
@@ -293,6 +298,13 @@ describe("sync", () => {
           "script-from-package.json": "test",
         },
       }
+    `);
+    expect(gitignore).toMatchInlineSnapshot(`
+      "node_modules
+
+      # coat local files
+      /.coat
+      "
     `);
   });
 
@@ -531,6 +543,7 @@ describe("sync", () => {
     const fileEntries = await fs.readdir(testCwd);
 
     const expectedFiles = [
+      ".gitignore",
       "some-folder",
       COAT_MANIFEST_FILENAME,
       PACKAGE_JSON_FILENAME,
