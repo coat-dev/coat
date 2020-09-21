@@ -10,10 +10,18 @@ import { textFileFunctions } from "./text";
 import { yamlFileFunctions } from "./yaml";
 
 export interface FileTypeFunctions<ContentType> {
+  /**
+   * Merges the source and the target content
+   */
   merge: (
     source: ContentType | null | undefined,
     target: ContentType
   ) => ContentType | null;
+  /**
+   * Converts the content of the file
+   * to a string and styles the result,
+   * usually using prettier
+   */
   polish: (
     source: ContentType,
     filePath: string,

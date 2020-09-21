@@ -45,12 +45,21 @@ export function polish(
     sortedContent = JSON.stringify(jsonContent, null, 1);
   }
 
+  const prettier = getPrettier(context);
+
+  // Check whether prettier can already infer the parser
+  // from the current file path
+  const fileInfo = prettier.getFileInfo.sync(filePath);
+  let filePathForPrettier = filePath;
+  if (!fileInfo.inferredParser) {
+    // Add .json extension since prettier was not
+    // able to infer the parser automatically
+    filePathForPrettier = `${filePath}.json`;
+  }
+
   // Format with prettier
-  return getPrettier(context).format(sortedContent, {
-    // Add .json extension to infer json parser in prettier
-    // since files might have different extensions
-    // (e.g. .babelrc, file.config, etc.)
-    filepath: `${filePath}.json`,
+  return prettier.format(sortedContent, {
+    filepath: filePathForPrettier,
   });
 }
 
