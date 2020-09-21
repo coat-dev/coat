@@ -73,5 +73,19 @@ describe("file-types/text", () => {
         "
       `);
     });
+
+    test("should format file with prettier if parser can be inferred", () => {
+      const content = "console.log(1);console.log(2);";
+      const polished = textFileFunctions.polish(
+        content,
+        "file.js",
+        testContext
+      );
+      expect(polished).toMatchInlineSnapshot(`
+        "console.log(1);
+        console.log(2);
+        "
+      `);
+    });
   });
 });

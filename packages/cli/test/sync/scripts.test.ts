@@ -8,7 +8,7 @@ import { runCli } from "../utils/run-cli";
 
 describe("coat sync - scripts", () => {
   test("should work with a template with an empty scripts entry", async () => {
-    const filePath = "file.json";
+    const filePath = "file.txt";
     const fileContent = "Hello coat\n";
     const { cwd, task } = await runSyncTest({
       coatManifest: {
