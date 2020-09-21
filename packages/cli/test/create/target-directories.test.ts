@@ -183,7 +183,7 @@ describe("coat create - target directories", () => {
     const targetDir = path.join(cwd, relativeTargetDir);
     const { task } = runCli(
       ["create", defaultTemplate, defaultProjectName, relativeTargetDir],
-      cwd
+      { cwd }
     );
     await task;
     const [entries, packageJson, coatManifest] = await Promise.all([
@@ -204,7 +204,7 @@ describe("coat create - target directories", () => {
     const targetDir = ".";
     const { task } = runCli(
       ["create", defaultTemplate, defaultProjectName, targetDir],
-      tmpDir
+      { cwd: tmpDir }
     );
     await task;
     const [entries, packageJson, coatManifest] = await Promise.all([

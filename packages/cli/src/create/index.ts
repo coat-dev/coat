@@ -12,6 +12,7 @@ import {
   COAT_MANIFEST_FILENAME,
 } from "../constants";
 import { polish as jsonPolish } from "../file-types/json";
+import { addInitialCommit } from "./add-initial-commit";
 
 /**
  * Creates and generates a new coat project.
@@ -84,9 +85,6 @@ export async function create(
     "Installing template into project directory"
   ).start();
   try {
-    // Initialize a git repository in the target directory
-    await execa("git", ["init"], { cwd: targetCwd });
-
     // Run npm install to install the template and its dependencies
     await execa("npm", ["install", "--save-exact", "--save-dev", template], {
       cwd: targetCwd,
@@ -186,4 +184,8 @@ export async function create(
     // setup will be triggered implicitly via sync
     await sync(targetCwd);
   }
+
+  // Initialize a git repository and add an initial commit
+  // if the project was not created in an existing git repository
+  await addInitialCommit(targetCwd);
 }

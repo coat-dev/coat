@@ -127,7 +127,7 @@ describe("coat sync - files", () => {
       ),
     ]);
 
-    const { task } = runCli(["sync"], cwd);
+    const { task } = runCli(["sync"], { cwd });
     await task;
 
     const [aJson, bTxt] = await Promise.all([
@@ -182,7 +182,7 @@ describe("coat sync - files", () => {
       ),
     ]);
 
-    const { task } = runCli(["sync"], cwd);
+    const { task } = runCli(["sync"], { cwd });
     await task;
 
     const [aJson, bTxt] = await Promise.all([
@@ -233,7 +233,7 @@ describe("coat sync - files", () => {
       path.join(cwd, "a.json-custom.js")
     );
 
-    const { task } = runCli(["sync"], cwd);
+    const { task } = runCli(["sync"], { cwd });
     await task;
 
     await expect(() =>
@@ -390,7 +390,7 @@ describe("coat sync - files", () => {
     ]);
 
     // Run sync again to verify that files will not be changed
-    const { task: secondSyncRun } = runCli(["sync"], cwd);
+    const { task: secondSyncRun } = runCli(["sync"], { cwd });
     await secondSyncRun;
 
     // Read files

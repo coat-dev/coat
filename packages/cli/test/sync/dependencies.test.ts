@@ -81,7 +81,7 @@ describe("coat sync - dependencies", () => {
     const lodashVersionBefore = await getPackageVersion("lodash", cwd);
     expect(lodashVersionBefore).toBe("3.0.0");
 
-    const { task } = runCli(["sync"], cwd);
+    const { task } = runCli(["sync"], { cwd });
     await task;
 
     const packageJsonContent = await fs.readFile(
@@ -243,7 +243,7 @@ describe("coat sync - dependencies", () => {
     expect(beforeStatResult.isDirectory()).toBe(true);
 
     // Run sync
-    const { task } = runCli(["sync"], cwd);
+    const { task } = runCli(["sync"], { cwd });
     await task;
 
     // Ensure that package.json is updated

@@ -71,7 +71,7 @@ describe("coat sync - gathering", () => {
     // Run npm install in folder
     await execa("npm", ["install"], { cwd: tmpDir });
 
-    const { task } = runCli(["sync"], tmpDir);
+    const { task } = runCli(["sync"], { cwd: tmpDir });
     await task;
 
     // Verify that files that are created by the installed templates
@@ -124,7 +124,7 @@ describe("coat sync - gathering", () => {
     // Run npm install in folder
     await execa("npm", ["install"], { cwd: tmpDir });
 
-    const { task } = runCli(["sync"], tmpDir);
+    const { task } = runCli(["sync"], { cwd: tmpDir });
     await task;
 
     // Verify that files that are created by the installed templates

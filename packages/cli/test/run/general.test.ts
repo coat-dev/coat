@@ -21,7 +21,7 @@ describe("coat run - general", () => {
     });
     await syncTask;
 
-    const { task: runTask } = runCli(["run", "test-script"], cwd);
+    const { task: runTask } = runCli(["run", "test-script"], { cwd });
     const result = await runTask;
 
     expect(result.stdout).toContain("Running test script");
@@ -54,7 +54,7 @@ describe("coat run - general", () => {
 
     const { task: runTask } = runCli(
       ["run", "test-script:*", "another-test-script"],
-      cwd
+      { cwd }
     );
     const result = await runTask;
 
@@ -80,7 +80,7 @@ describe("coat run - general", () => {
 
     const { task: runTask } = runCli(
       ["run", "test-script:*", "another-test-script"],
-      cwd
+      { cwd }
     );
     const result = await runTask;
 
@@ -104,7 +104,7 @@ describe("coat run - general", () => {
     });
     await syncTask;
 
-    const { task: runTask } = runCli(["run", "test-script"], cwd);
+    const { task: runTask } = runCli(["run", "test-script"], { cwd });
     try {
       await runTask;
       throw new Error("should not be reached");
@@ -133,7 +133,7 @@ describe("coat run - general", () => {
     });
     await syncTask;
 
-    const { task: runTask } = runCli(["run", "test-script:*"], cwd);
+    const { task: runTask } = runCli(["run", "test-script:*"], { cwd });
     try {
       await runTask;
       throw new Error("should not be reached");

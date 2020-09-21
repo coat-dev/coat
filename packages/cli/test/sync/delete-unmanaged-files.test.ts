@@ -25,7 +25,7 @@ describe("coat sync - delete unmanaged files", () => {
       // Place unmanaged file
       await fs.outputFile(path.join(cwd, "folder-1", unmanagedFilePath), "");
 
-      const { task } = runCli(["sync"], cwd);
+      const { task } = runCli(["sync"], { cwd });
       await task;
 
       await expect(
@@ -76,7 +76,7 @@ describe("coat sync - delete unmanaged files", () => {
         await fs.chmod(path.join(cwd, "folder-1"), 0o000);
 
         try {
-          const { task } = runCli(["sync"], cwd);
+          const { task } = runCli(["sync"], { cwd });
           await expect(task).rejects.toHaveProperty(
             "message",
             expect.stringMatching(
@@ -115,7 +115,7 @@ describe("coat sync - delete unmanaged files", () => {
       );
 
       // Run sync again
-      const { task: secondSyncRun } = runCli(["sync"], cwd);
+      const { task: secondSyncRun } = runCli(["sync"], { cwd });
       await secondSyncRun;
 
       fileRaw = await fs.readFile(path.join(cwd, "file.json"), "utf-8");
@@ -141,7 +141,7 @@ describe("coat sync - delete unmanaged files", () => {
       // Place unmanaged file
       await fs.outputFile(path.join(cwd, "folder-1", unmanagedFilePath), "");
 
-      const { task } = runCli(["sync"], cwd);
+      const { task } = runCli(["sync"], { cwd });
       await task;
 
       await expect(
@@ -192,7 +192,7 @@ describe("coat sync - delete unmanaged files", () => {
         await fs.chmod(path.join(cwd, "folder-1"), 0o000);
 
         try {
-          const { task } = runCli(["sync"], cwd);
+          const { task } = runCli(["sync"], { cwd });
           await expect(task).rejects.toHaveProperty(
             "message",
             expect.stringMatching(
@@ -232,7 +232,7 @@ describe("coat sync - delete unmanaged files", () => {
       );
 
       // Run sync again
-      const { task: secondSyncRun } = runCli(["sync"], cwd);
+      const { task: secondSyncRun } = runCli(["sync"], { cwd });
       await secondSyncRun;
 
       fileRaw = await fs.readFile(path.join(cwd, "file.json"), "utf-8");

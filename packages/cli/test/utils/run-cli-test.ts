@@ -131,7 +131,7 @@ export async function runSetupTest(
 ): Promise<RunCliResult> {
   const tmpDir = await prepareCliTest(options);
 
-  return runCli(["setup"], tmpDir);
+  return runCli(["setup"], { cwd: tmpDir });
 }
 
 /**
@@ -150,5 +150,5 @@ export async function runSyncTest(
 ): Promise<RunCliResult> {
   const tmpDir = await prepareCliTest(options);
 
-  return runCli(["sync"], tmpDir);
+  return runCli(["sync"], { cwd: tmpDir });
 }

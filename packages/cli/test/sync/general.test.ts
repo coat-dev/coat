@@ -47,8 +47,12 @@ describe("coat sync - general", () => {
       },
     });
 
-    const { task: helpArgumentPromise } = runCli(["sync", "--help"], tmpDir);
-    const { task: helpCommandPromise } = runCli(["help", "sync"], tmpDir);
+    const { task: helpArgumentPromise } = runCli(["sync", "--help"], {
+      cwd: tmpDir,
+    });
+    const { task: helpCommandPromise } = runCli(["help", "sync"], {
+      cwd: tmpDir,
+    });
 
     await Promise.all([helpArgumentPromise, helpCommandPromise]);
 

@@ -41,7 +41,7 @@ describe("sync - setup", () => {
     await fs.unlink(path.join(cwd, "setup-test.txt"));
 
     // Run sync again
-    const { task: secondSyncRun } = runCli(["sync"], cwd);
+    const { task: secondSyncRun } = runCli(["sync"], { cwd });
     await secondSyncRun;
 
     // Validate that setup file does not exist
@@ -74,7 +74,7 @@ describe("sync - setup", () => {
     await fs.unlink(path.join(cwd, "setup-test.txt"));
 
     // Run sync again
-    const { task: secondSyncRun } = runCli(["sync"], cwd);
+    const { task: secondSyncRun } = runCli(["sync"], { cwd });
     await secondSyncRun;
 
     // Validate that setup file has been written again

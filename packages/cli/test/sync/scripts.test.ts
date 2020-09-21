@@ -99,7 +99,7 @@ describe("coat sync - scripts", () => {
       )
     );
 
-    const { task } = runCli(["sync"], cwd);
+    const { task } = runCli(["sync"], { cwd });
     await task;
 
     const packageJsonContent = await fs.readFile(

@@ -43,6 +43,6 @@ module.exports = {
   // if they are top-level properties and not inside projects.
   // In order to test the integration tests with these extensions
   // uncomment these lines below:
-  // globalSetup: "./test/utils/integration-setup.ts",
-  // globalTeardown: "./test/utils/integration-teardown.ts",
+  globalSetup: "./test/utils/integration-setup.ts",
+  globalTeardown: "./test/utils/integration-teardown.ts",
 };

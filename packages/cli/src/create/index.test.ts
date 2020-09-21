@@ -7,6 +7,7 @@ import { getProjectName } from "./get-project-name";
 import { getTemplateInfo } from "./get-template-info";
 import { sync } from "../sync";
 import { COAT_CLI_VERSION } from "../constants";
+import { addInitialCommit } from "./add-initial-commit";
 
 jest
   .mock("fs")
@@ -14,7 +15,8 @@ jest
   .mock("ora")
   .mock("../sync")
   .mock("./get-template-info")
-  .mock("./get-project-name");
+  .mock("./get-project-name")
+  .mock("./add-initial-commit");
 
 const execaMock = (execa as unknown) as jest.Mock;
 const execaMockImplementation = (): unknown => ({
@@ -110,7 +112,7 @@ describe("create", () => {
   test("should add the template as a devDependency in the target dir", async () => {
     await create("template", "project-name");
 
-    expect(execa).toHaveBeenCalledTimes(4);
+    expect(execa).toHaveBeenCalledTimes(3);
     expect(execa).toHaveBeenCalledWith(
       "npm",
       ["install", "--save-exact", "--save-dev", "template"],
@@ -123,10 +125,10 @@ describe("create", () => {
   test("should initialize a git repository in the target dir", async () => {
     await create("template", "project-name");
 
-    expect(execa).toHaveBeenCalledTimes(4);
-    expect(execa).toHaveBeenCalledWith("git", ["init"], {
-      cwd: path.join(process.cwd(), "project-name"),
-    });
+    expect(addInitialCommit).toHaveBeenCalledTimes(1);
+    expect(addInitialCommit).toHaveBeenCalledWith(
+      path.join(process.cwd(), "project-name")
+    );
   });
 
   test("should add the template and its peerDependencies as devDependencies in the target dir", async () => {
@@ -139,7 +141,7 @@ describe("create", () => {
     }));
     await create("template", "project-name");
 
-    expect(execa).toHaveBeenCalledTimes(5);
+    expect(execa).toHaveBeenCalledTimes(4);
     expect(execa).toHaveBeenCalledWith(
       "npm",
       ["install", "--save-exact", "--save-dev", "template"],
@@ -160,9 +162,6 @@ describe("create", () => {
     expect.assertions(2);
 
     try {
-      execaMock.mockImplementationOnce(() => {
-        // Empty
-      });
       execaMock.mockImplementationOnce(() =>
         Promise.reject(new Error("Rejected"))
       );
@@ -178,9 +177,6 @@ describe("create", () => {
     expect.assertions(3);
 
     try {
-      execaMock.mockImplementationOnce(() => {
-        // Empty
-      });
       execaMock.mockImplementationOnce(() =>
         Promise.reject(new Error("Rejected"))
       );

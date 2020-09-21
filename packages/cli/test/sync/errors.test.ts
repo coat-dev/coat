@@ -15,7 +15,7 @@ describe("coat sync - errors", () => {
     // Delete coat manifest file
     await fs.unlink(path.join(tmpDir, COAT_MANIFEST_FILENAME));
 
-    const { task } = runCli(["sync"], tmpDir);
+    const { task } = runCli(["sync"], { cwd: tmpDir });
     try {
       await task;
       throw new Error("This error should not be reached. Task should throw");
@@ -32,7 +32,7 @@ describe("coat sync - errors", () => {
     // Delete package.json
     await fs.unlink(path.join(tmpDir, PACKAGE_JSON_FILENAME));
 
-    const { task } = runCli(["sync"], tmpDir);
+    const { task } = runCli(["sync"], { cwd: tmpDir });
     try {
       await task;
       throw new Error("This error should not be reached. Task should throw");
@@ -97,7 +97,7 @@ describe("coat sync - errors", () => {
       // Remove coat.json read permissions
       await fs.chmod(path.join(tmpDir, COAT_MANIFEST_FILENAME), "222");
 
-      const { task } = runCli(["sync"], tmpDir);
+      const { task } = runCli(["sync"], { cwd: tmpDir });
       try {
         await task;
         throw new Error("This error should not be reached. Task should throw");
@@ -117,7 +117,7 @@ describe("coat sync - errors", () => {
       // Remove package.json read permissions
       await fs.chmod(path.join(tmpDir, PACKAGE_JSON_FILENAME), "222");
 
-      const { task } = runCli(["sync"], tmpDir);
+      const { task } = runCli(["sync"], { cwd: tmpDir });
       try {
         await task;
         throw new Error("This error should not be reached. Task should throw");
@@ -153,7 +153,7 @@ describe("coat sync - errors", () => {
       await fs.mkdir(fileFolderPath);
       await fs.chmod(fileFolderPath, "222");
 
-      const { task } = runCli(["sync"], tmpDir);
+      const { task } = runCli(["sync"], { cwd: tmpDir });
       try {
         await task;
         throw new Error("This error should not be reached. Task should throw");
