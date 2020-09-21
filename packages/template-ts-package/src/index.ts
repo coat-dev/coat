@@ -134,8 +134,8 @@ function createTemplate(context: CoatContext): CoatManifest {
         scriptName: "test",
       },
       {
-        id: "prepare:build",
-        run: "coat run build",
+        id: "prepare-sync-and-build",
+        run: "coat sync && coat run build",
         scriptName: "prepare",
       },
     ],
