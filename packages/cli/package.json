@@ -64,6 +64,7 @@
     "coat"
   ],
   "license": "MIT",
+  "main": "build/index.js",
   "scripts": {
     "build": "concurrently npm:build:*",
     "build:babel": "babel src -d build --extensions \".ts,.ts\" --ignore \"**/*.d.ts,**/*.test.ts\"",

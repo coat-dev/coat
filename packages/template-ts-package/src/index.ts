@@ -1,11 +1,11 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { CoatManifest } from "@coat/cli/build/types/coat-manifest";
 import {
+  CoatManifest,
   CoatManifestFile,
   CoatManifestFileType,
-} from "@coat/cli/build/types/coat-manifest-file";
-import { CoatContext } from "@coat/cli/build/types/coat-context";
+  CoatContext,
+} from "@coat/cli";
 
 const filesDir = path.join(__dirname, "..", "files");
 
