@@ -32,8 +32,8 @@ jobs:
         with:
           name: coat
           path: packages/*/*.tgz
-  integration-tests:
-    name: Integration tests
+  e2e-tests:
+    name: E2E tests
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]

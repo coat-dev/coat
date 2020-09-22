@@ -76,7 +76,7 @@
     "prepare": "npm run build",
     "prepack": "cross-env BABEL_ENV=production npm run build",
     "test": "cross-env JEST_PROJECT=\"Unit tests\" jest",
-    "test:integration": "cross-env JEST_PROJECT=\"Integration tests\" jest --coverage=false",
+    "test:e2e": "cross-env JEST_PROJECT=\"E2E tests\" jest --coverage=false",
     "test:all": "jest",
     "watch-build": "concurrently npm:watch-build:*",
     "watch-build:babel": "npm run build:babel -- --watch",

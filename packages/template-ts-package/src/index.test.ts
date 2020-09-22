@@ -6,7 +6,7 @@ import { gatherExtendedTemplates } from "@coat/cli/build/util/gather-extended-te
 import { getStrictCoatManifest } from "@coat/cli/build/util/get-strict-coat-manifest";
 
 // TODO: See #47
-// Add more thorough tests and integration tests
+// Add more thorough tests and e2e tests
 // that don't rely on coat cli internals
 
 jest.mock("@coat/cli/build/util/gather-extended-templates").mock("execa");

@@ -72,7 +72,7 @@ describe("coat create - errors", () => {
 
     try {
       const { task } = runCli(
-        ["create", "@coat/integration-test-template", "project-name"],
+        ["create", "@coat/e2e-test-template", "project-name"],
         { cwd: tmpDir }
       );
       await task;

@@ -3,38 +3,38 @@ import path from "path";
 import { runCli } from "../utils/run-cli";
 import { getTmpDir } from "../utils/get-tmp-dir";
 import { enterPrompts, KeyboardInput } from "../utils/enter-prompts";
-import { PackageJson } from "type-fest";
 
 describe("coat create - target directories", () => {
-  const defaultTemplate = "@coat/integration-test-template@2.1.0";
+  const defaultTemplate = path.join(
+    __dirname,
+    "..",
+    "utils",
+    "test-packages",
+    "local-create-template-1"
+  );
   const defaultProjectName = "project-name";
   const packageJsonFileName = "package.json";
   const coatManifestFileName = "coat.json";
   const defaultEntries = [
     ".git",
+    ".gitignore",
+    "a.json",
     coatManifestFileName,
+    "coat.lock",
+    "ignored.txt",
     packageJsonFileName,
     "package-lock.json",
     "node_modules",
   ];
   defaultEntries.sort();
-  function createPackageJsonResult(
-    projectName: string,
-    devDependencies: Record<string, string>
-  ): PackageJson {
-    return {
-      name: projectName,
-      version: "1.0.0",
-      devDependencies,
-    };
-  }
-  const defaultPackageJsonResult = createPackageJsonResult(defaultProjectName, {
-    "@coat/cli": "0.0.2",
-    "@coat/integration-test-template": "2.1.0",
-  });
+
+  const defaultPackageJsonResult = {
+    name: defaultProjectName,
+    version: "1.0.0",
+  };
   const defaultCoatManifestResult = {
     name: defaultProjectName,
-    extends: "@coat/integration-test-template",
+    extends: "local-create-template-1",
   };
 
   test("should use the projectName as the directory when projectName is prompted", async () => {
@@ -51,7 +51,9 @@ describe("coat create - target directories", () => {
     entries.sort();
 
     expect(entries).toEqual(defaultEntries);
-    expect(JSON.parse(packageJson)).toEqual(defaultPackageJsonResult);
+    expect(JSON.parse(packageJson)).toEqual(
+      expect.objectContaining({ name: defaultProjectName, version: "1.0.0" })
+    );
     expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
   });
 
@@ -76,7 +78,9 @@ describe("coat create - target directories", () => {
     entries.sort();
 
     expect(entries).toEqual(defaultEntries);
-    expect(JSON.parse(packageJson)).toEqual(defaultPackageJsonResult);
+    expect(JSON.parse(packageJson)).toEqual(
+      expect.objectContaining(defaultPackageJsonResult)
+    );
     expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
   });
 
@@ -97,7 +101,9 @@ describe("coat create - target directories", () => {
     entries.sort();
 
     expect(entries).toEqual(defaultEntries);
-    expect(JSON.parse(packageJson)).toEqual(defaultPackageJsonResult);
+    expect(JSON.parse(packageJson)).toEqual(
+      expect.objectContaining(defaultPackageJsonResult)
+    );
     expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
   });
 
@@ -120,7 +126,9 @@ describe("coat create - target directories", () => {
     entries.sort();
 
     expect(entries).toEqual(defaultEntries);
-    expect(JSON.parse(packageJson)).toEqual(defaultPackageJsonResult);
+    expect(JSON.parse(packageJson)).toEqual(
+      expect.objectContaining(defaultPackageJsonResult)
+    );
     expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
   });
 
@@ -148,7 +156,9 @@ describe("coat create - target directories", () => {
 
     expect(firstLevelFolder).toEqual(["second-dir"]);
     expect(entries).toEqual(defaultEntries);
-    expect(JSON.parse(packageJson)).toEqual(defaultPackageJsonResult);
+    expect(JSON.parse(packageJson)).toEqual(
+      expect.objectContaining(defaultPackageJsonResult)
+    );
     expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
   });
 
@@ -169,7 +179,9 @@ describe("coat create - target directories", () => {
     entries.sort();
 
     expect(entries).toEqual(defaultEntries);
-    expect(JSON.parse(packageJson)).toEqual(defaultPackageJsonResult);
+    expect(JSON.parse(packageJson)).toEqual(
+      expect.objectContaining(defaultPackageJsonResult)
+    );
     expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
   });
 
@@ -194,7 +206,9 @@ describe("coat create - target directories", () => {
     entries.sort();
 
     expect(entries).toEqual(defaultEntries);
-    expect(JSON.parse(packageJson)).toEqual(defaultPackageJsonResult);
+    expect(JSON.parse(packageJson)).toEqual(
+      expect.objectContaining(defaultPackageJsonResult)
+    );
     expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
   });
 
@@ -215,7 +229,9 @@ describe("coat create - target directories", () => {
     entries.sort();
 
     expect(entries).toEqual(defaultEntries);
-    expect(JSON.parse(packageJson)).toEqual(defaultPackageJsonResult);
+    expect(JSON.parse(packageJson)).toEqual(
+      expect.objectContaining(defaultPackageJsonResult)
+    );
     expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
   });
 });

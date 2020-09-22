@@ -13,13 +13,13 @@ export interface RunCliResult {
 }
 
 export function runCli(args: string[], options?: RunCliOptions): RunCliResult {
-  if (!process.env.COAT_CLI_TMP_INTEGRATION_PATH) {
+  if (!process.env.COAT_CLI_TMP_E2E_PATH) {
     throw new Error(
-      "Environment variable COAT_CLI_TMP_INTEGRATION_PATH must be defined for integration tests. Ensure that jest is running the global setup file."
+      "Environment variable COAT_CLI_TMP_E2E_PATH must be defined for e2e tests. Ensure that jest is running the global setup file."
     );
   }
   const binPath = path.join(
-    process.env.COAT_CLI_TMP_INTEGRATION_PATH,
+    process.env.COAT_CLI_TMP_E2E_PATH,
     "node_modules",
     "@coat",
     "cli",

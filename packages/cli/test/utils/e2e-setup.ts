@@ -5,7 +5,7 @@ import { version } from "../../package.json";
 
 // Packs and installs the cli in
 // a temporary directory in order to run
-// the integration tests in an environment
+// the e2e tests in an environment
 // which mirrors a coat users actual development
 // environment
 export default async (): Promise<void> => {
@@ -23,7 +23,7 @@ export default async (): Promise<void> => {
   await execa("npm", ["install", tarPath], { cwd: tmpDir });
 
   // Set global environment variables which are used in
-  // integration tests for the cli and tarball path
+  // e2e tests for the cli and tarball path
   process.env.COAT_CLI_TMP_TARBALL_PATH = tarPath;
-  process.env.COAT_CLI_TMP_INTEGRATION_PATH = tmpDir;
+  process.env.COAT_CLI_TMP_E2E_PATH = tmpDir;
 };

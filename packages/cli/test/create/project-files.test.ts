@@ -8,7 +8,7 @@ describe("coat create - project files", () => {
       const projectName = "project-name";
       const { cwd, task } = runCli([
         "create",
-        "@coat/integration-test-template",
+        "@coat/e2e-test-template",
         projectName,
       ]);
       await task;
@@ -26,19 +26,19 @@ describe("coat create - project files", () => {
       expect(packageJson.version).toBe("1.0.0");
 
       // Should add the template as a devDependency
-      expect(
-        packageJson.devDependencies?.["@coat/integration-test-template"]
-      ).toBe("2.1.0");
+      expect(packageJson.devDependencies?.["@coat/e2e-test-template"]).toBe(
+        "2.0.0"
+      );
 
       // should add peerDependencies as devDependencies
-      expect(packageJson.devDependencies?.["@coat/cli"]).toBe("0.0.2");
+      expect(packageJson.devDependencies?.["no-op"]).toBe("^1.0.3");
     });
 
     test("should add the template with GitHub url as devDependency", async () => {
       const projectName = "project-name";
       const { cwd, task } = runCli([
         "create",
-        "coat-dev/cli-integration-tests-template",
+        "coat-dev/cli-e2e-tests-template",
         projectName,
       ]);
       await task;
@@ -49,9 +49,8 @@ describe("coat create - project files", () => {
       );
       const packageJson = JSON.parse(packageJsonRaw);
       expect(packageJson.devDependencies).toEqual({
-        "@coat/integration-test-template":
-          "github:coat-dev/cli-integration-tests-template",
-        "@coat/cli": "0.0.2",
+        "@coat/e2e-test-template": "github:coat-dev/cli-e2e-tests-template",
+        "no-op": "^1.0.3",
       });
     });
   });
@@ -59,9 +58,16 @@ describe("coat create - project files", () => {
   describe("coat.json", () => {
     test("should use the project name as the name field with correct formatting", async () => {
       const projectName = "project-name";
+      const localCreateTemplate = path.join(
+        __dirname,
+        "..",
+        "utils",
+        "test-packages",
+        "local-create-template-1"
+      );
       const { cwd, task } = runCli([
         "create",
-        "@coat/integration-test-template",
+        localCreateTemplate,
         projectName,
       ]);
       await task;
@@ -83,7 +89,7 @@ describe("coat create - project files", () => {
     test("should extend specified template name if no version specified", async () => {
       const { task, cwd } = runCli([
         "create",
-        "@coat/integration-test-template",
+        "@coat/e2e-test-template",
         "project-name",
       ]);
       await task;
@@ -92,13 +98,13 @@ describe("coat create - project files", () => {
         "utf8"
       );
       const coatManifest = JSON.parse(coatManifestRaw);
-      expect(coatManifest.extends).toBe("@coat/integration-test-template");
+      expect(coatManifest.extends).toBe("@coat/e2e-test-template");
     });
 
     test("should extend template base name if a version is specified", async () => {
       const { task, cwd } = runCli([
         "create",
-        "@coat/integration-test-template@2.1.0",
+        "@coat/e2e-test-template@2.0.0",
         "project-name",
       ]);
       await task;
@@ -107,13 +113,13 @@ describe("coat create - project files", () => {
         "utf8"
       );
       const coatManifest = JSON.parse(coatManifestRaw);
-      expect(coatManifest.extends).toBe("@coat/integration-test-template");
+      expect(coatManifest.extends).toBe("@coat/e2e-test-template");
     });
 
     test("should extend template name from package.json if GitHub URL is specified", async () => {
       const { task, cwd } = runCli([
         "create",
-        "coat-dev/cli-integration-tests-template",
+        "coat-dev/cli-e2e-tests-template",
         "project-name",
       ]);
       await task;
@@ -122,7 +128,7 @@ describe("coat create - project files", () => {
         "utf8"
       );
       const coatManifest = JSON.parse(coatManifestRaw);
-      expect(coatManifest.extends).toBe("@coat/integration-test-template");
+      expect(coatManifest.extends).toBe("@coat/e2e-test-template");
     });
   });
 
@@ -130,7 +136,7 @@ describe("coat create - project files", () => {
     const projectName = "project-name";
     const { cwd, task } = runCli([
       "create",
-      "@coat/integration-test-template",
+      "@coat/e2e-test-template",
       projectName,
     ]);
     await task;
@@ -155,5 +161,3 @@ describe("coat create - project files", () => {
     expect(nodeModuleEntries.length).toBeTruthy();
   });
 });
-
-export default {};

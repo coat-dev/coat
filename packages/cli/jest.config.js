@@ -9,16 +9,16 @@ const unitTestsProject = {
   testPathIgnorePatterns: ["/node_modules/", "<rootDir>/test/"],
 };
 
-const integrationTestsProject = {
+const e2eTestsProject = {
   ...sharedConfig,
-  displayName: "Integration tests",
+  displayName: "E2E tests",
   testPathIgnorePatterns: ["/node_modules/", "<rootDir>/src/"],
-  globalSetup: "./test/utils/integration-setup.ts",
-  globalTeardown: "./test/utils/integration-teardown.ts",
-  setupFilesAfterEnv: ["./test/utils/integration-setup-test-env.ts"],
+  globalSetup: "./test/utils/e2e-setup.ts",
+  globalTeardown: "./test/utils/e2e-teardown.ts",
+  setupFilesAfterEnv: ["./test/utils/e2e-setup-test-env.ts"],
 };
 
-let projectsToRun = [unitTestsProject, integrationTestsProject];
+let projectsToRun = [unitTestsProject, e2eTestsProject];
 const projectToRun = projectsToRun.find(
   (project) => project.displayName === process.env.JEST_PROJECT
 );
@@ -36,13 +36,13 @@ module.exports = {
   collectCoverageFrom: ["src/**/*.ts", "!src/**/*.test.ts"],
   coverageReporters: ["text"],
 
-  // Workaround to test integration tests
+  // Workaround to test e2e tests
   // with VSCode test explorer jest test adapter:
   //
   // globalSetup and globalTeardown are only considered
   // if they are top-level properties and not inside projects.
-  // In order to test the integration tests with these extensions
+  // In order to test the e2e tests with these extensions
   // uncomment these lines below:
-  // globalSetup: "./test/utils/integration-setup.ts",
-  // globalTeardown: "./test/utils/integration-teardown.ts",
+  globalSetup: "./test/utils/e2e-setup.ts",
+  globalTeardown: "./test/utils/e2e-teardown.ts",
 };

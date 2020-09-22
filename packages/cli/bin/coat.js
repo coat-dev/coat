@@ -4,7 +4,7 @@
 // if it is transpiled during the bootstrapping process
 //
 // While this code is not covered by unit tests
-// and code coverage, integration tests
+// and code coverage, e2e tests
 // in /tests will run this code since they
 // node with this file as the main module
 //
