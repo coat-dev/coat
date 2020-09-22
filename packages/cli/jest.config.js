@@ -43,6 +43,6 @@ module.exports = {
   // if they are top-level properties and not inside projects.
   // In order to test the e2e tests with these extensions
   // uncomment these lines below:
-  globalSetup: "./test/utils/e2e-setup.ts",
-  globalTeardown: "./test/utils/e2e-teardown.ts",
+  // globalSetup: "./test/utils/e2e-setup.ts",
+  // globalTeardown: "./test/utils/e2e-teardown.ts",
 };

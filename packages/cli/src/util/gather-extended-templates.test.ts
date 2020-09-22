@@ -22,12 +22,22 @@ resolveFromMock.mockImplementation(
   (cwd, template) => `${cwd}/${template}/index.js`
 );
 
+type CoatStrictTemplate = CoatManifestStrict | (() => CoatManifestStrict);
+
 const testExtendedTemplates: {
-  [template: string]: CoatManifestStrict | (() => CoatManifestStrict);
+  [template: string]:
+    | CoatStrictTemplate
+    | { default: CoatStrictTemplate; __esModule: { value: true } };
 } = {
   [`${testCwd}/template`]: getStrictCoatManifest({
     name: "template",
   }),
+  [`${testCwd}/template-es6`]: {
+    default: getStrictCoatManifest({
+      name: "template",
+    }),
+    __esModule: { value: true },
+  },
   [`${testCwd}/template-fn-result`]: getStrictCoatManifest({
     name: "template-fn",
   }),
@@ -155,6 +165,28 @@ describe("sync/gather-extended-templates", () => {
     };
     const templates = gatherExtendedTemplates(coatContext);
     expect(templates).toEqual([testExtendedTemplates[`${testCwd}/template`]]);
+  });
+
+  test("should retrieve a template that is using a es6 module default export", () => {
+    const coatContext: CoatContext = {
+      cwd: testCwd,
+      coatManifest: getStrictCoatManifest({
+        name: "testManifest",
+        extends: ["template-es6"],
+      }),
+      packageJson: {},
+      coatGlobalLockfile: getStrictCoatGlobalLockfile({
+        version: COAT_GLOBAL_LOCKFILE_VERSION,
+      }),
+      coatLocalLockfile: getStrictCoatLocalLockfile({
+        version: COAT_LOCAL_LOCKFILE_VERSION,
+      }),
+    };
+    const templates = gatherExtendedTemplates(coatContext);
+    const expectedTemplate = testExtendedTemplates[
+      `${testCwd}/template-es6`
+    ] as { default: CoatStrictTemplate };
+    expect(templates).toEqual([expectedTemplate.default]);
   });
 
   test("should retrieve a single extended template exporting a function", () => {

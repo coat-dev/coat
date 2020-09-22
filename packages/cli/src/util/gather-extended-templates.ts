@@ -26,7 +26,23 @@ function getTemplates(
   // TODO: See #15
   // Better error message when template can't be imported
   // with a hint to install node_modules
-  const templateManifestRaw = importFrom(cwd, template) as CoatTemplate;
+  const templateManifestRawModule = importFrom(cwd, template);
+
+  // Check whether the template exported its manifest or manifest function
+  // as a default export or directly using module.exports
+  let templateManifestRaw: CoatTemplate;
+  if (
+    typeof templateManifestRawModule === "object" &&
+    templateManifestRawModule !== null &&
+    "__esModule" in templateManifestRawModule &&
+    "default" in templateManifestRawModule
+  ) {
+    templateManifestRaw = (templateManifestRawModule as {
+      default: CoatTemplate;
+    }).default;
+  } else {
+    templateManifestRaw = templateManifestRawModule as CoatTemplate;
+  }
 
   let resolvedTemplate: CoatManifestStrict;
   if (typeof templateManifestRaw === "function") {
