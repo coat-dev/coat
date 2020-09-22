@@ -510,4 +510,61 @@ describe("setup", () => {
       },
     });
   });
+
+  test("should work with tasks that don't return any result", async () => {
+    const globalTaskRun = jest.fn(() => {
+      // Empty function
+    });
+    const localTaskRun = jest.fn(() => {
+      // Empty function
+    });
+
+    const context: CoatContext = {
+      ...testContext,
+      coatManifest: {
+        ...testContext.coatManifest,
+        setup: [
+          {
+            id: "globalTask",
+            run: globalTaskRun,
+          },
+          {
+            id: "localTask",
+            run: localTaskRun,
+            local: true,
+          },
+        ],
+      },
+    };
+    getContextSpy.mockImplementationOnce(() => context);
+    await setup(testCwd, false);
+
+    expect(globalTaskRun).toHaveBeenCalledTimes(1);
+    expect(globalTaskRun).toHaveBeenLastCalledWith({
+      context,
+      previousResults: {
+        global: {},
+        local: {},
+      },
+    });
+
+    expect(localTaskRun).toHaveBeenCalledTimes(1);
+    expect(localTaskRun).toHaveBeenLastCalledWith({
+      context: {
+        ...context,
+        coatGlobalLockfile: {
+          ...context.coatGlobalLockfile,
+          setup: {
+            globalTask: {},
+          },
+        },
+      },
+      previousResults: {
+        global: {
+          globalTask: {},
+        },
+        local: {},
+      },
+    });
+  });
 });

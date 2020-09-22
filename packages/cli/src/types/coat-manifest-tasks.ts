@@ -26,7 +26,9 @@ interface CoatTask {
    *
    * It will be called with the task results from previous tasks or runs.
    */
-  run: (options: CoatTaskRunOptions) => JsonObject | Promise<JsonObject>;
+  run: (
+    options: CoatTaskRunOptions
+  ) => JsonObject | Promise<JsonObject | void> | void;
   /**
    * An optional function to determine whether a task should be run or not.
    *
