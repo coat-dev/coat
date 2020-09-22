@@ -4,15 +4,13 @@ import tmp from "tmp";
 import { sync } from "@coat/cli/build/sync";
 import { gatherExtendedTemplates } from "@coat/cli/build/util/gather-extended-templates";
 import { getStrictCoatManifest } from "@coat/cli/build/util/get-strict-coat-manifest";
+import createTemplate from ".";
 
 // TODO: See #47
 // Add more thorough tests and e2e tests
 // that don't rely on coat cli internals
 
 jest.mock("@coat/cli/build/util/gather-extended-templates").mock("execa");
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const createTemplate = require(".");
 
 const gatherExtendedTemplatesMock = gatherExtendedTemplates as jest.Mock;
 gatherExtendedTemplatesMock.mockImplementation((context) => [

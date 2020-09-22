@@ -32,7 +32,7 @@ function getTemplateFile(
   };
 }
 
-function createTemplate(context: CoatContext): CoatManifest {
+export default function createTemplate(context: CoatContext): CoatManifest {
   return {
     name: "@coat/template-ts-package",
     files: [
@@ -141,5 +141,3 @@ function createTemplate(context: CoatContext): CoatManifest {
     ],
   };
 }
-
-module.exports = createTemplate;
