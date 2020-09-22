@@ -16,6 +16,7 @@ import {
   COAT_LOCAL_LOCKFILE_VERSION,
 } from "../constants";
 import { groupFiles } from "./group-files";
+import { jsonFileFunctions } from "../file-types/json";
 
 jest.mock("fs").mock("import-from");
 
@@ -155,6 +156,7 @@ describe("sync/merge-files", () => {
       ...input,
       value3: 3,
     }));
+    const file4 = jest.fn((input, merge) => merge(input, { z: 5 }));
     const files = groupFiles(
       [
         {
@@ -172,6 +174,11 @@ describe("sync/merge-files", () => {
           content: file3,
           type: CoatManifestFileType.Json,
         },
+        {
+          file: "path.json",
+          content: file4,
+          type: CoatManifestFileType.Json,
+        },
       ],
       testContext
     );
@@ -181,9 +188,9 @@ describe("sync/merge-files", () => {
     expect(file2).toHaveBeenCalledTimes(1);
     expect(file3).toHaveBeenCalledTimes(1);
 
-    expect(file1).toHaveBeenCalledWith(undefined);
-    expect(file2).toHaveBeenCalledWith({ value1: 1 });
-    expect(file3).toHaveBeenCalledWith({ value2: 2 });
+    expect(file1).toHaveBeenCalledWith(undefined, jsonFileFunctions.merge);
+    expect(file2).toHaveBeenCalledWith({ value1: 1 }, jsonFileFunctions.merge);
+    expect(file3).toHaveBeenCalledWith({ value2: 2 }, jsonFileFunctions.merge);
 
     expect(result).toEqual([
       {
@@ -193,6 +200,7 @@ describe("sync/merge-files", () => {
         content: {
           value2: 2,
           value3: 3,
+          z: 5,
         },
         local: false,
         once: false,
@@ -234,9 +242,9 @@ describe("sync/merge-files", () => {
     expect(file2).toHaveBeenCalledTimes(1);
     expect(file3).toHaveBeenCalledTimes(1);
 
-    expect(file1).toHaveBeenCalledWith(undefined);
-    expect(file2).toHaveBeenCalledWith({ value1: 1 });
-    expect(file3).toHaveBeenCalledWith({ value2: 2 });
+    expect(file1).toHaveBeenCalledWith(undefined, jsonFileFunctions.merge);
+    expect(file2).toHaveBeenCalledWith({ value1: 1 }, jsonFileFunctions.merge);
+    expect(file3).toHaveBeenCalledWith({ value2: 2 }, jsonFileFunctions.merge);
 
     expect(result).toEqual([]);
   });

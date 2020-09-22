@@ -47,7 +47,23 @@ export interface CoatManifestFileBase<FileType extends CoatManifestFileType> {
   content:
     | CoatManifestFileContentTypesMap[FileType]
     | ((
-        previous: CoatManifestFileContentTypesMap[FileType] | undefined | null
+        /**
+         * Previous content of the file that has been provided by
+         * an earlier CoatManifestFile entry.
+         *
+         * This content should be used as a base for merging
+         * (if merging is the desired outcome)
+         */
+        previous: CoatManifestFileContentTypesMap[FileType] | undefined | null,
+        /**
+         * The default merge function used by coat. Useful when you
+         * want to perform certain operations based on the previous content
+         * and want to use the same merge mechanism that is provided by coat.
+         */
+        merge: (
+          source: CoatManifestFileContentTypesMap[FileType] | undefined | null,
+          target: CoatManifestFileContentTypesMap[FileType]
+        ) => CoatManifestFileContentTypesMap[FileType] | null
       ) =>
         | null
         | CoatManifestFileContentTypesMap[FileType]
