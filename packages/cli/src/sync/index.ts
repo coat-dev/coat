@@ -235,7 +235,7 @@ export async function sync(cwd: string): Promise<void> {
     };
 
     if (!isEqual(finalDependencies, currentDependencies)) {
-      const installSpinner = ora("Installing dependencies").start();
+      const installSpinner = ora("Installing dependencies\n").start();
       try {
         await execa("npm", ["install"], { cwd: context.cwd });
         installSpinner.succeed();

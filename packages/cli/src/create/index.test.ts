@@ -2,6 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { vol } from "memfs";
 import execa from "execa";
+import chalk from "chalk";
 import { create } from ".";
 import { getProjectName } from "./get-project-name";
 import { getTemplateInfo } from "./get-template-info";
@@ -215,7 +216,8 @@ describe("create", () => {
       await create("template", "project-name");
 
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        "Running coat setup and coat sync with @coat/cli version %s",
+        "Running %s with @coat/cli version %s\n",
+        chalk.cyan("coat sync"),
         "1.0.0-mocked.1"
       );
     });

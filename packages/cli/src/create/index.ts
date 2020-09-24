@@ -3,6 +3,7 @@ import fsExtra from "fs-extra";
 import path from "path";
 import execa from "execa";
 import ora from "ora";
+import chalk from "chalk";
 import { sync } from "../sync";
 import { getProjectName } from "./get-project-name";
 import { getTemplateInfo } from "./get-template-info";
@@ -13,6 +14,10 @@ import {
 } from "../constants";
 import { polish as jsonPolish } from "../file-types/json";
 import { addInitialCommit } from "./add-initial-commit";
+import {
+  printCreateCustomizationHelp,
+  printCreateHeader,
+} from "./print-create-messages";
 
 /**
  * Creates and generates a new coat project.
@@ -26,6 +31,9 @@ export async function create(
   projectNameInput?: string,
   directoryInput?: string
 ): Promise<void> {
+  // Prints the coat logo and header
+  printCreateHeader();
+
   const projectName = await getProjectName(projectNameInput);
 
   // Use the directoryInput from the cli argument or the project name if
@@ -81,8 +89,22 @@ export async function create(
     targetCwd = path.join(process.cwd(), targetDirectory);
   }
 
+  console.log(
+    "\nCreating a new %s project in %s\n",
+    chalk.cyan("coat"),
+    chalk.green(targetCwd)
+  );
+
+  // Print getting started guidance for customization
+  printCreateCustomizationHelp();
+
+  console.log(
+    "%s will install the project template and its dependencies into the project directory.\nThis might take a couple of minutes.\n",
+    chalk.cyan("coat")
+  );
+
   const installSpinner = ora(
-    "Installing template into project directory"
+    "Installing template into project directory\n"
   ).start();
   try {
     // Run npm install to install the template and its dependencies
@@ -167,7 +189,8 @@ export async function create(
     const localCoatVersion = localCoatVersionTask.stdout;
     if (localCoatVersion !== COAT_CLI_VERSION) {
       console.log(
-        "Running coat setup and coat sync with @coat/cli version %s",
+        "Running %s with @coat/cli version %s\n",
+        chalk.cyan("coat sync"),
         localCoatVersion
       );
     }
@@ -188,4 +211,18 @@ export async function create(
   // Initialize a git repository and add an initial commit
   // if the project was not created in an existing git repository
   await addInitialCommit(targetCwd);
+
+  console.log(
+    "🎊 Your new %s project has been successfully created! 🎊\n",
+    chalk.cyan("coat")
+  );
+  console.log(
+    "Get started by changing into your project folder: %s",
+    chalk.cyan(`cd ${targetDirectory}`)
+  );
+  console.log(
+    "You can ensure your generated files are up to date by running: %s\n",
+    chalk.cyan("coat sync")
+  );
+  console.log("⚡️ Happy hacking! ⚡️\n");
 }
