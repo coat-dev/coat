@@ -2,13 +2,13 @@ import boxen from "boxen";
 import chalk from "chalk";
 import wrapAnsi from "wrap-ansi";
 import jsonColorizer from "json-colorizer";
-import { COAT_ASCII_LOGO, COAT_LOGO_BOX_WIDTH } from "../constants";
 import { centerText } from "../ui/center-text";
 import {
   getUsableTerminalSize,
   TerminalSize,
 } from "../ui/get-usable-terminal-size";
 import { fillLastLine } from "../ui/fill-last-line";
+import { createCoatLogo } from "../ui/create-coat-logo";
 
 /**
  * Prints the coat logo, description and the website url in
@@ -21,30 +21,9 @@ export function printCreateHeader(): void {
   if (usableTerminalSize.size === TerminalSize.Tiny) {
     const tinyLogo = `🚀 ${chalk.cyan("coat")} 🚀`;
     console.log(`\n${tinyLogo}`);
-    return;
+  } else {
+    console.log(createCoatLogo());
   }
-
-  const text = [
-    centerText(COAT_ASCII_LOGO, COAT_LOGO_BOX_WIDTH),
-    "",
-    chalk.dim.green("─".repeat(COAT_LOGO_BOX_WIDTH)),
-    "",
-    centerText(
-      "Declarative & continuous project configuration",
-      COAT_LOGO_BOX_WIDTH
-    ),
-    centerText(chalk.cyan("https://coat.dev"), COAT_LOGO_BOX_WIDTH),
-    "",
-  ].join("\n");
-
-  // Place the logo and descriptions into a box
-  const logoBox = boxen(text, {
-    dimBorder: true,
-    borderColor: "green",
-    float: "center",
-  });
-
-  console.log(logoBox);
 }
 
 /**
