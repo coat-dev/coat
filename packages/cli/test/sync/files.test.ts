@@ -6,6 +6,7 @@ import {
   CoatManifestFileType,
   CoatManifestFileContentTypesMap,
 } from "../../src/types/coat-manifest-file";
+import stripAnsi from "strip-ansi";
 
 describe("coat sync - files", () => {
   const testPackagesPath = path.join(__dirname, "..", "utils", "test-packages");
@@ -17,7 +18,13 @@ describe("coat sync - files", () => {
         files: [],
       },
     });
-    await task;
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        UPDATED  package.json
+      "
+    `);
   });
 
   test("should merge a file from multiple stages", async () => {
@@ -31,7 +38,16 @@ describe("coat sync - files", () => {
         ].map((templateName) => path.join(testPackagesPath, templateName)),
       },
     });
-    await task;
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  a.json
+        CREATED  b.txt
+        CREATED  c.txt
+        UPDATED  package.json
+      "
+    `);
 
     const [folderContent, aJson, bTxt, cTxt, gitignore] = await Promise.all([
       fs.readdir(cwd),
@@ -95,7 +111,16 @@ describe("coat sync - files", () => {
         ].map((templateName) => path.join(testPackagesPath, templateName)),
       },
     });
-    await task;
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  a.json
+        CREATED  b.txt
+        CREATED  c.txt
+        UPDATED  package.json
+      "
+    `);
 
     const aJson = await fs.readFile(path.join(cwd, "a.json"), "utf8");
     expect(JSON.parse(aJson)).toMatchInlineSnapshot(`
@@ -138,7 +163,16 @@ describe("coat sync - files", () => {
     ]);
 
     const { task } = runCli(["sync"], { cwd });
-    await task;
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  a.json
+        CREATED  b.txt
+        CREATED  c.txt
+        UPDATED  package.json
+      "
+    `);
 
     const [aJson, bTxt] = await Promise.all([
       fs.readFile(path.join(cwd, "a.json"), "utf8"),
@@ -193,7 +227,16 @@ describe("coat sync - files", () => {
     ]);
 
     const { task } = runCli(["sync"], { cwd });
-    await task;
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  a.json
+        CREATED  b.txt
+        CREATED  c.txt
+        UPDATED  package.json
+      "
+    `);
 
     const [aJson, bTxt] = await Promise.all([
       fs.readFile(path.join(cwd, "a.json"), "utf8"),
@@ -244,7 +287,15 @@ describe("coat sync - files", () => {
     );
 
     const { task } = runCli(["sync"], { cwd });
-    await task;
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  b.txt
+        CREATED  c.txt
+        UPDATED  package.json
+      "
+    `);
 
     await expect(() =>
       fs.readFile(path.join(cwd, "a.json"), "utf8")
@@ -310,7 +361,17 @@ describe("coat sync - files", () => {
         ],
       },
     });
-    await task;
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  a.json
+        CREATED  b.txt
+        CREATED  c.txt
+        CREATED  d.yaml
+        UPDATED  package.json
+      "
+    `);
 
     const [aJson, bTxt, cTxt, dYaml] = await Promise.all([
       fs.readFile(path.join(cwd, "a.json"), "utf8"),
@@ -385,7 +446,15 @@ describe("coat sync - files", () => {
         ),
       },
     });
-    await firstSyncRun;
+    const firstSyncResult = await firstSyncRun;
+    expect(stripAnsi(firstSyncResult.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  a.json
+        CREATED  b.json
+        UPDATED  package.json
+      "
+    `);
 
     // Modify files
     await Promise.all([
@@ -401,7 +470,12 @@ describe("coat sync - files", () => {
 
     // Run sync again to verify that files will not be changed
     const { task: secondSyncRun } = runCli(["sync"], { cwd });
-    await secondSyncRun;
+    const secondSyncResult = await secondSyncRun;
+    expect(stripAnsi(secondSyncResult.stdout)).toMatchInlineSnapshot(`
+      "
+      ♻️  Everything up to date️
+      "
+    `);
 
     // Read files
     const [aRaw, bRaw] = await Promise.all([

@@ -131,7 +131,7 @@ describe("coat sync - errors", () => {
   );
 
   testExceptWindows(
-    "should throw error when file can't be accessed due to missing read permissions for potential customization files",
+    "should throw error when current files can't be accessed due to missing read permissions",
     async () => {
       const fileFolderName = "some-folder";
       const tmpDir = await prepareCliTest({
@@ -162,7 +162,7 @@ describe("coat sync - errors", () => {
           true
         );
         expect(
-          error.stderr.includes(path.join("some-folder", "file.json-custom.js"))
+          error.stderr.includes(path.join("some-folder", "file.json"))
         ).toBe(true);
       }
     }

@@ -1,4 +1,3 @@
-import path from "path";
 import { CoatContext } from "../types/coat-context";
 import { getStrictCoatManifest } from "../util/get-strict-coat-manifest";
 import { getUnmanagedFiles } from "./get-unmanaged-files";
@@ -10,12 +9,15 @@ import {
   COAT_GLOBAL_LOCKFILE_VERSION,
   COAT_LOCAL_LOCKFILE_VERSION,
 } from "../constants";
+import { CoatLockfileFileEntryStrict } from "../types/coat-lockfiles";
 
 describe("sync/get-unmanaged-files", () => {
   test("should return empty array if lockfile does not exist", () => {
     const newLockfileFiles = [
       {
         path: "a.json",
+        hash: "a.json-hash",
+        once: false,
       },
     ];
     const testContext: CoatContext = {
@@ -34,8 +36,7 @@ describe("sync/get-unmanaged-files", () => {
 
     const unmanagedFiles = getUnmanagedFiles(
       newLockfileFiles,
-      testContext.coatGlobalLockfile,
-      testContext
+      testContext.coatGlobalLockfile
     );
     expect(unmanagedFiles).toEqual([]);
   });
@@ -44,9 +45,13 @@ describe("sync/get-unmanaged-files", () => {
     const newLockfileFiles = [
       {
         path: "a.json",
+        hash: "a.json-hash",
+        once: false,
       },
       {
         path: "b.json",
+        hash: "b.json-hash",
+        once: false,
       },
     ];
     const testContext: CoatContext = {
@@ -60,8 +65,9 @@ describe("sync/get-unmanaged-files", () => {
         files: [
           {
             path: "a.json",
+            hash: "a.json-hash",
           },
-          { path: "b.json" },
+          { path: "b.json", hash: "b.json-hash" },
         ],
       }),
       coatLocalLockfile: getStrictCoatLocalLockfile({
@@ -71,8 +77,7 @@ describe("sync/get-unmanaged-files", () => {
 
     const unmanagedFiles = getUnmanagedFiles(
       newLockfileFiles,
-      testContext.coatGlobalLockfile,
-      testContext
+      testContext.coatGlobalLockfile
     );
     expect(unmanagedFiles).toEqual([]);
   });
@@ -81,9 +86,13 @@ describe("sync/get-unmanaged-files", () => {
     const newLockfileFiles = [
       {
         path: "a.json",
+        hash: "a.json-hash",
+        once: false,
       },
       {
         path: "b.json",
+        hash: "b.json-hash",
+        once: false,
       },
     ];
     const testContext: CoatContext = {
@@ -95,10 +104,10 @@ describe("sync/get-unmanaged-files", () => {
       coatGlobalLockfile: getStrictCoatGlobalLockfile({
         version: COAT_GLOBAL_LOCKFILE_VERSION,
         files: [
-          { path: "a.json" },
-          { path: "b.json" },
-          { path: "c.json" },
-          { path: "d.json" },
+          { path: "a.json", hash: "a.json-hash" },
+          { path: "b.json", hash: "b.json-hash" },
+          { path: "c.json", hash: "c.json-hash" },
+          { path: "d.json", hash: "d.json-hash" },
         ],
       }),
       coatLocalLockfile: getStrictCoatLocalLockfile({
@@ -108,12 +117,57 @@ describe("sync/get-unmanaged-files", () => {
 
     const unmanagedFiles = getUnmanagedFiles(
       newLockfileFiles,
-      testContext.coatGlobalLockfile,
-      testContext
+      testContext.coatGlobalLockfile
     );
     expect(unmanagedFiles).toEqual([
-      path.join("test", "c.json"),
-      path.join("test", "d.json"),
+      {
+        path: "c.json",
+        hash: "c.json-hash",
+        once: false,
+      },
+      {
+        path: "d.json",
+        hash: "d.json-hash",
+        once: false,
+      },
     ]);
+  });
+
+  test("should not return once files that are not managed anymore", () => {
+    const newLockfileFiles: CoatLockfileFileEntryStrict[] = [
+      {
+        path: "a.json",
+        once: true,
+      },
+      {
+        path: "b.json",
+        once: true,
+      },
+    ];
+    const testContext: CoatContext = {
+      coatManifest: getStrictCoatManifest({
+        name: "test-project",
+      }),
+      cwd: "test",
+      packageJson: {},
+      coatGlobalLockfile: getStrictCoatGlobalLockfile({
+        version: COAT_GLOBAL_LOCKFILE_VERSION,
+        files: [
+          { path: "a.json", once: true },
+          { path: "b.json", once: true },
+          { path: "c.json", once: true },
+          { path: "d.json", once: true },
+        ],
+      }),
+      coatLocalLockfile: getStrictCoatLocalLockfile({
+        version: COAT_LOCAL_LOCKFILE_VERSION,
+      }),
+    };
+
+    const unmanagedFiles = getUnmanagedFiles(
+      newLockfileFiles,
+      testContext.coatGlobalLockfile
+    );
+    expect(unmanagedFiles).toEqual([]);
   });
 });

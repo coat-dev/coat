@@ -3,6 +3,7 @@ import {
   CoatGlobalLockfile,
   CoatLocalLockfile,
   CoatLocalLockfileStrict,
+  CoatLockfileFileEntryStrict,
 } from "../types/coat-lockfiles";
 
 /**
@@ -17,10 +18,19 @@ export function getStrictCoatGlobalLockfile(
   return {
     version: lockfile.version,
     files:
-      lockfile.files?.map((file) => ({
-        ...file,
-        once: !!file.once,
-      })) ?? [],
+      lockfile.files?.map<CoatLockfileFileEntryStrict>((file) => {
+        if (file.once) {
+          return {
+            path: file.path,
+            once: true,
+          };
+        }
+        return {
+          path: file.path,
+          once: false,
+          hash: file.hash,
+        };
+      }) ?? [],
     setup: lockfile.setup ?? {},
   };
 }
@@ -37,10 +47,19 @@ export function getStrictCoatLocalLockfile(
   return {
     version: lockfile.version,
     files:
-      lockfile.files?.map((file) => ({
-        ...file,
-        once: !!file.once,
-      })) ?? [],
+      lockfile.files?.map((file) => {
+        if (file.once) {
+          return {
+            path: file.path,
+            once: true,
+          };
+        }
+        return {
+          path: file.path,
+          once: false,
+          hash: file.hash,
+        };
+      }) ?? [],
     setup: lockfile.setup ?? {},
   };
 }

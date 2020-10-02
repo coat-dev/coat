@@ -14,7 +14,6 @@ import * as mergeFilesImport from "./merge-files";
 import * as mergeScriptsImport from "./merge-scripts";
 import * as mergeDependenciesImport from "./merge-dependencies";
 import * as setupImport from "../setup";
-import * as updateLockfilesImport from "../lockfiles/update-lockfiles";
 import { getStrictCoatManifest } from "../util/get-strict-coat-manifest";
 import {
   COAT_GLOBAL_LOCKFILE_PATH,
@@ -27,12 +26,15 @@ import { CoatManifest } from "../types/coat-manifest";
 import { groupFiles } from "./group-files";
 import { flatten } from "lodash";
 import { getDefaultFiles } from "./get-default-files";
+import { updateFilesOnDisk } from "./update-files-on-disk";
+import { getFileHash } from "../util/get-file-hash";
 
 jest
   .mock("fs")
   .mock("execa")
   .mock("ora")
-  .mock("../util/gather-extended-templates");
+  .mock("../util/gather-extended-templates")
+  .mock("./update-files-on-disk.ts");
 
 const platformRoot = path.parse(process.cwd()).root;
 const testCwd = path.join(platformRoot, "test");
@@ -65,6 +67,7 @@ const templates: CoatManifest[] = [
       {
         file: "local-file.json",
         content: { local2: true },
+        local: true,
         type: CoatManifestFileType.Json as const,
       },
     ],
@@ -81,6 +84,8 @@ const templates: CoatManifest[] = [
 
 const gatherExtendedTemplatesMock = (gatherExtendedTemplates as unknown) as jest.Mock;
 gatherExtendedTemplatesMock.mockImplementation(() => templates);
+
+const updateFilesOnDiskMock = (updateFilesOnDisk as unknown) as jest.Mock;
 
 const coatManifest: CoatManifest = {
   name: "test-manifest",
@@ -128,7 +133,6 @@ describe("sync", () => {
   let mergeDependenciesSpy: jest.SpyInstance;
   let mergeFilesSpy: jest.SpyInstance;
   let setupSpy: jest.SpyInstance;
-  let updateLockfilesSpy: jest.SpyInstance;
 
   afterEach(() => {
     vol.reset();
@@ -143,7 +147,6 @@ describe("sync", () => {
     );
     mergeFilesSpy = jest.spyOn(mergeFilesImport, "mergeFiles");
     setupSpy = jest.spyOn(setupImport, "setup");
-    updateLockfilesSpy = jest.spyOn(updateLockfilesImport, "updateLockfiles");
 
     // Place template files
     await Promise.all([
@@ -222,90 +225,132 @@ describe("sync", () => {
     );
   });
 
-  test("should write all synced files to the file system", async () => {
+  test("should call updateFilesOnDisk with the correct files", async () => {
     await sync(testCwd);
-    const [
-      fileEntries,
-      coatManifestFileRaw,
-      templateFileRaw,
-      templateLocalFileRaw,
-      packageJsonRaw,
-      gitignore,
-    ] = await Promise.all([
-      fs.readdir(testCwd),
-      fs.readFile(path.join(testCwd, "manifestA.json"), "utf8"),
-      fs.readFile(
-        path.join(testCwd, "some-folder", "deep-folder", "template2x.json"),
-        "utf8"
-      ),
-      fs.readFile(path.join(testCwd, "local-file.json"), "utf8"),
-      fs.readFile(path.join(testCwd, "package.json"), "utf8"),
-      fs.readFile(path.join(testCwd, ".gitignore"), "utf8"),
+
+    expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(1);
+    expect(updateFilesOnDiskMock.mock.calls[0]).toEqual([
+      // files to place
+      [
+        {
+          file: path.join(testCwd, PACKAGE_JSON_FILENAME),
+          content: expect.any(String),
+          hash: expect.any(String),
+          local: false,
+          once: false,
+          relativePath: PACKAGE_JSON_FILENAME,
+          type: "JSON",
+        },
+        {
+          file: path.join(testCwd, ".gitignore"),
+          content: expect.any(String),
+          local: false,
+          once: true,
+          relativePath: ".gitignore",
+          type: "TEXT",
+        },
+        {
+          file: path.join(
+            testCwd,
+            "some-folder",
+            "deep-folder",
+            "template2x.json"
+          ),
+          content: expect.any(String),
+          hash: expect.any(String),
+          local: false,
+          once: false,
+          relativePath: "some-folder/deep-folder/template2x.json",
+          type: "JSON",
+        },
+        {
+          file: path.join(testCwd, "local-file.json"),
+          content: expect.any(String),
+          hash: expect.any(String),
+          local: true,
+          once: false,
+          relativePath: "local-file.json",
+          type: "JSON",
+        },
+        {
+          file: path.join(testCwd, "manifestA.json"),
+          content: expect.any(String),
+          hash: expect.any(String),
+          local: false,
+          once: false,
+          relativePath: "manifestA.json",
+          type: "JSON",
+        },
+      ],
+      // files to remove
+      [],
+      // current files
+      {
+        [path.join(testCwd, ".gitignore")]: undefined,
+        [path.join(testCwd, "local-file.json")]: undefined,
+        [path.join(testCwd, "manifestA.json")]: undefined,
+        [path.join(
+          testCwd,
+          "some-folder",
+          "deep-folder",
+          "template2x.json"
+        )]: undefined,
+        [path.join(testCwd, "package.json")]: expect.any(String),
+      },
+      // coat context
+      {
+        coatGlobalLockfile: {
+          files: [],
+          setup: {},
+          version: 1,
+        },
+        coatLocalLockfile: {
+          files: [],
+          setup: {},
+          version: 1,
+        },
+        coatManifest: {
+          dependencies: {
+            dependencies: {
+              coatManifestA: "1.0.0",
+            },
+          },
+          extends: ["./template-0.js", "./template-1.js"],
+          files: [
+            {
+              content: { a: true },
+              file: "manifestA.json",
+              type: "JSON",
+            },
+          ],
+          name: "test-manifest",
+          scripts: [],
+          setup: [],
+        },
+        cwd: testCwd,
+        packageJson: {
+          dependencies: {
+            a: "1.0.0",
+            coatManifestA: "1.0.0",
+            template1A: "1.0.0",
+          },
+          devDependencies: {
+            b: "1.0.0",
+          },
+          optionalDependencies: {
+            c: "1.0.0",
+          },
+          peerDependencies: {
+            d: "1.0.0",
+          },
+          scripts: {
+            build: "test",
+            lint: "test",
+            "script-from-package.json": "test",
+          },
+        },
+      },
     ]);
-
-    const expectedFiles = [
-      ".gitignore",
-      "some-folder",
-      COAT_MANIFEST_FILENAME,
-      PACKAGE_JSON_FILENAME,
-      "manifestA.json",
-      COAT_GLOBAL_LOCKFILE_PATH,
-      "local-file.json",
-    ];
-    fileEntries.sort();
-    expectedFiles.sort();
-    expect(fileEntries).toEqual(expectedFiles);
-
-    const coatManifestFileParsed = JSON.parse(coatManifestFileRaw);
-    const templateFileParsed = JSON.parse(templateFileRaw);
-    const templateLocalFileParsed = JSON.parse(templateLocalFileRaw);
-    const packageJsonParsed = JSON.parse(packageJsonRaw);
-
-    expect(coatManifestFileParsed).toMatchInlineSnapshot(`
-      Object {
-        "a": true,
-      }
-    `);
-    expect(templateFileParsed).toMatchInlineSnapshot(`
-      Object {
-        "template2": true,
-      }
-    `);
-    expect(templateLocalFileParsed).toMatchInlineSnapshot(`
-      Object {
-        "local2": true,
-      }
-    `);
-    expect(packageJsonParsed).toMatchInlineSnapshot(`
-      Object {
-        "dependencies": Object {
-          "a": "1.0.0",
-          "coatManifestA": "1.0.0",
-          "template1A": "1.0.0",
-        },
-        "devDependencies": Object {
-          "b": "1.0.0",
-        },
-        "optionalDependencies": Object {
-          "c": "1.0.0",
-        },
-        "peerDependencies": Object {
-          "d": "1.0.0",
-        },
-        "scripts": Object {
-          "build": "test",
-          "lint": "test",
-          "script-from-package.json": "test",
-        },
-      }
-    `);
-    expect(gitignore).toMatchInlineSnapshot(`
-      "node_modules
-
-      # coat local files
-      /.coat
-      "
-    `);
   });
 
   test("should run npm install in project directory if dependencies are changed", async () => {
@@ -386,6 +431,7 @@ describe("sync", () => {
           files: [
             {
               path: unmanagedFilePath,
+              hash: getFileHash(""),
             },
           ],
         })
@@ -394,13 +440,17 @@ describe("sync", () => {
       fs.outputFile(path.join(testCwd, unmanagedFilePath), ""),
     ]);
 
-    const folderContentBeforeSync = await fs.readdir(testCwd);
-    expect(folderContentBeforeSync).toContain(unmanagedFilePath);
-
     await sync(testCwd);
 
-    const folderContentAfterSync = await fs.readdir(testCwd);
-    expect(folderContentAfterSync).not.toContain(unmanagedFilePath);
+    expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(1);
+    expect(updateFilesOnDiskMock.mock.calls[0][1]).toEqual([
+      {
+        hash:
+          "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
+        once: false,
+        path: "unmanaged-path-1.json",
+      },
+    ]);
   });
 
   test("should delete local files that are no longer managed", async () => {
@@ -414,6 +464,7 @@ describe("sync", () => {
           files: [
             {
               path: unmanagedFilePath,
+              hash: getFileHash(""),
             },
           ],
         })
@@ -422,34 +473,17 @@ describe("sync", () => {
       fs.outputFile(path.join(testCwd, unmanagedFilePath), ""),
     ]);
 
-    const folderContentBeforeSync = await fs.readdir(testCwd);
-    expect(folderContentBeforeSync).toContain(unmanagedFilePath);
-
     await sync(testCwd);
 
-    const folderContentAfterSync = await fs.readdir(testCwd);
-    expect(folderContentAfterSync).not.toContain(unmanagedFilePath);
-  });
-
-  test("should not throw any errors if files that are no longer managed have already been deleted", async () => {
-    const unmanagedFilePath = "unmanaged-path-1.json";
-
-    // Put unmanaged file into global lockfile
-    await fs.outputFile(
-      path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
-      yaml.safeDump({
-        version: 1,
-        files: [
-          {
-            path: unmanagedFilePath,
-          },
-        ],
-      })
-    );
-    await sync(testCwd);
-
-    const folderContentAfterSync = await fs.readdir(testCwd);
-    expect(folderContentAfterSync).not.toContain(unmanagedFilePath);
+    expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(1);
+    expect(updateFilesOnDiskMock.mock.calls[0][1]).toEqual([
+      {
+        hash:
+          "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
+        once: false,
+        path: "unmanaged-path-1.json",
+      },
+    ]);
   });
 
   test("should place files that have once = true only once", async () => {
@@ -479,48 +513,35 @@ describe("sync", () => {
 
     await sync(testCwd);
 
-    const [onceARaw, onceBRaw] = await Promise.all([
-      fs.readFile(path.join(testCwd, "once-a.json"), "utf-8"),
-      fs.readFile(path.join(testCwd, "once-b.json"), "utf-8"),
-    ]);
-    expect(JSON.parse(onceARaw)).toEqual({
-      a: true,
-    });
-    expect(JSON.parse(onceBRaw)).toEqual({
-      b: true,
-    });
-
-    // Modify once files
-    await Promise.all([
-      fs.unlink(path.join(testCwd, "once-a.json")),
-      fs.writeFile(
-        path.join(testCwd, "once-b.json"),
-        JSON.stringify({ newB: true })
-      ),
-    ]);
+    expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(1);
+    expect(updateFilesOnDiskMock.mock.calls[0][0]).toContainEqual(
+      expect.objectContaining({
+        relativePath: "once-a.json",
+      })
+    );
+    expect(updateFilesOnDiskMock.mock.calls[0][0]).toContainEqual(
+      expect.objectContaining({
+        relativePath: "once-b.json",
+      })
+    );
 
     gatherExtendedTemplatesMock.mockImplementationOnce(() => newTemplates);
     gatherExtendedTemplatesMock.mockImplementationOnce(() => newTemplates);
 
     await sync(testCwd);
 
-    await expect(
-      fs.readFile(path.join(testCwd, "once-a.json"), "utf-8")
-    ).rejects.toHaveProperty(
-      "message",
-      expect.stringMatching(
-        /ENOENT: no such file or directory, open '.*once-a.json/
-      )
-    );
+    expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(2);
 
-    const onceBRaw2 = await fs.readFile(
-      path.join(testCwd, "once-b.json"),
-      "utf-8"
+    expect(updateFilesOnDiskMock.mock.calls[1][0]).not.toContainEqual(
+      expect.objectContaining({
+        relativePath: "once-a.json",
+      })
     );
-
-    expect(JSON.parse(onceBRaw2)).toEqual({
-      newB: true,
-    });
+    expect(updateFilesOnDiskMock.mock.calls[1][0]).not.toContainEqual(
+      expect.objectContaining({
+        relativePath: "once-b.json",
+      })
+    );
   });
 
   test("should call setup with force = false", async () => {
@@ -528,30 +549,5 @@ describe("sync", () => {
 
     expect(setupSpy).toHaveBeenCalledTimes(1);
     expect(setupSpy).toHaveBeenLastCalledWith(testCwd, false);
-  });
-
-  test("should still write files to disk if lockfile updates fail", async () => {
-    updateLockfilesSpy.mockImplementationOnce(async () => {
-      throw new Error("Expected error");
-    });
-
-    await expect(() => sync(testCwd)).rejects.toHaveProperty(
-      "message",
-      "Expected error"
-    );
-
-    const fileEntries = await fs.readdir(testCwd);
-
-    const expectedFiles = [
-      ".gitignore",
-      "some-folder",
-      COAT_MANIFEST_FILENAME,
-      PACKAGE_JSON_FILENAME,
-      "manifestA.json",
-      "local-file.json",
-    ];
-    fileEntries.sort();
-    expectedFiles.sort();
-    expect(fileEntries).toEqual(expectedFiles);
   });
 });

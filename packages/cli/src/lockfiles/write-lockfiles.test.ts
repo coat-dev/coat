@@ -52,9 +52,11 @@ describe("lockfiles/write-lockfiles", () => {
         files: [
           {
             path: "bye.json",
+            hash: "bye.json-hash",
           },
           {
             path: "hi.json",
+            hash: "hi.json-hash",
           },
         ],
       });
@@ -68,8 +70,10 @@ describe("lockfiles/write-lockfiles", () => {
 
       expect(lockfileContent).toMatchInlineSnapshot(`
         "files:
-          - path: bye.json
-          - path: hi.json
+          - hash: bye.json-hash
+            path: bye.json
+          - hash: hi.json-hash
+            path: hi.json
         setup:
           task1:
             result:
@@ -104,9 +108,11 @@ describe("lockfiles/write-lockfiles", () => {
           {
             path: "a.json",
             once: false,
+            hash: "a.json-hash",
           },
           {
             path: "b.json",
+            hash: "b.json-hash",
           },
           {
             path: "c.json",
@@ -124,9 +130,11 @@ describe("lockfiles/write-lockfiles", () => {
       expect(newLockfile).toHaveProperty("files", [
         {
           path: "a.json",
+          hash: "a.json-hash",
         },
         {
           path: "b.json",
+          hash: "b.json-hash",
         },
         {
           path: "c.json",
@@ -168,9 +176,11 @@ describe("lockfiles/write-lockfiles", () => {
         files: [
           {
             path: "bye.json",
+            hash: "bye.json-hash",
           },
           {
             path: "hi.json",
+            hash: "hi.json-hash",
           },
         ],
       });
@@ -184,8 +194,10 @@ describe("lockfiles/write-lockfiles", () => {
 
       expect(lockfileContent).toMatchInlineSnapshot(`
         "files:
-          - path: bye.json
-          - path: hi.json
+          - hash: bye.json-hash
+            path: bye.json
+          - hash: hi.json-hash
+            path: hi.json
         setup:
           task1:
             result:
@@ -220,9 +232,11 @@ describe("lockfiles/write-lockfiles", () => {
           {
             path: "a.json",
             once: false,
+            hash: "a.json-hash",
           },
           {
             path: "b.json",
+            hash: "b.json-hash",
           },
           {
             path: "c.json",
@@ -240,9 +254,11 @@ describe("lockfiles/write-lockfiles", () => {
       expect(newLockfile).toHaveProperty("files", [
         {
           path: "a.json",
+          hash: "a.json-hash",
         },
         {
           path: "b.json",
+          hash: "b.json-hash",
         },
         {
           path: "c.json",

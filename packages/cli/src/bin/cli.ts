@@ -62,7 +62,6 @@ export function createProgram(): InstanceType<CommandConstructor> {
         // Exit immediately with the exitCode if a script has thrown an error
         if (error.exitCode) {
           process.exit(error.exitCode);
-          return;
         }
         // Otherwise rethrow the error directly
         throw error;
@@ -84,19 +83,18 @@ export function createProgram(): InstanceType<CommandConstructor> {
       // been thrown from a script that has been run.
       if (error.exitCode) {
         process.exit(error.exitCode);
-        return;
+      } else {
+        // If there is no exitCode, the error has to be in an earlier
+        // part of the run function, e.g. because no package.json file exists
+        // or the script name is not a part of it.
+        //
+        // Therefore we output the default error message from commander to
+        // let the user know that the command or script was not found.
+        console.error(
+          `error: unknown script or command '${commands[0]}'. See 'coat --help'`
+        );
+        process.exit(1);
       }
-
-      // If there is no exitCode, the error has to be in an earlier
-      // part of the run function, e.g. because no package.json file exists
-      // or the script name is not a part of it.
-      //
-      // Therefore we output the default error message from commander to
-      // let the user know that the command or script was not found.
-      console.error(
-        `error: unknown script or command '${commands[0]}'. See 'coat --help'`
-      );
-      process.exit(1);
     }
   });
 

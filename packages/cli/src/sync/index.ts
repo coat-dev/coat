@@ -1,4 +1,3 @@
-import fs from "fs-extra";
 import execa from "execa";
 import ora from "ora";
 import flatten from "lodash/flatten";
@@ -17,13 +16,15 @@ import isEqual from "lodash/isEqual";
 import { CoatManifestStrict } from "../types/coat-manifest";
 import { generateLockfileFiles } from "../lockfiles/generate-lockfile-files";
 import { getUnmanagedFiles } from "./get-unmanaged-files";
-import { deleteFile } from "../util/delete-file";
 import { getAllTemplates } from "../util/get-all-templates";
 import { updateLockfiles } from "../lockfiles/update-lockfiles";
 import { setup } from "../setup";
 import produce from "immer";
 import { groupFiles } from "./group-files";
 import { getDefaultFiles } from "./get-default-files";
+import { getCurrentFiles } from "./get-current-files";
+import { updateFilesOnDisk } from "./update-files-on-disk";
+import { getNormalizedFilePath } from "../util/get-normalized-file-path";
 
 /**
  * Generates all files from the current coat project.
@@ -108,25 +109,58 @@ export async function sync(cwd: string): Promise<void> {
   // Group files by file path
   const groupedFiles = groupFiles(allFiles, context);
 
-  // Exclude one-time files that have already been generated
-  const previouslyPlacedFiles = new Set(
-    [
-      ...context.coatGlobalLockfile.files,
-      ...context.coatLocalLockfile.files,
-    ].map((file) => file.path)
-  );
+  // Gather previously placed files to exclude one-time files
+  // that have already been generated
+  const previouslyPlacedFiles = [
+    ...context.coatGlobalLockfile.files,
+    ...context.coatLocalLockfile.files,
+  ].map((file) => file.path);
+
+  // Gather the files of which the current disk content
+  // should be retrieved to determine they need to be updated
+  const filesToRetrieve = [
+    ...Object.keys(groupedFiles),
+    ...previouslyPlacedFiles.map((relativePath) =>
+      getNormalizedFilePath(relativePath, context)
+    ),
+  ];
+
+  // Filter out duplicate file paths, since filesToRetrieve
+  // contains both the current lockfile entries and new groupedFiles
+  // keys that overlap for consecutive sync runs
+  const filesToRetrieveUnique = [...new Set(filesToRetrieve)];
+
+  // Retrieve the contents of the files
+  const currentFiles = await getCurrentFiles(filesToRetrieveUnique);
+
+  // Create a Set to easily access the generated file paths
+  // when grouping files
+  const previouslyPlacedFileSet = new Set(previouslyPlacedFiles);
 
   // Group by files that should only be placed once
   // and have already been placed in a previous run of coat sync
   const { onceAlreadyPlaced, filesToMerge } = Object.values(
     groupedFiles
   ).reduce<{
-    onceAlreadyPlaced: { [filePath: string]: CoatManifestGroupedFile };
+    onceAlreadyPlaced: {
+      [filePath: string]: CoatManifestGroupedFile & { once: true };
+    };
     filesToMerge: { [filePath: string]: CoatManifestGroupedFile };
   }>(
     (accumulator, file) => {
-      let targetProperty;
-      if (file.once && previouslyPlacedFiles.has(file.relativePath)) {
+      let targetProperty:
+        | typeof accumulator.filesToMerge
+        | typeof accumulator.onceAlreadyPlaced;
+
+      if (
+        file.once &&
+        // Check if the once file has already been placed via coat
+        // and is tracked in a lockfile
+        (previouslyPlacedFileSet.has(file.relativePath) ||
+          // Even if the file has not yet been tracked in a lockfile
+          // it should also not be placed if it already exists on the disk
+          typeof currentFiles[file.relativePath] !== "undefined")
+      ) {
         targetProperty = accumulator.onceAlreadyPlaced;
       } else {
         targetProperty = accumulator.filesToMerge;
@@ -150,66 +184,47 @@ export async function sync(cwd: string): Promise<void> {
   const polishedFiles = polishFiles(mergedFiles, context);
 
   // Generate new coat lockfile files property from merged files
-  const lockfileCandidates = [
+  const lockFileCanditates = [
     ...Object.values(onceAlreadyPlaced),
-    ...mergedFiles,
+    ...polishedFiles,
   ];
-  const localLockfileFileEntries = lockfileCandidates.filter(
-    (file) => !!file.local
+
+  // Split lockfile candidates by local and global file entries
+  const {
+    localLockFileEntries,
+    globalLockFileEntries,
+  } = lockFileCanditates.reduce<{
+    localLockFileEntries: typeof lockFileCanditates;
+    globalLockFileEntries: typeof lockFileCanditates;
+  }>(
+    (accumulator, file) => {
+      if (file.local) {
+        accumulator.localLockFileEntries.push(file);
+      } else {
+        accumulator.globalLockFileEntries.push(file);
+      }
+      return accumulator;
+    },
+    { localLockFileEntries: [], globalLockFileEntries: [] }
   );
-  const globalLockfileFileEntries = lockfileCandidates.filter(
-    (file) => !file.local
-  );
-  const newLocalLockfileFiles = generateLockfileFiles(localLockfileFileEntries);
-  const newGlobalLockfileFiles = generateLockfileFiles(
-    globalLockfileFileEntries
-  );
+
+  const newLocalLockFiles = generateLockfileFiles(localLockFileEntries);
+  const newGlobalLockFiles = generateLockfileFiles(globalLockFileEntries);
 
   const filesToRemove = [
-    ...getUnmanagedFiles(
-      newLocalLockfileFiles,
-      context.coatLocalLockfile,
-      context
-    ),
-    ...getUnmanagedFiles(
-      newGlobalLockfileFiles,
-      context.coatGlobalLockfile,
-      context
-    ),
+    ...getUnmanagedFiles(newLocalLockFiles, context.coatLocalLockfile),
+    ...getUnmanagedFiles(newGlobalLockFiles, context.coatGlobalLockfile),
   ];
 
+  // Place or update new polished files on the disk and remove unmanaged files
+  await updateFilesOnDisk(polishedFiles, filesToRemove, currentFiles, context);
+
   // Update the lockfiles with the new file entries
-  //
-  // The method is kicked off immediately, to run concurrently
-  // to the file system operations
-  const updateLockfilesPromise = updateLockfiles({
-    updatedGlobalLockfile: { files: newGlobalLockfileFiles },
-    updatedLocalLockfile: { files: newLocalLockfileFiles },
+  context = await updateLockfiles({
+    updatedGlobalLockfile: { files: newGlobalLockFiles },
+    updatedLocalLockfile: { files: newLocalLockFiles },
     context,
   });
-  updateLockfilesPromise.catch(() => {
-    // Add an empty catch block to not throw any unhandled rejection
-    // issues.
-    //
-    // The promise is still await later, therefore errors will still be
-    // propagated correctly.
-  });
-
-  // Remove files first before placing the new files to not run into a race
-  // condition where a local file has been converted to a global file,
-  // or vice versa
-  await Promise.all(
-    // Remove files that are no longer managed by coat
-    filesToRemove.map(deleteFile)
-  );
-
-  // Place new files
-  await Promise.all(
-    // Use fs.outputFile to automatically create any missing directories
-    polishedFiles.map((file) => fs.outputFile(file.file, file.content))
-  );
-
-  context = await updateLockfilesPromise;
 
   // Retrieve dependencies after merging to run npm install if they have changed
   //
@@ -218,6 +233,7 @@ export async function sync(cwd: string): Promise<void> {
   const mergedPackageJson = mergedFiles.find(
     (file) => file.relativePath === PACKAGE_JSON_FILENAME
   )?.content as PackageJson | undefined;
+
   if (mergedPackageJson) {
     const finalDependencies = {
       ...(mergedPackageJson.dependencies && {
