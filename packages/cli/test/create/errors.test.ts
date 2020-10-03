@@ -40,30 +40,6 @@ describe("coat create - errors", () => {
     }
   });
 
-  test("should not create target directory and files if template does not exist in registry", async () => {
-    let tmpDir: string | undefined;
-    try {
-      const { task, cwd } = runCli([
-        "create",
-        "@coat/non-existent-package",
-        "project-name",
-      ]);
-      tmpDir = cwd;
-      await task;
-
-      // This should not be reached, since the expectation is that
-      // task throws an error
-      throw new Error("Error! Task should have thrown an error");
-    } catch (error) {
-      if (!tmpDir) {
-        throw new Error("Could not create/retrieve tmpDir");
-      }
-      // The project-name folder should not have been created
-      const entries = await fs.readdir(tmpDir);
-      expect(entries).toEqual([]);
-    }
-  });
-
   test("should throw error if target directory is not empty", async () => {
     const tmpDir = getTmpDir();
     const targetFolder = path.join(tmpDir, "project-name");

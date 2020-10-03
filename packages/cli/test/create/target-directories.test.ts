@@ -12,6 +12,7 @@ describe("coat create - target directories", () => {
     "test-packages",
     "local-create-template-1"
   );
+  const defaultTargetDir = "project-name";
   const defaultProjectName = "project-name";
   const packageJsonFileName = "package.json";
   const coatManifestFileName = "coat.json";
@@ -37,8 +38,8 @@ describe("coat create - target directories", () => {
     extends: "local-create-template-1",
   };
 
-  test("should use the projectName as the directory when projectName is prompted", async () => {
-    const targetDir = defaultProjectName;
+  test("should use the project name as the directory when project name is prompted", async () => {
+    const targetDir = defaultTargetDir;
     const { task, cwd } = runCli(["create", defaultTemplate]);
     enterPrompts(task.stdin, [defaultProjectName, KeyboardInput.Enter]);
 
@@ -57,21 +58,17 @@ describe("coat create - target directories", () => {
     expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
   });
 
-  test("should use the projectName as the directory when projectName is specified", async () => {
-    const { task, cwd } = runCli([
-      "create",
-      defaultTemplate,
-      defaultProjectName,
-    ]);
+  test("should use the directory as the project name when directory is specified", async () => {
+    const { task, cwd } = runCli(["create", defaultTemplate, defaultTargetDir]);
     await task;
     const [entries, packageJson, coatManifest] = await Promise.all([
-      fs.readdir(path.join(cwd, defaultProjectName)),
+      fs.readdir(path.join(cwd, defaultTargetDir)),
       fs.readFile(
-        path.join(cwd, defaultProjectName, packageJsonFileName),
+        path.join(cwd, defaultTargetDir, packageJsonFileName),
         "utf8"
       ),
       fs.readFile(
-        path.join(cwd, defaultProjectName, coatManifestFileName),
+        path.join(cwd, defaultTargetDir, coatManifestFileName),
         "utf8"
       ),
     ]);
@@ -84,39 +81,14 @@ describe("coat create - target directories", () => {
     expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
   });
 
-  test("should use the specified targetDir if projectName is valid", async () => {
+  test("should apply the specified projectName", async () => {
     const targetDir = "project-target-dir";
     const { task, cwd } = runCli([
       "create",
       defaultTemplate,
+      targetDir,
       defaultProjectName,
-      targetDir,
     ]);
-    await task;
-    const [entries, packageJson, coatManifest] = await Promise.all([
-      fs.readdir(path.join(cwd, targetDir)),
-      fs.readFile(path.join(cwd, targetDir, packageJsonFileName), "utf8"),
-      fs.readFile(path.join(cwd, targetDir, coatManifestFileName), "utf8"),
-    ]);
-    entries.sort();
-
-    expect(entries).toEqual(defaultEntries);
-    expect(JSON.parse(packageJson)).toEqual(
-      expect.objectContaining(defaultPackageJsonResult)
-    );
-    expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
-  });
-
-  test("should use the specified targetDir if projectName is invalid and prompted again", async () => {
-    const targetDir = "targetDir";
-    const { task, cwd } = runCli([
-      "create",
-      defaultTemplate,
-      "Invalid-project",
-      targetDir,
-    ]);
-    enterPrompts(task.stdin, [defaultProjectName, KeyboardInput.Enter]);
-
     await task;
     const [entries, packageJson, coatManifest] = await Promise.all([
       fs.readdir(path.join(cwd, targetDir)),
@@ -137,8 +109,8 @@ describe("coat create - target directories", () => {
     const { task, cwd } = runCli([
       "create",
       defaultTemplate,
-      defaultProjectName,
       targetDir,
+      defaultProjectName,
     ]);
     await task;
     const [
@@ -167,8 +139,8 @@ describe("coat create - target directories", () => {
     const { task } = runCli([
       "create",
       defaultTemplate,
-      defaultProjectName,
       targetDir,
+      defaultProjectName,
     ]);
     await task;
     const [entries, packageJson, coatManifest] = await Promise.all([
@@ -194,7 +166,7 @@ describe("coat create - target directories", () => {
     const relativeTargetDir = path.join("..", "..", "b-2", "c-2");
     const targetDir = path.join(cwd, relativeTargetDir);
     const { task } = runCli(
-      ["create", defaultTemplate, defaultProjectName, relativeTargetDir],
+      ["create", defaultTemplate, relativeTargetDir, defaultProjectName],
       { cwd }
     );
     await task;
@@ -217,7 +189,7 @@ describe("coat create - target directories", () => {
 
     const targetDir = ".";
     const { task } = runCli(
-      ["create", defaultTemplate, defaultProjectName, targetDir],
+      ["create", defaultTemplate, targetDir, defaultProjectName],
       { cwd: tmpDir }
     );
     await task;

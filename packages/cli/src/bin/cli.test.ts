@@ -9,9 +9,12 @@ jest.mock("../create").mock("../sync").mock("../setup").mock("../run");
 
 jest.spyOn(process, "cwd").mockImplementation(() => "mock-cwd");
 
-const exitMock = jest.spyOn(process, "exit").mockImplementation((): never => {
-  throw new Error("process.exit");
-});
+const exitMock = jest.spyOn(process, "exit").mockImplementation(
+  // @ts-expect-error
+  (): never => {
+    // Empty mock functino
+  }
+);
 
 const runMock = run as jest.Mock<
   ReturnType<typeof run>,
@@ -98,6 +101,10 @@ describe("coat cli", () => {
 
   test("should exit from run function with correct error code thrown from script", async () => {
     const program = createProgram();
+
+    exitMock.mockImplementationOnce((): never => {
+      throw new Error("process.exit");
+    });
 
     runMock.mockImplementationOnce(async () => {
       const error = new Error("script error");

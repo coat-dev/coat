@@ -17,11 +17,11 @@ export function createProgram(): InstanceType<CommandConstructor> {
     .allowUnknownOption();
 
   program
-    .command("create <template> [projectName] [dir]")
+    .command("create <template> [dir] [projectName]")
     .description("Create a new project based on the coat template.")
     .helpOption(
       undefined,
-      '\n\nArguments:\ntemplate (required): The name of coat template from the npm registry (e.g. "@coat/template-ts-package")\n\nprojectName (optional): The name of your new project. You will be prompted if no name is provided. The name must be a valid package name inside package.json.\n\ndir (optional): The directory where coat should create the project. The project name is used by default. If the project name contains a slash only the trailing part will be used.'
+      '\n\nArguments:\ntemplate (required): The name of coat template from the npm registry (e.g. "@coat/template-ts-package")\n\ndir (optional): The directory where coat should create a project. Resolves to a relative path from the current working directory\n\nprojectName (optional): The name of your new project. Will use the trailing folder name of the project directory by default'
     )
     .action(create);
 
