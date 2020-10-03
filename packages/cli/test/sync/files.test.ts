@@ -7,6 +7,7 @@ import {
   CoatManifestFileContentTypesMap,
 } from "../../src/types/coat-manifest-file";
 import stripAnsi from "strip-ansi";
+import { PACKAGE_JSON_FILENAME } from "../../src/constants";
 
 describe("coat sync - files", () => {
   const testPackagesPath = path.join(__dirname, "..", "utils", "test-packages");
@@ -493,6 +494,46 @@ describe("coat sync - files", () => {
         "modifiedLocal": true,
       }
     `);
+  });
+
+  test("should generate a package.json file if it did not exist before but package.json properties were added by the project", async () => {
+    const cwd = await prepareCliTest({
+      coatManifest: {
+        name: "test",
+        scripts: [
+          {
+            id: "test",
+            run: "echo test",
+            scriptName: "test",
+          },
+        ],
+      },
+    });
+
+    // Remove the package.json file that has been placed by default
+    await fs.unlink(path.join(cwd, PACKAGE_JSON_FILENAME));
+
+    // Run sync
+    const { task } = runCli(["sync"], { cwd });
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  package.json
+      "
+    `);
+
+    const packageJsonRaw = await fs.readFile(
+      path.join(cwd, PACKAGE_JSON_FILENAME),
+      "utf-8"
+    );
+    const packageJson = JSON.parse(packageJsonRaw);
+
+    expect(packageJson).toEqual({
+      scripts: {
+        test: "echo test",
+      },
+    });
   });
 
   // Add once JavaScript files are added or JSON formatting is

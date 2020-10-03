@@ -23,7 +23,7 @@ import {
   COAT_LOCAL_LOCKFILE_PATH,
 } from "../constants";
 import { CoatManifest } from "../types/coat-manifest";
-import { groupFiles } from "./group-files";
+import * as groupFilesImport from "./group-files";
 import { flatten } from "lodash";
 import { getDefaultFiles } from "./get-default-files";
 import { updateFilesOnDisk } from "./update-files-on-disk";
@@ -86,6 +86,9 @@ const gatherExtendedTemplatesMock = (gatherExtendedTemplates as unknown) as jest
 gatherExtendedTemplatesMock.mockImplementation(() => templates);
 
 const updateFilesOnDiskMock = (updateFilesOnDisk as unknown) as jest.Mock;
+
+const groupFilesSpy = jest.spyOn(groupFilesImport, "groupFiles");
+const { groupFiles } = groupFilesImport;
 
 const coatManifest: CoatManifest = {
   name: "test-manifest",
@@ -549,5 +552,72 @@ describe("sync", () => {
 
     expect(setupSpy).toHaveBeenCalledTimes(1);
     expect(setupSpy).toHaveBeenLastCalledWith(testCwd, false);
+  });
+
+  test("should work without a package.json file on disk", async () => {
+    // Remove package.json file before testing
+    await fs.unlink(path.join(testCwd, PACKAGE_JSON_FILENAME));
+
+    await sync(testCwd);
+
+    // group files will still be called with the new package.json file,
+    // since the coat properties add properties to package.json
+    expect(groupFilesSpy).toHaveBeenLastCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          file: PACKAGE_JSON_FILENAME,
+        }),
+      ]),
+      expect.objectContaining({
+        packageJson: expect.objectContaining({}),
+      })
+    );
+
+    await expect(
+      fs.readFile(path.join(testCwd, PACKAGE_JSON_FILENAME))
+    ).rejects.toHaveProperty(
+      "message",
+      expect.stringMatching(
+        /ENOENT: no such file or directory, open '.*package.json'/
+      )
+    );
+  });
+
+  test("should work without any package.json content", async () => {
+    // Remove package.json file before testing
+    await fs.unlink(path.join(testCwd, PACKAGE_JSON_FILENAME));
+    // Place empty coat manifest
+    await fs.writeFile(
+      path.join(testCwd, COAT_MANIFEST_FILENAME),
+      JSON.stringify({ name: "my-project" })
+    );
+
+    // Don't supply any templates when gatherAllTemplates is called
+    gatherExtendedTemplatesMock.mockImplementationOnce(() => []);
+    gatherExtendedTemplatesMock.mockImplementationOnce(() => []);
+
+    await sync(testCwd);
+
+    // group files will still be called with the new package.json file,
+    // since the coat properties add properties to package.json
+    expect(groupFilesSpy).not.toHaveBeenLastCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          file: PACKAGE_JSON_FILENAME,
+        }),
+      ]),
+      expect.objectContaining({
+        packageJson: expect.objectContaining({}),
+      })
+    );
+
+    await expect(
+      fs.readFile(path.join(testCwd, PACKAGE_JSON_FILENAME))
+    ).rejects.toHaveProperty(
+      "message",
+      expect.stringMatching(
+        /ENOENT: no such file or directory, open '.*package.json'/
+      )
+    );
   });
 });

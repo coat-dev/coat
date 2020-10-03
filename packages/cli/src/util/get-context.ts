@@ -22,18 +22,31 @@ export async function getContext(cwd: string): Promise<CoatContext> {
   // More friendly error messages if files are missing
   const [
     coatManifestRaw,
-    packageJsonRaw,
     coatGlobalLockfile,
     coatLocalLockfile,
   ] = await Promise.all([
     fs.readFile(path.join(cwd, COAT_MANIFEST_FILENAME), "utf8"),
-    fs.readFile(path.join(cwd, PACKAGE_JSON_FILENAME), "utf8"),
     getCoatGlobalLockfile(cwd),
     getCoatLocalLockfile(cwd),
   ]);
 
   const coatManifest: CoatManifest = JSON.parse(coatManifestRaw);
-  const packageJson: PackageJson = JSON.parse(packageJsonRaw);
+
+  // Try to retrieve package.json if it is available
+  let packageJson: PackageJson | undefined;
+  try {
+    const packageJsonRaw = await fs.readFile(
+      path.join(cwd, PACKAGE_JSON_FILENAME),
+      "utf-8"
+    );
+    packageJson = JSON.parse(packageJsonRaw);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+    // If the file is not available, packageJson will
+    // be undefined in the coatManifest
+  }
 
   const coatManifestStrict = getStrictCoatManifest(coatManifest);
 

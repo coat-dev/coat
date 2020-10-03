@@ -27,23 +27,6 @@ describe("coat sync - errors", () => {
     }
   });
 
-  test("should throw an error if package.json is missing", async () => {
-    const tmpDir = await prepareCliTest();
-    // Delete package.json
-    await fs.unlink(path.join(tmpDir, PACKAGE_JSON_FILENAME));
-
-    const { task } = runCli(["sync"], { cwd: tmpDir });
-    try {
-      await task;
-      throw new Error("This error should not be reached. Task should throw");
-    } catch (error) {
-      expect(
-        error.stderr.includes("Error: ENOENT: no such file or directory,")
-      ).toBe(true);
-      expect(error.stderr.includes("package.json")).toBe(true);
-    }
-  });
-
   test("should throw error if template can't be imported", async () => {
     const templateName = "test-template";
     const { task } = await runSyncTest({
