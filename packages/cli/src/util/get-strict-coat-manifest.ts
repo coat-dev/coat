@@ -9,7 +9,7 @@ import { CoatManifest, CoatManifestStrict } from "../types/coat-manifest";
 export function getStrictCoatManifest(
   coatManifest: CoatManifest
 ): CoatManifestStrict {
-  let extendsEntries: string[] = [];
+  let extendsEntries: CoatManifestStrict["extends"] = [];
   if (coatManifest.extends) {
     if (typeof coatManifest.extends === "string") {
       extendsEntries.push(coatManifest.extends);

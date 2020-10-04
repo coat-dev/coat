@@ -12,8 +12,22 @@ type NestedManifests = Array<NestedManifests | CoatManifestStrict>;
 function getTemplates(
   cwd: string,
   context: CoatContext,
-  template: string
+  templateEntry: CoatManifestStrict["extends"][0]
 ): NestedManifests {
+  let template: string;
+  let templateConfig: Record<string, unknown>;
+
+  // extends entries can either be plain strings or
+  // tuples in the form of:
+  // [templateName, templateConfig]
+  if (Array.isArray(templateEntry)) {
+    [template, templateConfig] = templateEntry;
+  } else {
+    template = templateEntry;
+    // Default config is an empty object
+    templateConfig = {};
+  }
+
   // Resolve the directory of the current template to
   // use it as the cwd for child templates.
   //
@@ -46,7 +60,9 @@ function getTemplates(
 
   let resolvedTemplate: CoatManifestStrict;
   if (typeof templateManifestRaw === "function") {
-    resolvedTemplate = getStrictCoatManifest(templateManifestRaw(context));
+    resolvedTemplate = getStrictCoatManifest(
+      templateManifestRaw({ coatContext: context, config: templateConfig })
+    );
   } else {
     resolvedTemplate = getStrictCoatManifest(templateManifestRaw);
   }

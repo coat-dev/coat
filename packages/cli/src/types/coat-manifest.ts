@@ -17,8 +17,13 @@ export interface CoatManifest {
    * specifying relative paths, e.g.:
    *
    * "./template-1" -> project-dir/template-1 or project-dir/template-1/index.js
+   *
+   * In addition to plain strings, extends array entries can also be tuples, where
+   * the first entry is the template name or path and the second entry is the config
+   * that is passed to the template function, e.g.:
+   * ["my-template", { "configValue": true }]
    */
-  extends?: string | string[];
+  extends?: string | (string | [string, Record<string, unknown>])[];
   /**
    * Dependencies that should be applied to the root package.json file
    */
@@ -40,10 +45,13 @@ export interface CoatManifest {
    * Setup tasks that should be run before the files are generated
    */
   setup?: CoatManifestTask[];
+  /**
+   *
+   */
 }
 
 export interface CoatManifestStrict extends CoatManifest {
-  extends: string[];
+  extends: (string | [string, Record<string, unknown>])[];
   files: CoatManifestFile[];
   scripts: CoatManifestScript[];
   dependencies: Exclude<CoatManifest["dependencies"], undefined>;
