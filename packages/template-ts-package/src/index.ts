@@ -83,7 +83,7 @@ export default function createTemplate(context: CoatContext): CoatManifest {
         eslint: "^7.8.1",
         "@typescript-eslint/eslint-plugin": "^4.0.1",
         "@typescript-eslint/parser": "^4.0.1",
-        "eslint-config-prettier": "6.11.0",
+        "eslint-config-prettier": "^6.11.0",
 
         // Jest
         jest: "^26.4.2",
