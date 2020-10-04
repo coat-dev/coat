@@ -1,4 +1,4 @@
-import { promises as fs } from "fs";
+import fs from "fs-extra";
 import path from "path";
 import { vol } from "memfs";
 import execa from "execa";
@@ -7,7 +7,11 @@ import { create } from ".";
 import { getProjectName } from "./get-project-name";
 import { getTemplateInfo } from "./get-template-info";
 import { sync } from "../sync";
-import { COAT_CLI_VERSION, COAT_MANIFEST_FILENAME } from "../constants";
+import {
+  COAT_CLI_VERSION,
+  COAT_MANIFEST_FILENAME,
+  PACKAGE_JSON_FILENAME,
+} from "../constants";
 import { addInitialCommit } from "./add-initial-commit";
 
 jest
@@ -37,6 +41,10 @@ const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {
   // Ignore console log messages
 });
 
+const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {
+  // Ignore console error messages
+});
+
 describe("create", () => {
   afterEach(() => {
     vol.reset();
@@ -63,6 +71,26 @@ describe("create", () => {
 
     const coatManifest = await fs.readFile(COAT_MANIFEST_FILENAME, "utf-8");
     expect(JSON.parse(coatManifest)).toHaveProperty("name", "prompted-name");
+  });
+
+  test("should throw an error if existing coat.json cannot be accessed", async () => {
+    await fs.outputFile(COAT_MANIFEST_FILENAME, "{}");
+    await fs.chmod(COAT_MANIFEST_FILENAME, 0o000);
+
+    await expect(create("my-template", ".")).rejects.toHaveProperty(
+      "message",
+      expect.stringMatching(/EACCES: permission denied, open '.*coat.json'/)
+    );
+  });
+
+  test("should throw an error if existing package.json cannot be accessed", async () => {
+    await fs.outputFile(PACKAGE_JSON_FILENAME, "{}");
+    await fs.chmod(PACKAGE_JSON_FILENAME, 0o000);
+
+    await expect(create("my-template", ".")).rejects.toHaveProperty(
+      "message",
+      expect.stringMatching(/EACCES: permission denied, open '.*package.json'/)
+    );
   });
 
   test("should re-throw error if npm install fails", async () => {
@@ -99,6 +127,17 @@ describe("create", () => {
     });
   });
 
+  test("should not create package.json if it already exists", async () => {
+    await fs.outputFile(PACKAGE_JSON_FILENAME, "{}");
+
+    await create("my-template", ".");
+
+    const packageJsonRaw = await fs.readFile(PACKAGE_JSON_FILENAME, "utf-8");
+    const packageJson = JSON.parse(packageJsonRaw);
+
+    expect(packageJson).toEqual({});
+  });
+
   test("should use the target directory as the project name if no project name is specified", async () => {
     await create("template", "project-name");
     const [dirs, coatManifest] = await Promise.all([
@@ -117,19 +156,17 @@ describe("create", () => {
     expect(dirs).toEqual(["target-dir"]);
   });
 
-  test("should throw an error if there are already files in the target directory", async () => {
-    expect.assertions(1);
-    await fs.mkdir("targetDir", { recursive: true });
-    await fs.writeFile(path.join("targetDir", "test-file"), "");
+  test("should throw an error if a coat manifest file already exists in the target directory", async () => {
+    await fs.outputFile(path.join("targetDir", "coat.json"), "{}");
 
-    try {
-      await create("template", "targetDir", "project-name");
-    } catch (error) {
-      expect(error).toHaveProperty(
-        "message",
-        "Warning! The specified target diretory is not empty. Aborting to prevent accidental file loss or override."
-      );
-    }
+    await expect(
+      create("template", "targetDir", "project-namme")
+    ).rejects.toHaveProperty("message", "coat manifest file already exists");
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy).toHaveBeenLastCalledWith(
+      "A coat manifest file already exists in the target directory.\n\nPlease install the template manually via npm and add the name of the template to the existing coat manifest file."
+    );
   });
 
   test("should add the template as a devDependency in the target dir", async () => {

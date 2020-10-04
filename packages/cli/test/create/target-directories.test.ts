@@ -1,8 +1,13 @@
-import { promises as fs } from "fs";
+import fs from "fs-extra";
 import path from "path";
 import { runCli } from "../utils/run-cli";
 import { getTmpDir } from "../utils/get-tmp-dir";
 import { enterPrompts, KeyboardInput } from "../utils/enter-prompts";
+import {
+  COAT_MANIFEST_FILENAME,
+  PACKAGE_JSON_FILENAME,
+} from "../../src/constants";
+import execa from "execa";
 
 describe("coat create - target directories", () => {
   const defaultTemplate = path.join(
@@ -161,7 +166,7 @@ describe("coat create - target directories", () => {
     const tmpDir = getTmpDir();
     // Create a few folders which will be used as the cwd
     const cwd = path.join(tmpDir, "a", "b", "c");
-    await fs.mkdir(cwd, { recursive: true });
+    await fs.mkdirp(cwd);
 
     const relativeTargetDir = path.join("..", "..", "b-2", "c-2");
     const targetDir = path.join(cwd, relativeTargetDir);
@@ -184,10 +189,58 @@ describe("coat create - target directories", () => {
     expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
   });
 
-  test("should work with with the current directory as the target if it is empty", async () => {
+  test("should work with with the current directory as the target if it doesn't contain a coat manifest", async () => {
     const tmpDir = getTmpDir();
 
     const targetDir = ".";
+
+    // Create one file that will be managed by coat, another file which is unrelated
+    await Promise.all([
+      fs.outputFile(
+        path.join(tmpDir, "a.json"),
+        JSON.stringify({ a: "before-create" })
+      ),
+      fs.outputFile(path.join(tmpDir, "unrelated-file.json"), "{}"),
+    ]);
+
+    const { task } = runCli(
+      ["create", defaultTemplate, targetDir, defaultProjectName],
+      { cwd: tmpDir }
+    );
+
+    // User will be prompted since a.json needs to be overwritten
+    enterPrompts(task.stdin, ["yes", KeyboardInput.Enter]);
+
+    await task;
+
+    const [entries, packageJson, coatManifest] = await Promise.all([
+      fs.readdir(tmpDir),
+      fs.readFile(path.join(tmpDir, packageJsonFileName), "utf8"),
+      fs.readFile(path.join(tmpDir, coatManifestFileName), "utf8"),
+    ]);
+    entries.sort();
+
+    expect(entries).toEqual([...defaultEntries, "unrelated-file.json"]);
+    expect(JSON.parse(packageJson)).toEqual(
+      expect.objectContaining(defaultPackageJsonResult)
+    );
+    expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
+  });
+
+  test("should work with with the current directory as the target and keep the existing package.json file", async () => {
+    const tmpDir = getTmpDir();
+
+    const targetDir = ".";
+
+    // Create a package.json file in the target dir
+    await fs.outputFile(
+      path.join(tmpDir, PACKAGE_JSON_FILENAME),
+      JSON.stringify({
+        name: "name-before-create",
+        version: "10.1.2",
+      })
+    );
+
     const { task } = runCli(
       ["create", defaultTemplate, targetDir, defaultProjectName],
       { cwd: tmpDir }
@@ -202,8 +255,49 @@ describe("coat create - target directories", () => {
 
     expect(entries).toEqual(defaultEntries);
     expect(JSON.parse(packageJson)).toEqual(
+      expect.objectContaining({
+        name: "name-before-create",
+        version: "10.1.2",
+      })
+    );
+    expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
+  });
+
+  test("should work with with the current directory if the project is created twice in a row (removing coat.json)", async () => {
+    const tmpDir = getTmpDir();
+    const targetDir = ".";
+
+    // Create project for the first time
+    const { task: firstCreateRun } = runCli(
+      ["create", defaultTemplate, targetDir, defaultProjectName],
+      { cwd: tmpDir }
+    );
+    await firstCreateRun;
+
+    // Remove coat.json and create project again
+    await fs.unlink(path.join(tmpDir, COAT_MANIFEST_FILENAME));
+    const { task: secondCreateRun } = runCli(
+      ["create", defaultTemplate, targetDir, defaultProjectName],
+      { cwd: tmpDir }
+    );
+    await secondCreateRun;
+
+    const [entries, packageJson, coatManifest] = await Promise.all([
+      fs.readdir(tmpDir),
+      fs.readFile(path.join(tmpDir, packageJsonFileName), "utf8"),
+      fs.readFile(path.join(tmpDir, coatManifestFileName), "utf8"),
+    ]);
+    entries.sort();
+
+    expect(entries).toEqual(defaultEntries);
+    expect(JSON.parse(packageJson)).toEqual(
       expect.objectContaining(defaultPackageJsonResult)
     );
     expect(JSON.parse(coatManifest)).toEqual(defaultCoatManifestResult);
+
+    // Ensure that there are no pending changes in git
+    await expect(
+      execa("git", ["diff", "--exit-code"], { cwd: tmpDir })
+    ).resolves.toHaveProperty("exitCode", 0);
   });
 });

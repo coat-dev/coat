@@ -1,8 +1,9 @@
-import { promises as fs } from "fs";
+import fs from "fs-extra";
 import path from "path";
 import execa from "execa";
 import ora from "ora";
 import chalk from "chalk";
+import { PackageJson } from "type-fest";
 import { sync } from "../sync";
 import { getProjectName } from "./get-project-name";
 import { getTemplateInfo } from "./get-template-info";
@@ -92,33 +93,62 @@ export async function create(
     }
   }
 
-  // Create the directory/directories if necessary
-  await fs.mkdir(targetCwd, { recursive: true });
-
-  // Check and throw an error if the target directory already contains any files.
-  // This is in order to prevent accidental file loss and overwrites of any existing
-  // files. In the future, a cli option could be provided to `coat create` which
-  // ignores existing files in the target directory and continues without throwing
-  // an error
-  const directoryEntries = await fs.readdir(targetCwd);
-  if (directoryEntries.length) {
-    throw new Error(
-      "Warning! The specified target diretory is not empty. Aborting to prevent accidental file loss or override."
-    );
+  // Check if a coat manifest file already exists in the project
+  let coatManifestExists = false;
+  try {
+    await fs.readFile(path.join(targetCwd, COAT_MANIFEST_FILENAME));
+    // If this line is reached the coat manifest file already exists
+    coatManifestExists = true;
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      // If the error is not due to a missing file, but e.g. due
+      // to missing permissions it should be thrown to the user
+      throw error;
+    }
+    // The coat manifest file does not exist in the target directory
   }
 
-  const packageJson = {
-    name: projectName,
-    version: "1.0.0",
-  };
-  // Create the package.json file inside the
-  // target directory.
-  await fs.writeFile(
-    path.join(targetCwd, PACKAGE_JSON_FILENAME),
-    // package.json does not need to be styled, since npm
-    // will alter and format it while installing dependencies
-    JSON.stringify(packageJson)
-  );
+  if (coatManifestExists) {
+    console.error(
+      `A coat manifest file already exists in the target directory.\n\nPlease install the template manually via npm and add the name of the template to the existing coat manifest file.`
+    );
+    throw new Error("coat manifest file already exists");
+  }
+
+  // Check if a package.json file already exists
+  // in the target directory, otherwise create it
+  let previousPackageJson: PackageJson | undefined;
+  try {
+    const previousPackageJsonRaw = await fs.readFile(
+      path.join(targetCwd, PACKAGE_JSON_FILENAME),
+      "utf-8"
+    );
+    previousPackageJson = JSON.parse(previousPackageJsonRaw);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      // If the error is not due to a missing file, but e.g. due
+      // to missing permissions it should be thrown to the user
+      throw error;
+    }
+    // package.json does not exit in the target directory
+  }
+
+  if (!previousPackageJson) {
+    const packageJson = {
+      name: projectName,
+      version: "1.0.0",
+    };
+    // Create the package.json file inside the
+    // target directory.
+    await fs.outputFile(
+      path.join(targetCwd, PACKAGE_JSON_FILENAME),
+      // package.json does not need to be styled, since npm
+      // will alter and format it while installing dependencies
+      JSON.stringify(packageJson)
+    );
+
+    previousPackageJson = packageJson;
+  }
 
   console.log(
     "\nCreating a new %s project in %s\n",
@@ -145,10 +175,21 @@ export async function create(
 
     // Templates should have a peerDependency on @coat/cli which could
     // differ from the version which is currently being run.
+    //
     // In order to run setup and sync with the correct @coat/cli version
     // peerDependencies of the template should be retrieved and installed
-    // as devDependencies in the project
-    const templateInfo = await getTemplateInfo(targetCwd);
+    // as devDependencies in the project.
+    //
+    // In addition to the peerDependencies, the templateInfo is also required
+    // to get the resolves template name, since the template string that has
+    // been passed to coat could also be a local file path,
+    // GitHub URL or npm tag
+    const templateInfo = await getTemplateInfo(
+      targetCwd,
+      previousPackageJson,
+      template,
+      installSpinner
+    );
     const peerDependenciesEntries = Object.entries(
       templateInfo.peerDependencies || {}
     );
@@ -223,10 +264,17 @@ export async function create(
     "🎊 Your new %s project has been successfully created! 🎊\n",
     chalk.cyan("coat")
   );
-  console.log(
-    "Get started by changing into your project folder: %s",
-    chalk.cyan(`cd ${path.relative(process.cwd(), targetCwd)}`)
-  );
+
+  const relativePath = path.relative(process.cwd(), targetCwd);
+  // Only log if relativePath exists, i.e. the user is in a different
+  // directory than the project target directory
+  if (relativePath) {
+    console.log(
+      "Get started by changing into your project folder: %s",
+      chalk.cyan(`cd ${relativePath}`)
+    );
+  }
+
   console.log(
     "You can ensure your generated files are up to date by running: %s\n",
     chalk.cyan("coat sync")

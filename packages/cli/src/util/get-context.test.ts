@@ -1,4 +1,4 @@
-import { promises as fs } from "fs";
+import fs from "fs-extra";
 import path from "path";
 import { vol } from "memfs";
 import { getContext } from "./get-context";
@@ -16,10 +16,12 @@ describe("util/get-context", () => {
     coatManifest: unknown,
     packageJson: unknown
   ): Promise<void> {
-    await fs.mkdir(cwd);
     await Promise.all([
-      fs.writeFile(path.join(cwd, "coat.json"), JSON.stringify(coatManifest)),
-      fs.writeFile(path.join(cwd, "package.json"), JSON.stringify(packageJson)),
+      fs.outputFile(path.join(cwd, "coat.json"), JSON.stringify(coatManifest)),
+      fs.outputFile(
+        path.join(cwd, "package.json"),
+        JSON.stringify(packageJson)
+      ),
     ]);
   }
 

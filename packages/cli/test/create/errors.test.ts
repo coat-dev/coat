@@ -1,7 +1,8 @@
 import { runCli } from "../utils/run-cli";
-import { promises as fs } from "fs";
+import fs from "fs-extra";
 import path from "path";
 import { getTmpDir } from "../utils/get-tmp-dir";
+import { COAT_MANIFEST_FILENAME } from "../../src/constants";
 
 describe("coat create - errors", () => {
   test("should throw error if no template is specified", async () => {
@@ -40,11 +41,10 @@ describe("coat create - errors", () => {
     }
   });
 
-  test("should throw error if target directory is not empty", async () => {
+  test("should throw error if target directory contanis a coat manifest file", async () => {
     const tmpDir = getTmpDir();
     const targetFolder = path.join(tmpDir, "project-name");
-    await fs.mkdir(targetFolder);
-    await fs.writeFile(path.join(targetFolder, "file"), "");
+    await fs.outputFile(path.join(targetFolder, COAT_MANIFEST_FILENAME), "{}");
 
     try {
       const { task } = runCli(
@@ -58,12 +58,12 @@ describe("coat create - errors", () => {
       throw new Error("Error! Task should have thrown an error");
     } catch (error) {
       expect(error.stderr).toContain(
-        "Warning! The specified target diretory is not empty. Aborting to prevent accidental file loss or override."
+        "A coat manifest file already exists in the target directory.\n\nPlease install the template manually via npm and add the name of the template to the existing coat manifest file."
       );
 
       // targetDir should only contain one file
       const entries = await fs.readdir(targetFolder);
-      expect(entries).toEqual(["file"]);
+      expect(entries).toEqual([COAT_MANIFEST_FILENAME]);
     }
   });
 });
