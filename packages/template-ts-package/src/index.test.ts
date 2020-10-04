@@ -12,9 +12,17 @@ import createTemplate from ".";
 
 jest.mock("@coat/cli/build/util/gather-extended-templates").mock("execa");
 
+jest.spyOn(console, "log").mockImplementation(() => {
+  // Empty mock function
+});
+
 const gatherExtendedTemplatesMock = gatherExtendedTemplates as jest.Mock;
-gatherExtendedTemplatesMock.mockImplementation((context) => [
-  getStrictCoatManifest(createTemplate(context)),
+gatherExtendedTemplatesMock.mockImplementation((coatContext) => [
+  getStrictCoatManifest(
+    typeof createTemplate === "function"
+      ? createTemplate({ coatContext, config: {} })
+      : createTemplate
+  ),
 ]);
 
 describe("@coat/template-ts-package", () => {

@@ -1,10 +1,9 @@
 import { promises as fs } from "fs";
 import path from "path";
 import {
-  CoatManifest,
   CoatManifestFile,
   CoatManifestFileType,
-  CoatContext,
+  CoatTemplate,
 } from "@coat/cli";
 
 const filesDir = path.join(__dirname, "..", "files");
@@ -32,7 +31,7 @@ function getTemplateFile(
   };
 }
 
-export default function createTemplate(context: CoatContext): CoatManifest {
+const createTemplate: CoatTemplate = ({ coatContext }) => {
   return {
     name: "@coat/template-ts-package",
     files: [
@@ -56,7 +55,7 @@ export default function createTemplate(context: CoatContext): CoatManifest {
       {
         file: "README.md",
         type: CoatManifestFileType.Text,
-        content: `# ${context.coatManifest.name}`,
+        content: `# ${coatContext.coatManifest.name}`,
         once: true,
       },
 
@@ -140,4 +139,6 @@ export default function createTemplate(context: CoatContext): CoatManifest {
       },
     ],
   };
-}
+};
+
+export default createTemplate;
