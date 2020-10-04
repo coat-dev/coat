@@ -496,6 +496,50 @@ describe("coat sync - files", () => {
     `);
   });
 
+  test("should not touch files that have existed before in the project", async () => {
+    const cwd = await prepareCliTest({
+      coatManifest: {
+        name: "test",
+        extends: ["local-files-6", "local-files-7"].map((template) =>
+          path.join(testPackagesPath, template)
+        ),
+      },
+    });
+
+    // Place once files before syncing
+    await Promise.all([
+      fs.writeFile(
+        path.join(cwd, "a.json"),
+        JSON.stringify({ globalBeforeSync: true })
+      ),
+      fs.writeFile(
+        path.join(cwd, "b.json"),
+        JSON.stringify({ localBeforeSync: true })
+      ),
+    ]);
+
+    // Run sync
+    const { task } = runCli(["sync"], { cwd });
+    await task;
+
+    // Read files
+    const [aRaw, bRaw] = await Promise.all([
+      fs.readFile(path.join(cwd, "a.json"), "utf-8"),
+      fs.readFile(path.join(cwd, "b.json"), "utf-8"),
+    ]);
+    expect(JSON.parse(aRaw)).toMatchInlineSnapshot(`
+      Object {
+        "globalBeforeSync": true,
+      }
+    `);
+
+    expect(JSON.parse(bRaw)).toMatchInlineSnapshot(`
+      Object {
+        "localBeforeSync": true,
+      }
+    `);
+  });
+
   test("should generate a package.json file if it did not exist before but package.json properties were added by the project", async () => {
     const cwd = await prepareCliTest({
       coatManifest: {

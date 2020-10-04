@@ -167,7 +167,7 @@ export async function sync(cwd: string): Promise<void> {
         (previouslyPlacedFileSet.has(file.relativePath) ||
           // Even if the file has not yet been tracked in a lockfile
           // it should also not be placed if it already exists on the disk
-          typeof currentFiles[file.relativePath] !== "undefined")
+          typeof currentFiles[file.file] !== "undefined")
       ) {
         targetProperty = accumulator.onceAlreadyPlaced;
       } else {
