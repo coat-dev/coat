@@ -1,4 +1,3 @@
-import fromPairs from "lodash/fromPairs";
 import semverMinVersion from "semver/ranges/min-version";
 import semverIntersects from "semver/ranges/intersects";
 import { CoatManifestStrict } from "../types/coat-manifest";
@@ -12,7 +11,7 @@ import { SemVer } from "semver";
 /* eslint-disable no-param-reassign */
 function applyDependencies(
   target: Record<string, string>,
-  source: Record<string, string> | undefined
+  source: Record<string, string>
 ): void {
   if (!source) {
     return;
@@ -71,9 +70,7 @@ function applyDependencies(
 export function mergeDependencies(
   allDependencies: CoatManifestStrict["dependencies"][]
 ): CoatManifestStrict["dependencies"] {
-  const mergedDependencyGroups = allDependencies.reduce<
-    Required<CoatManifestStrict["dependencies"]>
-  >(
+  return allDependencies.reduce<Required<CoatManifestStrict["dependencies"]>>(
     (result, template) => {
       applyDependencies(result.dependencies, template.dependencies);
       applyDependencies(result.devDependencies, template.devDependencies);
@@ -90,12 +87,5 @@ export function mergeDependencies(
       peerDependencies: {},
       optionalDependencies: {},
     }
-  );
-
-  // Remove empty dependency groups
-  return fromPairs(
-    Object.entries(mergedDependencyGroups).filter(
-      ([, dependencies]) => Object.keys(dependencies).length
-    )
   );
 }

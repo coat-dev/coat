@@ -32,6 +32,13 @@ export function getStrictCoatGlobalLockfile(
         };
       }) ?? [],
     setup: lockfile.setup ?? {},
+    scripts: lockfile.scripts ?? [],
+    dependencies: {
+      dependencies: lockfile.dependencies?.dependencies ?? [],
+      devDependencies: lockfile.dependencies?.devDependencies ?? [],
+      peerDependencies: lockfile.dependencies?.peerDependencies ?? [],
+      optionalDependencies: lockfile.dependencies?.optionalDependencies ?? [],
+    },
   };
 }
 

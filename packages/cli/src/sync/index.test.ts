@@ -22,7 +22,7 @@ import {
   COAT_MANIFEST_FILENAME,
   COAT_LOCAL_LOCKFILE_PATH,
 } from "../constants";
-import { CoatManifest } from "../types/coat-manifest";
+import { CoatManifestStrict } from "../types/coat-manifest";
 import * as groupFilesImport from "./group-files";
 import { flatten } from "lodash";
 import { getDefaultFiles } from "./get-default-files";
@@ -39,7 +39,7 @@ jest
 const platformRoot = path.parse(process.cwd()).root;
 const testCwd = path.join(platformRoot, "test");
 
-const templates: CoatManifest[] = [
+const templates: CoatManifestStrict[] = [
   {
     name: "template-1",
     files: [],
@@ -90,7 +90,7 @@ const updateFilesOnDiskMock = (updateFilesOnDisk as unknown) as jest.Mock;
 const groupFilesSpy = jest.spyOn(groupFilesImport, "groupFiles");
 const { groupFiles } = groupFilesImport;
 
-const coatManifest: CoatManifest = {
+const coatManifest: CoatManifestStrict = getStrictCoatManifest({
   name: "test-manifest",
   extends: templates.map((_, index) => `./template-${index}.js`),
   files: [
@@ -106,7 +106,7 @@ const coatManifest: CoatManifest = {
     },
   },
   scripts: [],
-};
+});
 
 const currentDependencies = {
   dependencies: {
@@ -183,14 +183,17 @@ describe("sync", () => {
 
   test("should call mergeDependencies with current dependencies, extended templates and deps from the current coat manifest", async () => {
     await sync(testCwd);
-    expect(mergeDependenciesSpy).toHaveBeenCalledTimes(1);
+    expect(mergeDependenciesSpy).toHaveBeenCalledTimes(2);
 
     const templateDeps = templates.map((template) => template.dependencies);
     const coatManifestDeps = coatManifest.dependencies;
-    expect(mergeDependenciesSpy).toHaveBeenCalledWith([
-      currentDependencies,
-      ...templateDeps,
-      coatManifestDeps,
+
+    expect(mergeDependenciesSpy.mock.calls[0]).toEqual([
+      [...templateDeps, coatManifestDeps],
+    ]);
+
+    expect(mergeDependenciesSpy.mock.calls[1]).toEqual([
+      [currentDependencies, mergeDependenciesSpy.mock.results[0].value],
     ]);
   });
 
@@ -204,7 +207,7 @@ describe("sync", () => {
       file: "package.json",
       content: {
         ...packageJson,
-        ...mergeDependenciesSpy.mock.results[0].value,
+        ...mergeDependenciesSpy.mock.results[1].value,
         scripts: {
           ...packageJson.scripts,
           ...mergeScriptsSpy.mock.results[0].value,
@@ -305,6 +308,13 @@ describe("sync", () => {
         coatGlobalLockfile: {
           files: [],
           setup: {},
+          scripts: [],
+          dependencies: {
+            dependencies: [],
+            devDependencies: [],
+            peerDependencies: [],
+            optionalDependencies: [],
+          },
           version: 1,
         },
         coatLocalLockfile: {
@@ -317,6 +327,9 @@ describe("sync", () => {
             dependencies: {
               coatManifestA: "1.0.0",
             },
+            devDependencies: {},
+            optionalDependencies: {},
+            peerDependencies: {},
           },
           extends: ["./template-0.js", "./template-1.js"],
           files: [
@@ -390,6 +403,30 @@ describe("sync", () => {
         dependencies: {},
       })
     );
+    await sync(testCwd);
+    expect(execa).not.toHaveBeenCalled();
+  });
+
+  test("should not run npm install if there are no dependencies", async () => {
+    const testTemplates = templates.map((template) => ({
+      ...template,
+      dependencies: {},
+    }));
+    gatherExtendedTemplatesMock.mockImplementationOnce(() => testTemplates);
+    gatherExtendedTemplatesMock.mockImplementationOnce(() => testTemplates);
+
+    // Place coat manifest without dependencies entry
+    await fs.outputFile(
+      path.join(testCwd, COAT_MANIFEST_FILENAME),
+      JSON.stringify({
+        ...coatManifest,
+        dependencies: {},
+      })
+    );
+
+    // Update package.json to be without dependencies
+    await fs.outputFile(path.join(testCwd, PACKAGE_JSON_FILENAME), "{}");
+
     await sync(testCwd);
     expect(execa).not.toHaveBeenCalled();
   });

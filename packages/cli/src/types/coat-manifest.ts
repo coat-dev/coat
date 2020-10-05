@@ -50,10 +50,7 @@ export interface CoatManifest {
    */
 }
 
-export interface CoatManifestStrict extends CoatManifest {
-  extends: (string | [string, Record<string, unknown>])[];
-  files: CoatManifestFile[];
-  scripts: CoatManifestScript[];
-  dependencies: Exclude<CoatManifest["dependencies"], undefined>;
-  setup: CoatManifestTask[];
+export interface CoatManifestStrict extends Required<CoatManifest> {
+  extends: Exclude<Required<CoatManifest>["extends"], string>;
+  dependencies: Exclude<Required<CoatManifest["dependencies"]>, undefined>;
 }

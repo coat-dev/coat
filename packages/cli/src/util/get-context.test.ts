@@ -29,7 +29,12 @@ describe("util/get-context", () => {
     const testCwd = "/test";
     const coatManifest = {
       name: "hi",
-      dependencies: {},
+      dependencies: {
+        dependencies: {},
+        devDependencies: {},
+        optionalDependencies: {},
+        peerDependencies: {},
+      },
       extends: [],
       files: [],
       scripts: [],
@@ -85,7 +90,12 @@ describe("util/get-context", () => {
     expect(context.coatManifest).toEqual({
       name: "hi",
       scripts: [],
-      dependencies: {},
+      dependencies: {
+        dependencies: {},
+        devDependencies: {},
+        optionalDependencies: {},
+        peerDependencies: {},
+      },
       extends: [],
       files: [],
       setup: [],

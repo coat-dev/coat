@@ -280,7 +280,7 @@ describe("lockfiles/update-lockfiles", () => {
     test("should replace files array", async () => {
       const testContext = {
         ...context,
-        coatGlobalLockfile: getStrictCoatLocalLockfile({
+        coatGlobalLockfile: getStrictCoatGlobalLockfile({
           version: 1,
           files: [
             {

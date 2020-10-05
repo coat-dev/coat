@@ -33,6 +33,33 @@ function stripEmptyPropertiesGlobal(
     if (!Object.keys(lockfile.setup).length) {
       delete draft?.setup;
     }
+
+    if (!lockfile.scripts.length) {
+      delete draft.scripts;
+    }
+
+    if (!lockfile.dependencies.dependencies.length) {
+      delete draft.dependencies?.dependencies;
+    }
+    if (!lockfile.dependencies.devDependencies.length) {
+      delete draft.dependencies?.devDependencies;
+    }
+    if (!lockfile.dependencies.peerDependencies.length) {
+      delete draft.dependencies?.peerDependencies;
+    }
+    if (!lockfile.dependencies.optionalDependencies.length) {
+      delete draft.dependencies?.optionalDependencies;
+    }
+
+    // If no dependency key exists, the dependencies
+    // property should also be deleted
+    if (
+      !Object.keys(
+        draft.dependencies as CoatGlobalLockfileStrict["dependencies"]
+      ).length
+    ) {
+      delete draft.dependencies;
+    }
   });
 }
 

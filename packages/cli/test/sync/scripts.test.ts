@@ -3,7 +3,10 @@ import path from "path";
 import fsExtra from "fs-extra";
 import { runSyncTest, prepareCliTest } from "../utils/run-cli-test";
 import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
-import { PACKAGE_JSON_FILENAME } from "../../src/constants";
+import {
+  COAT_MANIFEST_FILENAME,
+  PACKAGE_JSON_FILENAME,
+} from "../../src/constants";
 import { runCli } from "../utils/run-cli";
 
 describe("coat sync - scripts", () => {
@@ -149,6 +152,62 @@ describe("coat sync - scripts", () => {
       scripts: {
         existingScript: "existing",
         newScript: "new",
+      },
+    });
+  });
+
+  test("should remove managed scripts after they are no longer managed by coat", async () => {
+    const projectName = "test-project";
+    const { cwd, task: firstSyncRun } = await runSyncTest({
+      packageJson: {
+        name: projectName,
+        scripts: {
+          existingScript: "existing",
+        },
+      },
+      coatManifest: {
+        name: projectName,
+        scripts: [
+          {
+            id: "1",
+            run: "new",
+            scriptName: "newScript",
+          },
+        ],
+      },
+    });
+    await firstSyncRun;
+
+    let packageJsonContent = await fs.readFile(
+      path.join(cwd, PACKAGE_JSON_FILENAME),
+      "utf8"
+    );
+    expect(JSON.parse(packageJsonContent)).toEqual({
+      name: projectName,
+      scripts: {
+        existingScript: "existing",
+        newScript: "new",
+      },
+    });
+
+    // Remove script entry from the coat manifest file
+    await fs.writeFile(
+      path.join(cwd, COAT_MANIFEST_FILENAME),
+      JSON.stringify({ name: projectName })
+    );
+
+    // Run sync again
+    const { task: secondSyncRun } = runCli(["sync"], { cwd });
+    await secondSyncRun;
+
+    packageJsonContent = await fs.readFile(
+      path.join(cwd, PACKAGE_JSON_FILENAME),
+      "utf8"
+    );
+    expect(JSON.parse(packageJsonContent)).toEqual({
+      name: projectName,
+      scripts: {
+        existingScript: "existing",
       },
     });
   });

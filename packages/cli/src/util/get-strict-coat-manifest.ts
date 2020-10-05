@@ -1,6 +1,22 @@
 import { CoatManifest, CoatManifestStrict } from "../types/coat-manifest";
 
 /**
+ * Adds empty objects for all dependency groups if necessary
+ *
+ * @param dependencies Dependencies from the coat manifest or template
+ */
+function getStrictDependencies(
+  dependencies: CoatManifest["dependencies"]
+): CoatManifestStrict["dependencies"] {
+  return {
+    dependencies: dependencies?.dependencies ?? {},
+    devDependencies: dependencies?.devDependencies ?? {},
+    optionalDependencies: dependencies?.optionalDependencies ?? {},
+    peerDependencies: dependencies?.peerDependencies ?? {},
+  };
+}
+
+/**
  * Adds all missing properties to a coat manifest or template file
  * to access these properties safely in following code.
  *
@@ -28,7 +44,7 @@ export function getStrictCoatManifest(
     ...coatManifest,
     extends: extendsEntries,
     files: coatManifest.files ?? [],
-    dependencies: coatManifest.dependencies ?? {},
+    dependencies: getStrictDependencies(coatManifest.dependencies),
     scripts: coatManifest.scripts ?? [],
     setup: coatManifest.setup ?? [],
   };

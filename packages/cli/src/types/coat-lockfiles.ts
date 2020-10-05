@@ -55,6 +55,13 @@ export interface CoatGlobalLockfile extends JsonObject {
   version: number;
   files?: CoatLockfileFileEntry[];
   setup?: Record<string, JsonObject>;
+  scripts?: string[];
+  dependencies?: {
+    dependencies?: string[];
+    devDependencies?: string[];
+    peerDependencies?: string[];
+    optionalDependencies?: string[];
+  };
 }
 
 export interface CoatGlobalLockfileStrict extends CoatGlobalLockfile {
@@ -68,6 +75,31 @@ export interface CoatGlobalLockfileStrict extends CoatGlobalLockfile {
    * taskId: { taskResultProperty: A }
    */
   setup: Record<string, JsonObject>;
+  /**
+   * package.json script names that are managed by coat
+   */
+  scripts: string[];
+  /**
+   * package.json dependency types that are managed by coat
+   */
+  dependencies: {
+    /**
+     * names of managed package.json dependencies
+     */
+    dependencies: string[];
+    /**
+     * names of managed package.json devDependencies
+     */
+    devDependencies: string[];
+    /**
+     * names of managed package.json peerDependencies
+     */
+    peerDependencies: string[];
+    /**
+     * names of managed package.json optionalDependencies
+     */
+    optionalDependencies: string[];
+  };
 }
 
 export interface CoatLocalLockfile extends JsonObject {

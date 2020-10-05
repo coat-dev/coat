@@ -157,6 +157,59 @@ describe("lockfiles/write-lockfiles", () => {
       const newLockfile = yaml.safeLoad(lockfileContent);
       expect(newLockfile).not.toHaveProperty("setup");
     });
+
+    test.each`
+      dependencyGroup
+      ${"dependencies"}
+      ${"devDependencies"}
+      ${"optionalDependencies"}
+      ${"peerDependencies"}
+    `(
+      "should strip empty $dependencyGroup property",
+      async ({ dependencyGroup }) => {
+        const lockfile = getStrictCoatGlobalLockfile({
+          version: 1,
+          dependencies: {
+            dependencies: ["dependency"],
+            devDependencies: ["devDependency"],
+            optionalDependencies: ["optionalDependency"],
+            peerDependencies: ["peerDependency"],
+            [dependencyGroup]: [],
+          },
+        });
+        await writeGlobalLockfile(lockfile, context);
+
+        const lockfileContent = await fs.readFile(
+          path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
+          "utf-8"
+        );
+        const newLockfile = yaml.safeLoad(lockfileContent);
+        expect(newLockfile).toHaveProperty("dependencies");
+        expect(newLockfile).not.toHaveProperty(
+          `dependencies.${dependencyGroup}`
+        );
+      }
+    );
+
+    test("should strip dependencies property if no dependency is tracked", async () => {
+      const lockfile = getStrictCoatGlobalLockfile({
+        version: 1,
+        dependencies: {
+          dependencies: [],
+          devDependencies: [],
+          optionalDependencies: [],
+          peerDependencies: [],
+        },
+      });
+      await writeGlobalLockfile(lockfile, context);
+
+      const lockfileContent = await fs.readFile(
+        path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
+        "utf-8"
+      );
+      const newLockfile = yaml.safeLoad(lockfileContent);
+      expect(newLockfile).not.toHaveProperty("dependencies");
+    });
   });
 
   describe("local", () => {

@@ -1,6 +1,7 @@
 import execa from "execa";
 import ora from "ora";
 import flatten from "lodash/flatten";
+import fromPairs from "lodash/fromPairs";
 import { mergeFiles } from "./merge-files";
 import { mergeScripts } from "./merge-scripts";
 import { mergeDependencies } from "./merge-dependencies";
@@ -24,6 +25,7 @@ import { groupFiles } from "./group-files";
 import { getDefaultFiles } from "./get-default-files";
 import { getCurrentFiles } from "./get-current-files";
 import { updateFilesOnDisk } from "./update-files-on-disk";
+import { removeUnmanagedDependencies } from "./remove-unmanaged-dependencies";
 import { getNormalizedFilePath } from "../util/get-normalized-file-path";
 
 /**
@@ -52,40 +54,78 @@ export async function sync(cwd: string): Promise<void> {
   const mergedScripts = mergeScripts(
     allTemplates.map((template) => template.scripts)
   );
+
+  // Get all current scripts from the project's package.json file
+  //
+  const previouslyManagedScripts = new Set(context.coatGlobalLockfile.scripts);
+  // Node.js 10 compatibility
+  // Use Object.fromEntries once Node 10 is no longer supported
+  const currentScripts = fromPairs(
+    Object.entries(context.packageJson?.scripts || {})
+      // Filter out scripts that have been added / managed by coat.
+      // They will be re-added from mergedScripts or will be removed
+      // in case the coat manifest or its templates no longer supply
+      // a particular script
+      .filter(([scriptName]) => !previouslyManagedScripts.has(scriptName))
+  );
+
   const scripts = {
-    ...context.packageJson?.scripts,
+    ...currentScripts,
     ...mergedScripts,
   };
 
   // Merge dependencies
+  //
   // Add current dependencies from package.json, to satisfy the
   // correct minimum required versions for potentially existing dependencies
   const currentDependencies: CoatManifestStrict["dependencies"] = {
-    ...(context.packageJson?.dependencies && {
-      dependencies: context.packageJson.dependencies,
-    }),
-    ...(context.packageJson?.devDependencies && {
-      devDependencies: context.packageJson.devDependencies,
-    }),
-    ...(context.packageJson?.optionalDependencies && {
-      optionalDependencies: context.packageJson.optionalDependencies,
-    }),
-    ...(context.packageJson?.peerDependencies && {
-      peerDependencies: context.packageJson.peerDependencies,
-    }),
+    dependencies: context.packageJson?.dependencies ?? {},
+    devDependencies: context.packageJson?.devDependencies ?? {},
+    optionalDependencies: context.packageJson?.optionalDependencies ?? {},
+    peerDependencies: context.packageJson?.peerDependencies ?? {},
   };
-  const mergedDependencies = mergeDependencies([
+
+  const templateDependencies = mergeDependencies(
+    allTemplates.map((template) => template.dependencies)
+  );
+
+  // Remove dependencies that have been previously added
+  // by coat, but are no longer a part of any template
+  const strippedCurrentDependencies = removeUnmanagedDependencies(
     currentDependencies,
-    ...allTemplates.map((template) => template.dependencies),
+    templateDependencies,
+    context
+  );
+
+  const mergedDependencies = mergeDependencies([
+    strippedCurrentDependencies,
+    templateDependencies,
   ]);
 
   const allFiles: CoatManifestFile[] = [];
   // Add package.json file entry that can be merged and customized
-  const packageJsonFileContent = {
+  const packageJsonFileContent: PackageJson = {
     ...context.packageJson,
     ...mergedDependencies,
-    ...(Object.keys(scripts).length && { scripts }),
+    scripts,
   };
+
+  // Remove empty dependency and scripts properties
+  const keysToRemove = [
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+    "optionalDependencies",
+    "scripts",
+  ];
+  keysToRemove.forEach((key) => {
+    if (
+      !Object.keys(packageJsonFileContent[key] as Record<string, unknown>)
+        .length
+    ) {
+      delete packageJsonFileContent[key];
+    }
+  });
 
   // Only add package.json to the allFiles array if it currently exists
   // or if the contents of the file have been updated by coat
@@ -227,9 +267,26 @@ export async function sync(cwd: string): Promise<void> {
   // Place or update new polished files on the disk and remove unmanaged files
   await updateFilesOnDisk(polishedFiles, filesToRemove, currentFiles, context);
 
+  // Node.js 10 compatibility
+  // Use Object.fromEntries once Node 10 is no longer supported
+  const newLockfileDependencies = fromPairs(
+    Object.entries(
+      templateDependencies
+    ).map(([dependencyKey, dependencyEntries]) => [
+      dependencyKey,
+      Object.keys(dependencyEntries).sort(),
+    ])
+  );
+
+  const newLockfileScripts = Object.keys(mergedScripts).sort();
+
   // Update the lockfiles with the new file entries
   context = await updateLockfiles({
-    updatedGlobalLockfile: { files: newGlobalLockFiles },
+    updatedGlobalLockfile: {
+      files: newGlobalLockFiles,
+      dependencies: newLockfileDependencies,
+      scripts: newLockfileScripts,
+    },
     updatedLocalLockfile: { files: newLocalLockFiles },
     context,
   });
@@ -243,19 +300,11 @@ export async function sync(cwd: string): Promise<void> {
   )?.content as PackageJson | undefined;
 
   if (mergedPackageJson) {
-    const finalDependencies = {
-      ...(mergedPackageJson.dependencies && {
-        dependencies: mergedPackageJson.dependencies,
-      }),
-      ...(mergedPackageJson.devDependencies && {
-        devDependencies: mergedPackageJson.devDependencies,
-      }),
-      ...(mergedPackageJson.optionalDependencies && {
-        optionalDependencies: mergedPackageJson.optionalDependencies,
-      }),
-      ...(mergedPackageJson.peerDependencies && {
-        peerDependencies: mergedPackageJson.peerDependencies,
-      }),
+    const finalDependencies: CoatManifestStrict["dependencies"] = {
+      dependencies: mergedPackageJson.dependencies ?? {},
+      devDependencies: mergedPackageJson.devDependencies ?? {},
+      optionalDependencies: mergedPackageJson.optionalDependencies ?? {},
+      peerDependencies: mergedPackageJson.peerDependencies ?? {},
     };
 
     if (!isEqual(finalDependencies, currentDependencies)) {
