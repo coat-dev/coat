@@ -211,4 +211,45 @@ describe("coat sync - scripts", () => {
       },
     });
   });
+
+  test("should remove scripts if they conflict with a merged parallel script from coat", async () => {
+    const projectName = "test-project";
+    const { cwd, task } = await runSyncTest({
+      packageJson: {
+        name: projectName,
+        scripts: {
+          "test:existing": "existing",
+        },
+      },
+      coatManifest: {
+        name: projectName,
+        scripts: [
+          {
+            id: "test-1",
+            run: "echo Test 1",
+            scriptName: "test",
+          },
+          {
+            id: "test-2",
+            run: "echo Test 2",
+            scriptName: "test",
+          },
+        ],
+      },
+    });
+    await task;
+
+    const packageJsonContent = await fs.readFile(
+      path.join(cwd, PACKAGE_JSON_FILENAME),
+      "utf8"
+    );
+    expect(JSON.parse(packageJsonContent)).toEqual({
+      name: projectName,
+      scripts: {
+        test: "coat run test:*",
+        "test:1": "echo Test 1",
+        "test:2": "echo Test 2",
+      },
+    });
+  });
 });

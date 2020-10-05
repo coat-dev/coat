@@ -51,7 +51,7 @@ export async function sync(cwd: string): Promise<void> {
   const allTemplates = getAllTemplates(context);
 
   // Merge scripts
-  const mergedScripts = mergeScripts(
+  const { scripts: mergedScripts, parallelScriptPrefixes } = mergeScripts(
     allTemplates.map((template) => template.scripts)
   );
 
@@ -61,12 +61,18 @@ export async function sync(cwd: string): Promise<void> {
   // Node.js 10 compatibility
   // Use Object.fromEntries once Node 10 is no longer supported
   const currentScripts = fromPairs(
-    Object.entries(context.packageJson?.scripts || {})
-      // Filter out scripts that have been added / managed by coat.
-      // They will be re-added from mergedScripts or will be removed
-      // in case the coat manifest or its templates no longer supply
-      // a particular script
-      .filter(([scriptName]) => !previouslyManagedScripts.has(scriptName))
+    Object.entries(context.packageJson?.scripts || {}).filter(
+      ([scriptName]) =>
+        // Filter out scripts that have been added / managed by coat.
+        // They will be re-added from mergedScripts or will be removed
+        // in case the coat manifest or its templates no longer supply
+        // a particular script
+        !previouslyManagedScripts.has(scriptName) &&
+        // Also filter out scripts that start with a script that is managed by
+        // coat and will be run in parallel. This is done in order to ensure
+        // that the scripts from coat are running as expected
+        parallelScriptPrefixes.every((prefix) => !scriptName.startsWith(prefix))
+    )
   );
 
   const scripts = {

@@ -210,7 +210,7 @@ describe("sync", () => {
         ...mergeDependenciesSpy.mock.results[1].value,
         scripts: {
           ...packageJson.scripts,
-          ...mergeScriptsSpy.mock.results[0].value,
+          ...mergeScriptsSpy.mock.results[0].value.scripts,
         },
       },
     };
@@ -655,6 +655,61 @@ describe("sync", () => {
       expect.stringMatching(
         /ENOENT: no such file or directory, open '.*package.json'/
       )
+    );
+  });
+
+  test("should remove existing scripts that start with a merged script prefix", async () => {
+    // Write an existing script into package.json
+    await Promise.all([
+      fs.outputFile(
+        path.join(testCwd, PACKAGE_JSON_FILENAME),
+        JSON.stringify({
+          ...packageJson,
+          scripts: {
+            "test:hi": "test",
+          },
+        })
+      ),
+      // add a parallel script to the coat manifest file
+      fs.outputFile(
+        path.join(testCwd, COAT_MANIFEST_FILENAME),
+        JSON.stringify({
+          ...coatManifest,
+          scripts: [
+            {
+              id: "test-1",
+              scriptName: "test",
+              run: "echo Test 1",
+            },
+            {
+              id: "test-2",
+              scriptName: "test",
+              run: "echo Test 2",
+            },
+          ],
+        })
+      ),
+    ]);
+
+    await sync(testCwd);
+
+    expect(mergeFilesSpy).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        [path.join(testCwd, PACKAGE_JSON_FILENAME)]: expect.objectContaining({
+          content: [
+            expect.objectContaining({
+              scripts: {
+                build: "test",
+                lint: "test",
+                test: "coat run test:*",
+                "test:1": "echo Test 1",
+                "test:2": "echo Test 2",
+              },
+            }),
+          ],
+        }),
+      }),
+      expect.anything()
     );
   });
 });
