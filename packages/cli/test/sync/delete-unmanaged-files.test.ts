@@ -5,6 +5,8 @@ import { prepareCliTest, runSyncTest } from "../utils/run-cli-test";
 import { runCli } from "../utils/run-cli";
 import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
 import { COAT_MANIFEST_FILENAME } from "../../src/constants";
+import { getFileHash } from "../../src/util/get-file-hash";
+import stripAnsi from "strip-ansi";
 
 describe("coat sync - delete unmanaged files", () => {
   describe("global files", () => {
@@ -17,6 +19,7 @@ describe("coat sync - delete unmanaged files", () => {
           files: [
             {
               path: `folder-1/${unmanagedFilePath}`,
+              hash: getFileHash(""),
             },
           ],
         },
@@ -25,8 +28,15 @@ describe("coat sync - delete unmanaged files", () => {
       // Place unmanaged file
       await fs.outputFile(path.join(cwd, "folder-1", unmanagedFilePath), "");
 
-      const { task } = runCli(["sync"], cwd);
-      await task;
+      const { task } = runCli(["sync"], { cwd });
+      const result = await task;
+      expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+        "
+          CREATED  .gitignore
+          DELETED  folder-1/file.json
+          UPDATED  package.json
+        "
+      `);
 
       await expect(
         fs.readFile(path.join(cwd, "folder-1", unmanagedFilePath))
@@ -47,11 +57,19 @@ describe("coat sync - delete unmanaged files", () => {
           files: [
             {
               path: unmanagedFilePath,
+              hash: getFileHash(""),
             },
           ],
         },
       });
-      await task;
+
+      const result = await task;
+      expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+        "
+          CREATED  .gitignore
+          UPDATED  package.json
+        "
+      `);
     });
 
     testExceptWindows(
@@ -65,6 +83,7 @@ describe("coat sync - delete unmanaged files", () => {
             files: [
               {
                 path: `folder-1/${unmanagedFileName}`,
+                hash: getFileHash(""),
               },
             ],
           },
@@ -76,11 +95,11 @@ describe("coat sync - delete unmanaged files", () => {
         await fs.chmod(path.join(cwd, "folder-1"), 0o000);
 
         try {
-          const { task } = runCli(["sync"], cwd);
+          const { task } = runCli(["sync"], { cwd });
           await expect(task).rejects.toHaveProperty(
             "message",
             expect.stringMatching(
-              /.*EACCES: permission denied, unlink '.*file.json'.*/g
+              /.*EACCES: permission denied, open '.*file.json'/
             )
           );
         } finally {
@@ -103,7 +122,14 @@ describe("coat sync - delete unmanaged files", () => {
           ],
         },
       });
-      await firstSyncRun;
+      const firstSyncResult = await firstSyncRun;
+      expect(stripAnsi(firstSyncResult.stdout)).toMatchInlineSnapshot(`
+        "
+          CREATED  .gitignore
+          CREATED  file.json
+          UPDATED  package.json
+        "
+      `);
 
       let fileRaw = await fs.readFile(path.join(cwd, "file.json"), "utf-8");
       expect(JSON.parse(fileRaw)).toEqual({ a: true });
@@ -115,8 +141,13 @@ describe("coat sync - delete unmanaged files", () => {
       );
 
       // Run sync again
-      const { task: secondSyncRun } = runCli(["sync"], cwd);
-      await secondSyncRun;
+      const { task: secondSyncRun } = runCli(["sync"], { cwd });
+      const secondSyncResult = await secondSyncRun;
+      expect(stripAnsi(secondSyncResult.stdout)).toMatchInlineSnapshot(`
+        "
+        ♻️  Everything up to date️
+        "
+      `);
 
       fileRaw = await fs.readFile(path.join(cwd, "file.json"), "utf-8");
       expect(JSON.parse(fileRaw)).toEqual({ a: true });
@@ -133,6 +164,7 @@ describe("coat sync - delete unmanaged files", () => {
           files: [
             {
               path: `folder-1/${unmanagedFilePath}`,
+              hash: getFileHash(""),
             },
           ],
         },
@@ -141,8 +173,15 @@ describe("coat sync - delete unmanaged files", () => {
       // Place unmanaged file
       await fs.outputFile(path.join(cwd, "folder-1", unmanagedFilePath), "");
 
-      const { task } = runCli(["sync"], cwd);
-      await task;
+      const { task } = runCli(["sync"], { cwd });
+      const result = await task;
+      expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+        "
+          CREATED  .gitignore
+          DELETED  folder-1/file.json
+          UPDATED  package.json
+        "
+      `);
 
       await expect(
         fs.readFile(path.join(cwd, "folder-1", unmanagedFilePath))
@@ -163,11 +202,19 @@ describe("coat sync - delete unmanaged files", () => {
           files: [
             {
               path: unmanagedFilePath,
+              hash: "",
             },
           ],
         },
       });
-      await task;
+
+      const result = await task;
+      expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+        "
+          CREATED  .gitignore
+          UPDATED  package.json
+        "
+      `);
     });
 
     testExceptWindows(
@@ -181,6 +228,7 @@ describe("coat sync - delete unmanaged files", () => {
             files: [
               {
                 path: `folder-1/${unmanagedFileName}`,
+                hash: getFileHash(""),
               },
             ],
           },
@@ -192,11 +240,11 @@ describe("coat sync - delete unmanaged files", () => {
         await fs.chmod(path.join(cwd, "folder-1"), 0o000);
 
         try {
-          const { task } = runCli(["sync"], cwd);
+          const { task } = runCli(["sync"], { cwd });
           await expect(task).rejects.toHaveProperty(
             "message",
             expect.stringMatching(
-              /.*EACCES: permission denied, unlink '.*file.json'.*/g
+              /.*EACCES: permission denied, open '.*file.json'/
             )
           );
         } finally {
@@ -220,7 +268,14 @@ describe("coat sync - delete unmanaged files", () => {
           ],
         },
       });
-      await firstSyncRun;
+      const firstSyncResult = await firstSyncRun;
+      expect(stripAnsi(firstSyncResult.stdout)).toMatchInlineSnapshot(`
+        "
+          CREATED  .gitignore
+          CREATED  file.json
+          UPDATED  package.json
+        "
+      `);
 
       let fileRaw = await fs.readFile(path.join(cwd, "file.json"), "utf-8");
       expect(JSON.parse(fileRaw)).toEqual({ a: true });
@@ -232,11 +287,68 @@ describe("coat sync - delete unmanaged files", () => {
       );
 
       // Run sync again
-      const { task: secondSyncRun } = runCli(["sync"], cwd);
-      await secondSyncRun;
+      const { task: secondSyncRun } = runCli(["sync"], { cwd });
+      const secondSyncResult = await secondSyncRun;
+      expect(stripAnsi(secondSyncResult.stdout)).toMatchInlineSnapshot(`
+        "
+        ♻️  Everything up to date️
+        "
+      `);
 
       fileRaw = await fs.readFile(path.join(cwd, "file.json"), "utf-8");
       expect(JSON.parse(fileRaw)).toEqual({ a: true });
+    });
+
+    test("should delete managed files if they are no longer declared", async () => {
+      const { cwd, task: firstSyncRun } = await runSyncTest({
+        coatManifest: {
+          name: "test",
+          files: [
+            {
+              file: "file.json",
+              content: { a: true },
+              type: CoatManifestFileType.Json,
+              once: false,
+              local: true,
+            },
+          ],
+        },
+      });
+      const firstSyncResult = await firstSyncRun;
+      expect(stripAnsi(firstSyncResult.stdout)).toMatchInlineSnapshot(`
+        "
+          CREATED  .gitignore
+          CREATED  file.json
+          UPDATED  package.json
+        "
+      `);
+
+      const fileRaw = await fs.readFile(path.join(cwd, "file.json"), "utf-8");
+      expect(JSON.parse(fileRaw)).toEqual({ a: true });
+
+      // Adjust coat manifest to no longer place file
+      await fs.writeFile(
+        path.join(cwd, COAT_MANIFEST_FILENAME),
+        JSON.stringify({ name: "test" })
+      );
+
+      // Run sync again
+      const { task: secondSyncRun } = runCli(["sync"], { cwd });
+      const secondSyncResult = await secondSyncRun;
+      expect(stripAnsi(secondSyncResult.stdout)).toMatchInlineSnapshot(`
+        "
+          DELETED  file.json
+        "
+      `);
+
+      await expect(
+        fs.readFile(path.join(cwd, "file.json"))
+      ).rejects.toHaveProperty(
+        "message",
+        expect.stringMatching(
+          /ENOENT: no such file or directory, open '.*file.json'$/
+        )
+      );
     });
   });
 });

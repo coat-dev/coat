@@ -262,6 +262,9 @@ describe("file-types/json", () => {
       };
       const formatSpy = jest.fn(() => "formatted");
       importFromSilentMock.mockImplementationOnce(() => ({
+        getFileInfo: {
+          sync: () => ({}),
+        },
         format: formatSpy,
       }));
       const polished = jsonFileFunctions.polish(

@@ -3,7 +3,7 @@ import { mergeScripts } from "./merge-scripts";
 describe("sync/merge-scripts", () => {
   test("should work with empty scripts array", () => {
     const result = mergeScripts([]);
-    expect(result).toEqual({});
+    expect(result.scripts).toEqual({});
   });
 
   test("should take over scriptName if it is unique in the array", () => {
@@ -26,7 +26,7 @@ describe("sync/merge-scripts", () => {
         },
       ],
     ]);
-    expect(result).toEqual({
+    expect(result.scripts).toEqual({
       test: "test",
       build: "build",
       lint: "lint",
@@ -60,7 +60,7 @@ describe("sync/merge-scripts", () => {
         },
       ],
     ]);
-    expect(result).toEqual({
+    expect(result.scripts).toEqual({
       build: "build",
       test: "coat run test:*",
       "test:1": "test1",
@@ -96,7 +96,7 @@ describe("sync/merge-scripts", () => {
         },
       ],
     ]);
-    expect(result).toEqual({
+    expect(result.scripts).toEqual({
       build: "build",
       test: "coat run test:*",
       "test:1": "test1",

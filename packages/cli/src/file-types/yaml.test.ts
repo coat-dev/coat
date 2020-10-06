@@ -127,6 +127,9 @@ describe("file-types/yaml", () => {
       };
       const formatSpy = jest.fn(() => "formatted");
       importFromSilentMock.mockImplementationOnce(() => ({
+        getFileInfo: {
+          sync: () => ({}),
+        },
         format: formatSpy,
       }));
       const polished = yamlFileFunctions.polish(

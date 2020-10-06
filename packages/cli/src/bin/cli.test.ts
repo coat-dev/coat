@@ -12,7 +12,7 @@ jest.spyOn(process, "cwd").mockImplementation(() => "mock-cwd");
 const exitMock = jest.spyOn(process, "exit").mockImplementation(
   // @ts-expect-error
   (): never => {
-    // Empty mock function
+    // Empty mock functino
   }
 );
 
@@ -28,10 +28,6 @@ const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {
 describe("coat cli", () => {
   afterEach(() => {
     jest.clearAllMocks();
-  });
-
-  afterAll(() => {
-    jest.restoreAllMocks();
   });
 
   test("should print out version", async () => {
@@ -106,6 +102,10 @@ describe("coat cli", () => {
   test("should exit from run function with correct error code thrown from script", async () => {
     const program = createProgram();
 
+    exitMock.mockImplementationOnce((): never => {
+      throw new Error("process.exit");
+    });
+
     runMock.mockImplementationOnce(async () => {
       const error = new Error("script error");
       // @ts-expect-error
@@ -113,7 +113,9 @@ describe("coat cli", () => {
       throw error;
     });
 
-    await program.parseAsync(["run", "test-script"], { from: "user" });
+    await expect(() =>
+      program.parseAsync(["run", "test-script"], { from: "user" })
+    ).rejects.toHaveProperty("message", "process.exit");
 
     expect(exitMock).toHaveBeenCalledTimes(1);
     expect(exitMock).toHaveBeenLastCalledWith(5);
@@ -126,13 +128,9 @@ describe("coat cli", () => {
       throw new Error("run error");
     });
 
-    try {
-      await program.parseAsync(["run", "test-script"], { from: "user" });
-
-      throw new Error("This line should not be reached, run should throw!");
-    } catch (error) {
-      expect(error).toHaveProperty("message", "run error");
-    }
+    await expect(
+      program.parseAsync(["run", "test-script"], { from: "user" })
+    ).rejects.toHaveProperty("message", "run error");
 
     expect(exitMock).not.toHaveBeenCalled();
   });

@@ -17,7 +17,7 @@ describe("run/unknown-commands", () => {
     });
     await syncTask;
 
-    const { task: runTask } = runCli(["test-script"], cwd);
+    const { task: runTask } = runCli(["test-script"], { cwd });
     const result = await runTask;
 
     expect(result.stdout).toContain("Running test script");
@@ -43,7 +43,7 @@ describe("run/unknown-commands", () => {
     });
     await syncTask;
 
-    const { task: runTask } = runCli(["test-script:*"], cwd);
+    const { task: runTask } = runCli(["test-script:*"], { cwd });
     const result = await runTask;
 
     expect(result.stdout).toContain("Running test script 1");
@@ -65,7 +65,7 @@ describe("run/unknown-commands", () => {
     });
     await syncTask;
 
-    const { task: runTask } = runCli(["test-script"], cwd);
+    const { task: runTask } = runCli(["test-script"], { cwd });
     try {
       await runTask;
       throw new Error("Line should not be reached");
@@ -94,7 +94,7 @@ describe("run/unknown-commands", () => {
     });
     await syncTask;
 
-    const { task: runTask } = runCli(["test-script:*"], cwd);
+    const { task: runTask } = runCli(["test-script:*"], { cwd });
     try {
       await runTask;
       throw new Error("Line should not be reached");

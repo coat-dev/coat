@@ -67,7 +67,7 @@ describe("setup - general", () => {
     await fs.unlink(setupFilePath);
 
     // Run setup again
-    const { task: secondSetupRun } = runCli(["setup"], cwd);
+    const { task: secondSetupRun } = runCli(["setup"], { cwd });
     await secondSetupRun;
 
     // Validate setup file has been placed again
@@ -90,7 +90,7 @@ describe("setup - general", () => {
 
     // 4 additional setup runs
     for (let i = 0; i < 4; i++) {
-      const { task } = runCli(["setup"], cwd);
+      const { task } = runCli(["setup"], { cwd });
       await task;
     }
 

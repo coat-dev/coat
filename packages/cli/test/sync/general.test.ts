@@ -47,8 +47,12 @@ describe("coat sync - general", () => {
       },
     });
 
-    const { task: helpArgumentPromise } = runCli(["sync", "--help"], tmpDir);
-    const { task: helpCommandPromise } = runCli(["help", "sync"], tmpDir);
+    const { task: helpArgumentPromise } = runCli(["sync", "--help"], {
+      cwd: tmpDir,
+    });
+    const { task: helpCommandPromise } = runCli(["help", "sync"], {
+      cwd: tmpDir,
+    });
 
     await Promise.all([helpArgumentPromise, helpCommandPromise]);
 
@@ -88,5 +92,25 @@ describe("coat sync - general", () => {
       }
       "
     `);
+  });
+
+  test("should work without a package.json file", async () => {
+    const cwd = await prepareCliTest();
+
+    // Remove package.json file
+    await fs.unlink(path.join(cwd, PACKAGE_JSON_FILENAME));
+
+    // Run sync
+    const { task } = runCli(["sync"], { cwd });
+    await task;
+
+    await expect(
+      fs.readFile(path.join(cwd, PACKAGE_JSON_FILENAME))
+    ).rejects.toHaveProperty(
+      "message",
+      expect.stringMatching(
+        /ENOENT: no such file or directory, open '.*package.json'/
+      )
+    );
   });
 });

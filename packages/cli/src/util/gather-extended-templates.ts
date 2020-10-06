@@ -12,8 +12,22 @@ type NestedManifests = Array<NestedManifests | CoatManifestStrict>;
 function getTemplates(
   cwd: string,
   context: CoatContext,
-  template: string
+  templateEntry: CoatManifestStrict["extends"][0]
 ): NestedManifests {
+  let template: string;
+  let templateConfig: Record<string, unknown>;
+
+  // extends entries can either be plain strings or
+  // tuples in the form of:
+  // [templateName, templateConfig]
+  if (Array.isArray(templateEntry)) {
+    [template, templateConfig] = templateEntry;
+  } else {
+    template = templateEntry;
+    // Default config is an empty object
+    templateConfig = {};
+  }
+
   // Resolve the directory of the current template to
   // use it as the cwd for child templates.
   //
@@ -26,11 +40,29 @@ function getTemplates(
   // TODO: See #15
   // Better error message when template can't be imported
   // with a hint to install node_modules
-  const templateManifestRaw = importFrom(cwd, template) as CoatTemplate;
+  const templateManifestRawModule = importFrom(cwd, template);
+
+  // Check whether the template exported its manifest or manifest function
+  // as a default export or directly using module.exports
+  let templateManifestRaw: CoatTemplate;
+  if (
+    typeof templateManifestRawModule === "object" &&
+    templateManifestRawModule !== null &&
+    "__esModule" in templateManifestRawModule &&
+    "default" in templateManifestRawModule
+  ) {
+    templateManifestRaw = (templateManifestRawModule as {
+      default: CoatTemplate;
+    }).default;
+  } else {
+    templateManifestRaw = templateManifestRawModule as CoatTemplate;
+  }
 
   let resolvedTemplate: CoatManifestStrict;
   if (typeof templateManifestRaw === "function") {
-    resolvedTemplate = getStrictCoatManifest(templateManifestRaw(context));
+    resolvedTemplate = getStrictCoatManifest(
+      templateManifestRaw({ coatContext: context, config: templateConfig })
+    );
   } else {
     resolvedTemplate = getStrictCoatManifest(templateManifestRaw);
   }

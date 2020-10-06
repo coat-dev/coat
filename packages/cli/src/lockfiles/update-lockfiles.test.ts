@@ -164,9 +164,11 @@ describe("lockfiles/update-lockfiles", () => {
           files: [
             {
               path: "a.json",
+              hash: "a.json-hash",
             },
             {
               path: "b.json",
+              hash: "b.json-hash",
             },
           ],
         }),
@@ -176,6 +178,7 @@ describe("lockfiles/update-lockfiles", () => {
         files: [
           {
             path: "c.json",
+            hash: "c.json-hash",
           },
         ],
       });
@@ -186,6 +189,7 @@ describe("lockfiles/update-lockfiles", () => {
       expect(newContext.coatGlobalLockfile).toHaveProperty("files", [
         {
           path: "c.json",
+          hash: "c.json-hash",
           once: false,
         },
       ]);
@@ -197,6 +201,7 @@ describe("lockfiles/update-lockfiles", () => {
         files: [
           {
             path: "a.json",
+            hash: "a.json-hash",
           },
         ],
       });
@@ -275,14 +280,16 @@ describe("lockfiles/update-lockfiles", () => {
     test("should replace files array", async () => {
       const testContext = {
         ...context,
-        coatGlobalLockfile: getStrictCoatLocalLockfile({
+        coatGlobalLockfile: getStrictCoatGlobalLockfile({
           version: 1,
           files: [
             {
               path: "a.json",
+              hash: "a.json-hash",
             },
             {
               path: "b.json",
+              hash: "b.json-hash",
             },
           ],
         }),
@@ -292,6 +299,7 @@ describe("lockfiles/update-lockfiles", () => {
         files: [
           {
             path: "c.json",
+            hash: "c.json-hash",
           },
         ],
       });
@@ -302,6 +310,7 @@ describe("lockfiles/update-lockfiles", () => {
       expect(newContext.coatLocalLockfile).toHaveProperty("files", [
         {
           path: "c.json",
+          hash: "c.json-hash",
           once: false,
         },
       ]);
@@ -313,6 +322,7 @@ describe("lockfiles/update-lockfiles", () => {
         files: [
           {
             path: "a.json",
+            hash: "a.json-hash",
           },
         ],
       });

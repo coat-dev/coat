@@ -5,7 +5,7 @@ import { gatherAllTasks } from "./gather-all-tasks";
 import { updateLockfiles } from "../lockfiles/update-lockfiles";
 import { getTasksToRun } from "./get-tasks-to-run";
 import { CoatTaskType } from "../types/coat-manifest-tasks";
-import { removeUnamangedTasksFromLockfiles } from "./remove-unmanaged-tasks-from-lockfile";
+import { removeUnmanagedTasksFromLockfiles } from "./remove-unmanaged-tasks-from-lockfile";
 
 /**
  * Gathers and runs all tasks of a coat project.
@@ -63,7 +63,7 @@ export async function setup(cwd: string, force: boolean): Promise<CoatContext> {
 
   // Remove task results that are from tasks that are
   // no longer managed by coat
-  context = await removeUnamangedTasksFromLockfiles(
+  context = await removeUnmanagedTasksFromLockfiles(
     allTasks.filter((task) => task.type === CoatTaskType.Global),
     allTasks.filter((task) => task.type === CoatTaskType.Local),
     context

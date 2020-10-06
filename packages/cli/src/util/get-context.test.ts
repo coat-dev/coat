@@ -1,7 +1,8 @@
-import { promises as fs } from "fs";
+import fs from "fs-extra";
 import path from "path";
 import { vol } from "memfs";
 import { getContext } from "./get-context";
+import { PACKAGE_JSON_FILENAME } from "../constants";
 
 jest.mock("fs");
 
@@ -15,10 +16,12 @@ describe("util/get-context", () => {
     coatManifest: unknown,
     packageJson: unknown
   ): Promise<void> {
-    await fs.mkdir(cwd);
     await Promise.all([
-      fs.writeFile(path.join(cwd, "coat.json"), JSON.stringify(coatManifest)),
-      fs.writeFile(path.join(cwd, "package.json"), JSON.stringify(packageJson)),
+      fs.outputFile(path.join(cwd, "coat.json"), JSON.stringify(coatManifest)),
+      fs.outputFile(
+        path.join(cwd, "package.json"),
+        JSON.stringify(packageJson)
+      ),
     ]);
   }
 
@@ -26,7 +29,12 @@ describe("util/get-context", () => {
     const testCwd = "/test";
     const coatManifest = {
       name: "hi",
-      dependencies: {},
+      dependencies: {
+        dependencies: {},
+        devDependencies: {},
+        optionalDependencies: {},
+        peerDependencies: {},
+      },
       extends: [],
       files: [],
       scripts: [],
@@ -82,7 +90,12 @@ describe("util/get-context", () => {
     expect(context.coatManifest).toEqual({
       name: "hi",
       scripts: [],
-      dependencies: {},
+      dependencies: {
+        dependencies: {},
+        devDependencies: {},
+        optionalDependencies: {},
+        peerDependencies: {},
+      },
       extends: [],
       files: [],
       setup: [],
@@ -105,5 +118,29 @@ describe("util/get-context", () => {
     await createTestContextFiles(testCwd, coatManifest, packageJson);
     const context = await getContext(testCwd);
     expect(context.cwd).toEqual(testCwd);
+  });
+
+  test("should throw error if package.json cannot be parsed", async () => {
+    const testCwd = "/test";
+    const coatManifest = {
+      name: "hi",
+      dependencies: {},
+      extends: [],
+      files: [],
+      scripts: [],
+    };
+    const packageJson = {
+      name: "hi",
+      version: "1.0.0",
+    };
+    await createTestContextFiles(testCwd, coatManifest, packageJson);
+
+    // Overwrite package.json with an invalid JSON string
+    await fs.writeFile(path.join(testCwd, PACKAGE_JSON_FILENAME), "undefined");
+
+    await expect(() => getContext(testCwd)).rejects.toHaveProperty(
+      "message",
+      "Unexpected token u in JSON at position 0"
+    );
   });
 });

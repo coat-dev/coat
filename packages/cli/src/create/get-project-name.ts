@@ -1,73 +1,39 @@
 import { prompt } from "inquirer";
-import validateNpmPackageName from "validate-npm-package-name";
 
-function sanitizeProjectName(input: string): string {
-  return input.trim();
-}
-
-function createProjectNameErrorMessage(
-  validation: validateNpmPackageName.Result
-): string {
-  return `The project name must be a valid npm package name: ${[
-    ...(validation.warnings ?? []),
-    ...(validation.errors ?? []),
-  ].join(", ")}`;
+/**
+ * Trims the project name.
+ * Only exported for testing
+ *
+ * @param projectName  The project name that should be trimmed
+ */
+export function sanitizeProjectName(projectName: string): string {
+  return projectName.trim();
 }
 
 /**
- * Returns true when a project name is valid for coat.
- * If it is invalid, then a string is returned which can be used as
- * the error message to the user. This format is chosen to be
- * compatible with the inquirer validation methods.
+ * Validates that the project name can be used for the coat manifest.
+ * Only exported for testing.
+ *
+ * @param projectName The project name that should be validated
  */
-function validateProjectName(projectName: string): string | true {
-  const npmValidation = validateNpmPackageName(projectName);
-  if (npmValidation.validForNewPackages) {
-    return true;
-  }
-  return createProjectNameErrorMessage(npmValidation);
+export function validateProjectName(projectName: string): boolean {
+  return projectName.length > 0;
 }
 
 /**
- * Gets the project name for the coat project that will be created.
+ * Prompts for the project name for the coat project that will be created.
  *
- * If no name has been specified via the CLI, the user will be prompted
- * to enter a new project name
- *
- * @param projectNameInput The user CLI input for the project name, if it is available
+ * @param suggestedName An optional suggested name that the user will be prompted with
  */
-export async function getProjectName(
-  projectNameInput: string | undefined
-): Promise<string> {
-  let projectName = "";
-  // The project name must be a valid npm package name and is placed as the name of
-  // the resulting package.json file.
-  //
-  // See official docs: https://docs.npmjs.com/creating-a-package-json-file
-  // Also see validate-npm-package-name: https://github.com/npm/validate-npm-package-name
-  if (projectNameInput) {
-    const sanitizedProjectNameInput = sanitizeProjectName(projectNameInput);
-    const validationResult = validateProjectName(sanitizedProjectNameInput);
-    if (validationResult === true) {
-      projectName = sanitizedProjectNameInput;
-    } else {
-      console.warn(validationResult);
-    }
-  }
-
-  // If no project name is specified with the command - or the specified project name is
-  // not valid - the user should be prompted for the project name.
-  if (!projectName) {
-    const answers = await prompt([
-      {
-        name: "projectName",
-        message: "Enter the name of your new project",
-        filter: sanitizeProjectName,
-        default: projectNameInput,
-        validate: validateProjectName,
-      },
-    ]);
-    projectName = answers.projectName;
-  }
+export async function getProjectName(suggestedName?: string): Promise<string> {
+  const { projectName } = await prompt([
+    {
+      name: "projectName",
+      message: "Enter the name of your new project",
+      filter: sanitizeProjectName,
+      default: suggestedName || "my-project",
+      validate: validateProjectName,
+    },
+  ]);
   return projectName;
 }

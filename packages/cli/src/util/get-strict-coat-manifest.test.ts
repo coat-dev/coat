@@ -61,7 +61,12 @@ describe("util/get-strict-coat-manifest", () => {
       name: "manifest",
     };
     const result = getStrictCoatManifest(manifest);
-    expect(result).toHaveProperty("dependencies", {});
+    expect(result).toHaveProperty("dependencies", {
+      dependencies: {},
+      devDependencies: {},
+      optionalDependencies: {},
+      peerDependencies: {},
+    });
   });
 
   test(`should leave dependencies map alone if it's already an object`, () => {
@@ -78,12 +83,14 @@ describe("util/get-strict-coat-manifest", () => {
     };
     const result = getStrictCoatManifest(manifest);
     expect(result).toHaveProperty("dependencies", {
-      optionalDependencies: {
-        macro: "1.0.0",
-      },
+      dependencies: {},
       devDependencies: {
         lodash: "1.0.0",
       },
+      optionalDependencies: {
+        macro: "1.0.0",
+      },
+      peerDependencies: {},
     });
   });
 

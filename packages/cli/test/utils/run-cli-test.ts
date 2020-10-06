@@ -65,7 +65,7 @@ const defaultCoatManifest = {
 
 /**
  * Creates and prepares a temporary directory
- * for a cli integration test with the specified
+ * for a cli e2e test with the specified
  * packageJson and coatManifest and returns the path
  * to the created directory.
  * If no options are specified,
@@ -117,7 +117,7 @@ export async function prepareCliTest(
 
 /**
  * Creates and prepares a temporary directory
- * for a sync integration test with the specified
+ * for a sync e2e test with the specified
  * packageJson and coatManifest entries and runs
  * "coat sync" from the created directory.
  * If no options are specified,
@@ -131,12 +131,12 @@ export async function runSetupTest(
 ): Promise<RunCliResult> {
   const tmpDir = await prepareCliTest(options);
 
-  return runCli(["setup"], tmpDir);
+  return runCli(["setup"], { cwd: tmpDir });
 }
 
 /**
  * Creates and prepares a temporary directory
- * for a setup integration test with the specified
+ * for a setup e2e test with the specified
  * packageJson and coatManifest entries and runs
  * "coat setup" from the created directory.
  * If no options are specified,
@@ -150,5 +150,5 @@ export async function runSyncTest(
 ): Promise<RunCliResult> {
   const tmpDir = await prepareCliTest(options);
 
-  return runCli(["sync"], tmpDir);
+  return runCli(["sync"], { cwd: tmpDir });
 }

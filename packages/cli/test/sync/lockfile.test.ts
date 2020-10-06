@@ -10,7 +10,18 @@ import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
 describe("coat sync - lockfile", () => {
   describe("global", () => {
     test("should not generate lockfile if there is no need to write one", async () => {
-      const { cwd, task } = await runSyncTest();
+      const { cwd, task } = await runSyncTest({
+        coatManifest: {
+          name: "test",
+          files: [
+            {
+              file: ".gitignore",
+              content: null,
+              type: CoatManifestFileType.Text,
+            },
+          ],
+        },
+      });
 
       await task;
       await expect(
@@ -58,15 +69,27 @@ describe("coat sync - lockfile", () => {
         "utf-8"
       );
       expect(lockfileRaw).toMatchInlineSnapshot(`
-      "files:
-        - path: a.json
-        - path: b.txt
-        - path: c.txt
-        - path: folder-1/file-1.json
-        - path: folder-2/sub-folder-1/file-2.json
-      version: 1
-      "
-    `);
+        "files:
+          - once: true
+            path: .gitignore
+          - hash: >-
+              v6bfCEU3zI5CvHK4VPTEpin/6nRxdKpbtupWZHrRxXISgdXuSYoJ3P/rXSw4QXq8iDn9gHA8LrhgbGCjI2YZ8w==
+            path: a.json
+          - hash: >-
+              YtzEIVCxFq9Sxj0THGMVMM7hgRPRC3imGCQF8R92bKVMm1KS1EDdsA2HRqCyTj1BMsZm4RCkS65m1VVh0VDMZg==
+            path: b.txt
+          - hash: >-
+              YtzEIVCxFq9Sxj0THGMVMM7hgRPRC3imGCQF8R92bKVMm1KS1EDdsA2HRqCyTj1BMsZm4RCkS65m1VVh0VDMZg==
+            path: c.txt
+          - hash: >-
+              IrcZL7+2o2PjMGkyvjKOc7oUycXOkr14eRdN5oaxHsVsXbdBgutrHNJxJqAqZaJZtD9lP5TR3B25uBRaDw5rNw==
+            path: folder-1/file-1.json
+          - hash: >-
+              ioXVe7GMp+a3Q+PT1mWtLxB4opOl29lTr0zke8SgoRpBkipR3m5LZ6od36VBT39w8WwWzmVa+Pviyl8123ftHA==
+            path: folder-2/sub-folder-1/file-2.json
+        version: 1
+        "
+      `);
     });
   });
 
@@ -118,17 +141,23 @@ describe("coat sync - lockfile", () => {
         "utf-8"
       );
       expect(lockfileRaw).toMatchInlineSnapshot(`
-      "files:
-        - once: true
-          path: a.json
-        - once: true
-          path: b.json
-        - path: folder-1/c.json
-        - path: folder-1/file-1.json
-        - path: folder-2/sub-folder-1/file-2.json
-      version: 1
-      "
-    `);
+        "files:
+          - once: true
+            path: a.json
+          - once: true
+            path: b.json
+          - hash: >-
+              Qg2v+Js6RhKHE8rpPLhYFB4S8ohdDXuB1P8sMtVnhgW3CvpIdQDI5ZvpDZy0ERqb8YQWX53PiRwnRPE9yg4PQQ==
+            path: folder-1/c.json
+          - hash: >-
+              IrcZL7+2o2PjMGkyvjKOc7oUycXOkr14eRdN5oaxHsVsXbdBgutrHNJxJqAqZaJZtD9lP5TR3B25uBRaDw5rNw==
+            path: folder-1/file-1.json
+          - hash: >-
+              ioXVe7GMp+a3Q+PT1mWtLxB4opOl29lTr0zke8SgoRpBkipR3m5LZ6od36VBT39w8WwWzmVa+Pviyl8123ftHA==
+            path: folder-2/sub-folder-1/file-2.json
+        version: 1
+        "
+      `);
     });
   });
 });

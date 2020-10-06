@@ -1,11 +1,10 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { CoatManifest } from "@coat/cli/build/types/coat-manifest";
 import {
   CoatManifestFile,
   CoatManifestFileType,
-} from "@coat/cli/build/types/coat-manifest-file";
-import { CoatContext } from "@coat/cli/build/types/coat-context";
+  CoatTemplate,
+} from "@coat/cli";
 
 const filesDir = path.join(__dirname, "..", "files");
 
@@ -32,7 +31,7 @@ function getTemplateFile(
   };
 }
 
-function createTemplate(context: CoatContext): CoatManifest {
+const createTemplate: CoatTemplate = ({ coatContext }) => {
   return {
     name: "@coat/template-ts-package",
     files: [
@@ -56,7 +55,7 @@ function createTemplate(context: CoatContext): CoatManifest {
       {
         file: "README.md",
         type: CoatManifestFileType.Text,
-        content: `# ${context.coatManifest.name}`,
+        content: `# ${coatContext.coatManifest.name}`,
         once: true,
       },
 
@@ -83,7 +82,7 @@ function createTemplate(context: CoatContext): CoatManifest {
         eslint: "^7.8.1",
         "@typescript-eslint/eslint-plugin": "^4.0.1",
         "@typescript-eslint/parser": "^4.0.1",
-        "eslint-config-prettier": "6.11.0",
+        "eslint-config-prettier": "^6.11.0",
 
         // Jest
         jest: "^26.4.2",
@@ -134,12 +133,12 @@ function createTemplate(context: CoatContext): CoatManifest {
         scriptName: "test",
       },
       {
-        id: "prepare:build",
-        run: "coat run build",
+        id: "prepare-sync-and-build",
+        run: "coat sync && coat run build",
         scriptName: "prepare",
       },
     ],
   };
-}
+};
 
-module.exports = createTemplate;
+export default createTemplate;

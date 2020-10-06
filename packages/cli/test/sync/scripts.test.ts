@@ -3,12 +3,15 @@ import path from "path";
 import fsExtra from "fs-extra";
 import { runSyncTest, prepareCliTest } from "../utils/run-cli-test";
 import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
-import { PACKAGE_JSON_FILENAME } from "../../src/constants";
+import {
+  COAT_MANIFEST_FILENAME,
+  PACKAGE_JSON_FILENAME,
+} from "../../src/constants";
 import { runCli } from "../utils/run-cli";
 
 describe("coat sync - scripts", () => {
   test("should work with a template with an empty scripts entry", async () => {
-    const filePath = "file.json";
+    const filePath = "file.txt";
     const fileContent = "Hello coat\n";
     const { cwd, task } = await runSyncTest({
       coatManifest: {
@@ -99,7 +102,7 @@ describe("coat sync - scripts", () => {
       )
     );
 
-    const { task } = runCli(["sync"], cwd);
+    const { task } = runCli(["sync"], { cwd });
     await task;
 
     const packageJsonContent = await fs.readFile(
@@ -149,6 +152,103 @@ describe("coat sync - scripts", () => {
       scripts: {
         existingScript: "existing",
         newScript: "new",
+      },
+    });
+  });
+
+  test("should remove managed scripts after they are no longer managed by coat", async () => {
+    const projectName = "test-project";
+    const { cwd, task: firstSyncRun } = await runSyncTest({
+      packageJson: {
+        name: projectName,
+        scripts: {
+          existingScript: "existing",
+        },
+      },
+      coatManifest: {
+        name: projectName,
+        scripts: [
+          {
+            id: "1",
+            run: "new",
+            scriptName: "newScript",
+          },
+        ],
+      },
+    });
+    await firstSyncRun;
+
+    let packageJsonContent = await fs.readFile(
+      path.join(cwd, PACKAGE_JSON_FILENAME),
+      "utf8"
+    );
+    expect(JSON.parse(packageJsonContent)).toEqual({
+      name: projectName,
+      scripts: {
+        existingScript: "existing",
+        newScript: "new",
+      },
+    });
+
+    // Remove script entry from the coat manifest file
+    await fs.writeFile(
+      path.join(cwd, COAT_MANIFEST_FILENAME),
+      JSON.stringify({ name: projectName })
+    );
+
+    // Run sync again
+    const { task: secondSyncRun } = runCli(["sync"], { cwd });
+    await secondSyncRun;
+
+    packageJsonContent = await fs.readFile(
+      path.join(cwd, PACKAGE_JSON_FILENAME),
+      "utf8"
+    );
+    expect(JSON.parse(packageJsonContent)).toEqual({
+      name: projectName,
+      scripts: {
+        existingScript: "existing",
+      },
+    });
+  });
+
+  test("should remove scripts if they conflict with a merged parallel script from coat", async () => {
+    const projectName = "test-project";
+    const { cwd, task } = await runSyncTest({
+      packageJson: {
+        name: projectName,
+        scripts: {
+          "test:existing": "existing",
+        },
+      },
+      coatManifest: {
+        name: projectName,
+        scripts: [
+          {
+            id: "test-1",
+            run: "echo Test 1",
+            scriptName: "test",
+          },
+          {
+            id: "test-2",
+            run: "echo Test 2",
+            scriptName: "test",
+          },
+        ],
+      },
+    });
+    await task;
+
+    const packageJsonContent = await fs.readFile(
+      path.join(cwd, PACKAGE_JSON_FILENAME),
+      "utf8"
+    );
+    expect(JSON.parse(packageJsonContent)).toEqual({
+      name: projectName,
+      scripts: {
+        test: "coat run test:*",
+        "test:1": "echo Test 1",
+        "test:2": "echo Test 2",
       },
     });
   });

@@ -1,7 +1,7 @@
-import fs from "fs-extra";
 import execa from "execa";
 import ora from "ora";
 import flatten from "lodash/flatten";
+import fromPairs from "lodash/fromPairs";
 import { mergeFiles } from "./merge-files";
 import { mergeScripts } from "./merge-scripts";
 import { mergeDependencies } from "./merge-dependencies";
@@ -17,12 +17,16 @@ import isEqual from "lodash/isEqual";
 import { CoatManifestStrict } from "../types/coat-manifest";
 import { generateLockfileFiles } from "../lockfiles/generate-lockfile-files";
 import { getUnmanagedFiles } from "./get-unmanaged-files";
-import { deleteFile } from "../util/delete-file";
 import { getAllTemplates } from "../util/get-all-templates";
 import { updateLockfiles } from "../lockfiles/update-lockfiles";
 import { setup } from "../setup";
 import produce from "immer";
 import { groupFiles } from "./group-files";
+import { getDefaultFiles } from "./get-default-files";
+import { getCurrentFiles } from "./get-current-files";
+import { updateFilesOnDisk } from "./update-files-on-disk";
+import { removeUnmanagedDependencies } from "./remove-unmanaged-dependencies";
+import { getNormalizedFilePath } from "../util/get-normalized-file-path";
 
 /**
  * Generates all files from the current coat project.
@@ -47,81 +51,171 @@ export async function sync(cwd: string): Promise<void> {
   const allTemplates = getAllTemplates(context);
 
   // Merge scripts
-  const mergedScripts = mergeScripts(
+  const { scripts: mergedScripts, parallelScriptPrefixes } = mergeScripts(
     allTemplates.map((template) => template.scripts)
   );
+
+  // Get all current scripts from the project's package.json file
+  //
+  const previouslyManagedScripts = new Set(context.coatGlobalLockfile.scripts);
+  // Node.js 10 compatibility
+  // Use Object.fromEntries once Node 10 is no longer supported
+  const currentScripts = fromPairs(
+    Object.entries(context.packageJson?.scripts || {}).filter(
+      ([scriptName]) =>
+        // Filter out scripts that have been added / managed by coat.
+        // They will be re-added from mergedScripts or will be removed
+        // in case the coat manifest or its templates no longer supply
+        // a particular script
+        !previouslyManagedScripts.has(scriptName) &&
+        // Also filter out scripts that start with a script that is managed by
+        // coat and will be run in parallel. This is done in order to ensure
+        // that the scripts from coat are running as expected
+        parallelScriptPrefixes.every((prefix) => !scriptName.startsWith(prefix))
+    )
+  );
+
   const scripts = {
-    ...context.packageJson.scripts,
+    ...currentScripts,
     ...mergedScripts,
   };
 
   // Merge dependencies
+  //
   // Add current dependencies from package.json, to satisfy the
   // correct minimum required versions for potentially existing dependencies
   const currentDependencies: CoatManifestStrict["dependencies"] = {
-    ...(context.packageJson.dependencies && {
-      dependencies: context.packageJson.dependencies,
-    }),
-    ...(context.packageJson.devDependencies && {
-      devDependencies: context.packageJson.devDependencies,
-    }),
-    ...(context.packageJson.optionalDependencies && {
-      optionalDependencies: context.packageJson.optionalDependencies,
-    }),
-    ...(context.packageJson.peerDependencies && {
-      peerDependencies: context.packageJson.peerDependencies,
-    }),
+    dependencies: context.packageJson?.dependencies ?? {},
+    devDependencies: context.packageJson?.devDependencies ?? {},
+    optionalDependencies: context.packageJson?.optionalDependencies ?? {},
+    peerDependencies: context.packageJson?.peerDependencies ?? {},
   };
-  const mergedDependencies = mergeDependencies([
+
+  const templateDependencies = mergeDependencies(
+    allTemplates.map((template) => template.dependencies)
+  );
+
+  // Remove dependencies that have been previously added
+  // by coat, but are no longer a part of any template
+  const strippedCurrentDependencies = removeUnmanagedDependencies(
     currentDependencies,
-    ...allTemplates.map((template) => template.dependencies),
+    templateDependencies,
+    context
+  );
+
+  const mergedDependencies = mergeDependencies([
+    strippedCurrentDependencies,
+    templateDependencies,
   ]);
 
+  const allFiles: CoatManifestFile[] = [];
   // Add package.json file entry that can be merged and customized
-  const packageJsonFileContent = {
+  const packageJsonFileContent: PackageJson = {
     ...context.packageJson,
     ...mergedDependencies,
-    ...(Object.keys(scripts).length && { scripts }),
+    scripts,
   };
-  const packageJsonFileEntry: CoatManifestFile = {
-    type: CoatManifestFileType.Json,
-    file: PACKAGE_JSON_FILENAME,
-    content: packageJsonFileContent as JsonObject,
-  };
-  // Update package.json in context
-  // to let files access the newest version
-  context = produce(context, (draft) => {
-    draft.packageJson = packageJsonFileContent;
+
+  // Remove empty dependency and scripts properties
+  const keysToRemove = [
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+    "optionalDependencies",
+    "scripts",
+  ];
+  keysToRemove.forEach((key) => {
+    if (
+      !Object.keys(
+        (packageJsonFileContent as Record<string, Record<string, string>>)[key]
+      ).length
+    ) {
+      delete (packageJsonFileContent as Record<string, unknown>)[key];
+    }
   });
 
-  const allFiles = [
-    packageJsonFileEntry,
+  // Only add package.json to the allFiles array if it currently exists
+  // or if the contents of the file have been updated by coat
+  if (context.packageJson || !isEqual(packageJsonFileContent, {})) {
+    allFiles.push({
+      type: CoatManifestFileType.Json,
+      file: PACKAGE_JSON_FILENAME,
+      content: packageJsonFileContent as JsonObject,
+    });
+
+    // Update package.json in context
+    // to let files access the newest version
+    context = produce(context, (draft) => {
+      draft.packageJson = packageJsonFileContent;
+    });
+  }
+
+  // Add default files that are generated by coat sync
+  const defaultFiles = getDefaultFiles();
+  allFiles.push(...defaultFiles);
+
+  // Add files from all templates
+  allFiles.push(
     // Node.js 10 compatibility
     // Use Array.flatMap once Node 10 is no longer supported
-    ...flatten(allTemplates.map((template) => template.files)),
-  ];
+    ...flatten(allTemplates.map((template) => template.files))
+  );
+
   // Group files by file path
   const groupedFiles = groupFiles(allFiles, context);
 
-  // Exclude one-time files that have already been generated
-  const previouslyPlacedFiles = new Set(
-    [
-      ...context.coatGlobalLockfile.files,
-      ...context.coatLocalLockfile.files,
-    ].map((file) => file.path)
-  );
+  // Gather previously placed files to exclude one-time files
+  // that have already been generated
+  const previouslyPlacedFiles = [
+    ...context.coatGlobalLockfile.files,
+    ...context.coatLocalLockfile.files,
+  ].map((file) => file.path);
+
+  // Gather the files of which the current disk content
+  // should be retrieved to determine they need to be updated
+  const filesToRetrieve = [
+    ...Object.keys(groupedFiles),
+    ...previouslyPlacedFiles.map((relativePath) =>
+      getNormalizedFilePath(relativePath, context)
+    ),
+  ];
+
+  // Filter out duplicate file paths, since filesToRetrieve
+  // contains both the current lockfile entries and new groupedFiles
+  // keys that overlap for consecutive sync runs
+  const filesToRetrieveUnique = [...new Set(filesToRetrieve)];
+
+  // Retrieve the contents of the files
+  const currentFiles = await getCurrentFiles(filesToRetrieveUnique);
+
+  // Create a Set to easily access the generated file paths
+  // when grouping files
+  const previouslyPlacedFileSet = new Set(previouslyPlacedFiles);
 
   // Group by files that should only be placed once
   // and have already been placed in a previous run of coat sync
   const { onceAlreadyPlaced, filesToMerge } = Object.values(
     groupedFiles
   ).reduce<{
-    onceAlreadyPlaced: { [filePath: string]: CoatManifestGroupedFile };
+    onceAlreadyPlaced: {
+      [filePath: string]: CoatManifestGroupedFile & { once: true };
+    };
     filesToMerge: { [filePath: string]: CoatManifestGroupedFile };
   }>(
     (accumulator, file) => {
-      let targetProperty;
-      if (file.once && previouslyPlacedFiles.has(file.relativePath)) {
+      let targetProperty:
+        | typeof accumulator.filesToMerge
+        | typeof accumulator.onceAlreadyPlaced;
+
+      if (
+        file.once &&
+        // Check if the once file has already been placed via coat
+        // and is tracked in a lockfile
+        (previouslyPlacedFileSet.has(file.relativePath) ||
+          // Even if the file has not yet been tracked in a lockfile
+          // it should also not be placed if it already exists on the disk
+          typeof currentFiles[file.file] !== "undefined")
+      ) {
         targetProperty = accumulator.onceAlreadyPlaced;
       } else {
         targetProperty = accumulator.filesToMerge;
@@ -145,66 +239,64 @@ export async function sync(cwd: string): Promise<void> {
   const polishedFiles = polishFiles(mergedFiles, context);
 
   // Generate new coat lockfile files property from merged files
-  const lockfileCandidates = [
+  const lockFileCanditates = [
     ...Object.values(onceAlreadyPlaced),
-    ...mergedFiles,
+    ...polishedFiles,
   ];
-  const localLockfileFileEntries = lockfileCandidates.filter(
-    (file) => !!file.local
+
+  // Split lockfile candidates by local and global file entries
+  const {
+    localLockFileEntries,
+    globalLockFileEntries,
+  } = lockFileCanditates.reduce<{
+    localLockFileEntries: typeof lockFileCanditates;
+    globalLockFileEntries: typeof lockFileCanditates;
+  }>(
+    (accumulator, file) => {
+      if (file.local) {
+        accumulator.localLockFileEntries.push(file);
+      } else {
+        accumulator.globalLockFileEntries.push(file);
+      }
+      return accumulator;
+    },
+    { localLockFileEntries: [], globalLockFileEntries: [] }
   );
-  const globalLockfileFileEntries = lockfileCandidates.filter(
-    (file) => !file.local
-  );
-  const newLocalLockfileFiles = generateLockfileFiles(localLockfileFileEntries);
-  const newGlobalLockfileFiles = generateLockfileFiles(
-    globalLockfileFileEntries
-  );
+
+  const newLocalLockFiles = generateLockfileFiles(localLockFileEntries);
+  const newGlobalLockFiles = generateLockfileFiles(globalLockFileEntries);
 
   const filesToRemove = [
-    ...getUnmanagedFiles(
-      newLocalLockfileFiles,
-      context.coatLocalLockfile,
-      context
-    ),
-    ...getUnmanagedFiles(
-      newGlobalLockfileFiles,
-      context.coatGlobalLockfile,
-      context
-    ),
+    ...getUnmanagedFiles(newLocalLockFiles, context.coatLocalLockfile),
+    ...getUnmanagedFiles(newGlobalLockFiles, context.coatGlobalLockfile),
   ];
 
+  // Place or update new polished files on the disk and remove unmanaged files
+  await updateFilesOnDisk(polishedFiles, filesToRemove, currentFiles, context);
+
+  // Node.js 10 compatibility
+  // Use Object.fromEntries once Node 10 is no longer supported
+  const newLockfileDependencies = fromPairs(
+    Object.entries(
+      templateDependencies
+    ).map(([dependencyKey, dependencyEntries]) => [
+      dependencyKey,
+      Object.keys(dependencyEntries).sort(),
+    ])
+  );
+
+  const newLockfileScripts = Object.keys(mergedScripts).sort();
+
   // Update the lockfiles with the new file entries
-  //
-  // The method is kicked off immediately, to run concurrently
-  // to the file system operations
-  const updateLockfilesPromise = updateLockfiles({
-    updatedGlobalLockfile: { files: newGlobalLockfileFiles },
-    updatedLocalLockfile: { files: newLocalLockfileFiles },
+  context = await updateLockfiles({
+    updatedGlobalLockfile: {
+      files: newGlobalLockFiles,
+      dependencies: newLockfileDependencies,
+      scripts: newLockfileScripts,
+    },
+    updatedLocalLockfile: { files: newLocalLockFiles },
     context,
   });
-  updateLockfilesPromise.catch(() => {
-    // Add an empty catch block to not throw any unhandled rejection
-    // issues.
-    //
-    // The promise is still await later, therefore errors will still be
-    // propagated correctly.
-  });
-
-  // Remove files first before placing the new files to not run into a race
-  // condition where a local file has been converted to a global file,
-  // or vice versa
-  await Promise.all(
-    // Remove files that are no longer managed by coat
-    filesToRemove.map(deleteFile)
-  );
-
-  // Place new files
-  await Promise.all(
-    // Use fs.outputFile to automatically create any missing directories
-    polishedFiles.map((file) => fs.outputFile(file.file, file.content))
-  );
-
-  context = await updateLockfilesPromise;
 
   // Retrieve dependencies after merging to run npm install if they have changed
   //
@@ -213,24 +305,17 @@ export async function sync(cwd: string): Promise<void> {
   const mergedPackageJson = mergedFiles.find(
     (file) => file.relativePath === PACKAGE_JSON_FILENAME
   )?.content as PackageJson | undefined;
+
   if (mergedPackageJson) {
-    const finalDependencies = {
-      ...(mergedPackageJson.dependencies && {
-        dependencies: mergedPackageJson.dependencies,
-      }),
-      ...(mergedPackageJson.devDependencies && {
-        devDependencies: mergedPackageJson.devDependencies,
-      }),
-      ...(mergedPackageJson.optionalDependencies && {
-        optionalDependencies: mergedPackageJson.optionalDependencies,
-      }),
-      ...(mergedPackageJson.peerDependencies && {
-        peerDependencies: mergedPackageJson.peerDependencies,
-      }),
+    const finalDependencies: CoatManifestStrict["dependencies"] = {
+      dependencies: mergedPackageJson.dependencies ?? {},
+      devDependencies: mergedPackageJson.devDependencies ?? {},
+      optionalDependencies: mergedPackageJson.optionalDependencies ?? {},
+      peerDependencies: mergedPackageJson.peerDependencies ?? {},
     };
 
     if (!isEqual(finalDependencies, currentDependencies)) {
-      const installSpinner = ora("Installing dependencies").start();
+      const installSpinner = ora("Installing dependencies\n").start();
       try {
         await execa("npm", ["install"], { cwd: context.cwd });
         installSpinner.succeed();

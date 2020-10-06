@@ -27,6 +27,7 @@ export interface CoatContext {
   coatLocalLockfile: CoatLocalLockfileStrict;
   /**
    * The package json content in the root project directory
+   * or undefined if it does not exist
    */
-  packageJson: PackageJson;
+  packageJson: PackageJson | undefined;
 }

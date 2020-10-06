@@ -14,7 +14,7 @@ export async function deleteFile(filePath: string): Promise<void> {
     // error when trying to modify folder permissions.
     // See: https://github.com/streamich/memfs/issues/558
     //
-    // This block is however tested through the following integration
+    // This block is however tested through the following e2e
     // test in test/sync/delete-unmanaged-files.test.ts:
     // "should throw errors if unmanaged files cannot be accessed"
     /* istanbul ignore if */

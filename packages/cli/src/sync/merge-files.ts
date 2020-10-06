@@ -21,6 +21,7 @@ async function mergeFileContent(
     // previously, therefore target is a valid content value
     const targetContent = contentEntry as Exclude<typeof contentEntry, null>;
 
+    const mergeFunction = getMergeFunction(file);
     if (typeof targetContent === "function") {
       // If content is a function, the type of the function needs to be
       // casted since TypeScript does not understand the correlation
@@ -29,15 +30,21 @@ async function mergeFileContent(
         previous:
           | CoatManifestFileContentTypesMap[typeof file.type]
           | undefined
-          | null
+          | null,
+        merge: (
+          source:
+            | CoatManifestFileContentTypesMap[typeof file.type]
+            | undefined
+            | null,
+          target: CoatManifestFileContentTypesMap[typeof file.type]
+        ) => CoatManifestFileContentTypesMap[typeof file.type] | null
       ) =>
         | null
         | CoatManifestFileContentTypesMap[typeof file.type]
         | Promise<null | CoatManifestFileContentTypesMap[typeof file.type]>;
-      content = await targetContentFunction(content);
+      content = await targetContentFunction(content, mergeFunction);
     } else {
       // Merge based on the file type
-      const mergeFunction = getMergeFunction(file);
       content = mergeFunction(content, targetContent);
     }
   }

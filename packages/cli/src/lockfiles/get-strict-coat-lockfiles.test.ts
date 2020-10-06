@@ -47,9 +47,11 @@ describe("lockfiles/get-strict-coat-lockfiles", () => {
           {
             path: "b.json",
             once: false,
+            hash: "b.json-hash",
           },
           {
             path: "c.json",
+            hash: "c.json-hash",
           },
         ],
       };
@@ -62,10 +64,12 @@ describe("lockfiles/get-strict-coat-lockfiles", () => {
         {
           path: "b.json",
           once: false,
+          hash: "b.json-hash",
         },
         {
           path: "c.json",
           once: false,
+          hash: "c.json-hash",
         },
       ]);
     });
@@ -153,9 +157,11 @@ describe("lockfiles/get-strict-coat-lockfiles", () => {
           {
             path: "b.json",
             once: false,
+            hash: "b.json-hash",
           },
           {
             path: "c.json",
+            hash: "c.json-hash",
           },
         ],
       };
@@ -168,10 +174,12 @@ describe("lockfiles/get-strict-coat-lockfiles", () => {
         {
           path: "b.json",
           once: false,
+          hash: "b.json-hash",
         },
         {
           path: "c.json",
           once: false,
+          hash: "c.json-hash",
         },
       ]);
     });

@@ -34,9 +34,9 @@ describe("coat sync - gathering", () => {
   test("should work with local templates that are extending installed templates", async () => {
     // Template tree:
     // local-template-1
-    // -- @coat/integration-test-template-sync-1@1.0.0
+    // -- @coat/e2e-test-template-sync-1@1.0.0
     // local-template-1
-    // -- @coat/integration-test-template-sync-2@1.0.0
+    // -- @coat/e2e-test-template-sync-2@1.0.0
 
     // Retrieve a temporary directory
     const projectName = "test-project";
@@ -50,10 +50,10 @@ describe("coat sync - gathering", () => {
         name: projectName,
         version: "1.0.0",
         devDependencies: {
-          "@coat/integration-test-template-sync-1":
-            "github:coat-dev/cli-integration-tests-template#coat/integration-test-template-sync-1-v1.0.0",
-          "@coat/integration-test-template-sync-2":
-            "github:coat-dev/cli-integration-tests-template#coat/integration-test-template-sync-2-v1.0.0",
+          "@coat/e2e-test-template-sync-1":
+            "github:coat-dev/cli-e2e-tests-template#coat/e2e-test-template-sync-1-v1.0.0",
+          "@coat/e2e-test-template-sync-2":
+            "github:coat-dev/cli-e2e-tests-template#coat/e2e-test-template-sync-2-v1.0.0",
         },
       },
     });
@@ -71,7 +71,7 @@ describe("coat sync - gathering", () => {
     // Run npm install in folder
     await execa("npm", ["install"], { cwd: tmpDir });
 
-    const { task } = runCli(["sync"], tmpDir);
+    const { task } = runCli(["sync"], { cwd: tmpDir });
     await task;
 
     // Verify that files that are created by the installed templates
@@ -79,7 +79,7 @@ describe("coat sync - gathering", () => {
     const [template1File, template2File] = await Promise.all(
       templates.map((_, index) =>
         fs.readFile(
-          path.join(tmpDir, `integration-test-template-sync-${index + 1}`),
+          path.join(tmpDir, `e2e-test-template-sync-${index + 1}`),
           "utf-8"
         )
       )
@@ -90,16 +90,16 @@ describe("coat sync - gathering", () => {
 
   test("should work with nested installed templates, that require the same template in different versions", async () => {
     // Template tree:
-    // @coat/integration-test-template-sync-4@1.0.0
-    // -- @coat/integration-test-template-sync-3@1.0.0
-    // @coat/integration-test-template-sync-5@1.0.0
-    // -- @coat/integration-test-template-sync-3@2.0.0
+    // @coat/e2e-test-template-sync-4@1.0.0
+    // -- @coat/e2e-test-template@3.0.0-sync.1
+    // @coat/e2e-test-template-sync-5@1.0.0
+    // -- @coat/e2e-test-template@3.0.0-sync.2
 
     // Retrieve a temporary directory
     const projectName = "test-project";
     const templates = [
-      "@coat/integration-test-template-sync-4",
-      "@coat/integration-test-template-sync-5",
+      "@coat/e2e-test-template-sync-4",
+      "@coat/e2e-test-template-sync-5",
     ];
     const tmpDir = await prepareCliTest({
       coatManifest: {
@@ -112,8 +112,7 @@ describe("coat sync - gathering", () => {
         devDependencies: fromPairs(
           templates.map((template) => [
             template,
-            // Remove "@" from template name to form git tag
-            `github:coat-dev/cli-integration-tests-template#${template.substr(
+            `github:coat-dev/cli-e2e-tests-template#${template.substring(
               1
             )}-v1.0.0`,
           ])
@@ -124,28 +123,16 @@ describe("coat sync - gathering", () => {
     // Run npm install in folder
     await execa("npm", ["install"], { cwd: tmpDir });
 
-    const { task } = runCli(["sync"], tmpDir);
+    const { task } = runCli(["sync"], { cwd: tmpDir });
     await task;
 
     // Verify that files that are created by the installed templates
     // that the local templates are dependent on are created
     const templateFiles = await Promise.all([
-      fs.readFile(
-        path.join(tmpDir, "integration-test-template-sync-3-1.0.0"),
-        "utf-8"
-      ),
-      fs.readFile(
-        path.join(tmpDir, "integration-test-template-sync-3-2.0.0"),
-        "utf-8"
-      ),
-      fs.readFile(
-        path.join(tmpDir, "integration-test-template-sync-4"),
-        "utf-8"
-      ),
-      fs.readFile(
-        path.join(tmpDir, "integration-test-template-sync-5"),
-        "utf-8"
-      ),
+      fs.readFile(path.join(tmpDir, "e2e-test-template-sync-1.0.0"), "utf-8"),
+      fs.readFile(path.join(tmpDir, "e2e-test-template-sync-2.0.0"), "utf-8"),
+      fs.readFile(path.join(tmpDir, "e2e-test-template-sync-4"), "utf-8"),
+      fs.readFile(path.join(tmpDir, "e2e-test-template-sync-5"), "utf-8"),
     ]);
 
     templateFiles.forEach((templateFile) => {

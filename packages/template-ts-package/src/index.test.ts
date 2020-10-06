@@ -4,19 +4,25 @@ import tmp from "tmp";
 import { sync } from "@coat/cli/build/sync";
 import { gatherExtendedTemplates } from "@coat/cli/build/util/gather-extended-templates";
 import { getStrictCoatManifest } from "@coat/cli/build/util/get-strict-coat-manifest";
+import createTemplate from ".";
 
 // TODO: See #47
-// Add more thorough tests and integration tests
+// Add more thorough tests and e2e tests
 // that don't rely on coat cli internals
 
 jest.mock("@coat/cli/build/util/gather-extended-templates").mock("execa");
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const createTemplate = require(".");
+jest.spyOn(console, "log").mockImplementation(() => {
+  // Empty mock function
+});
 
 const gatherExtendedTemplatesMock = gatherExtendedTemplates as jest.Mock;
-gatherExtendedTemplatesMock.mockImplementation((context) => [
-  getStrictCoatManifest(createTemplate(context)),
+gatherExtendedTemplatesMock.mockImplementation((coatContext) => [
+  getStrictCoatManifest(
+    typeof createTemplate === "function"
+      ? createTemplate({ coatContext, config: {} })
+      : createTemplate
+  ),
 ]);
 
 describe("@coat/template-ts-package", () => {

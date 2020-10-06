@@ -8,7 +8,7 @@ describe("coat create - template resolution", () => {
   test("should resolve latest version of the template if no version specified", async () => {
     const { task, cwd } = runCli([
       "create",
-      "@coat/integration-test-template",
+      "@coat/e2e-test-template",
       defaultProjectName,
     ]);
     await task;
@@ -17,14 +17,14 @@ describe("coat create - template resolution", () => {
       "utf8"
     );
     expect(
-      JSON.parse(packageJson).devDependencies["@coat/integration-test-template"]
-    ).toBe("2.1.0");
+      JSON.parse(packageJson).devDependencies["@coat/e2e-test-template"]
+    ).toBe("2.0.0");
   });
 
   test("should resolve latest satisfying version of the template if version range is specified", async () => {
     const { task, cwd } = runCli([
       "create",
-      "@coat/integration-test-template@^1.0.0",
+      "@coat/e2e-test-template@^1.0.0",
       defaultProjectName,
     ]);
     await task;
@@ -33,14 +33,14 @@ describe("coat create - template resolution", () => {
       "utf8"
     );
     expect(
-      JSON.parse(packageJson).devDependencies["@coat/integration-test-template"]
-    ).toBe("1.0.4");
+      JSON.parse(packageJson).devDependencies["@coat/e2e-test-template"]
+    ).toBe("1.0.1");
   });
 
   test("should resolve exact version of the template if exact version is specified", async () => {
     const { task, cwd } = runCli([
       "create",
-      "@coat/integration-test-template@1.0.3",
+      "@coat/e2e-test-template@1.0.0",
       defaultProjectName,
     ]);
     await task;
@@ -49,14 +49,14 @@ describe("coat create - template resolution", () => {
       "utf8"
     );
     expect(
-      JSON.parse(packageJson).devDependencies["@coat/integration-test-template"]
-    ).toBe("1.0.3");
+      JSON.parse(packageJson).devDependencies["@coat/e2e-test-template"]
+    ).toBe("1.0.0");
   });
 
   test("should keep specific commit of the template if a GitHub commit is specified", async () => {
     const { task, cwd } = runCli([
       "create",
-      "coat-dev/cli-integration-tests-template#10797794f09b29692053190bd3c9cce2d44370d9",
+      "coat-dev/cli-e2e-tests-template#ce6dc94dbb87f5d4c297f27763621d39d55656c9",
       defaultProjectName,
     ]);
     await task;
@@ -65,9 +65,9 @@ describe("coat create - template resolution", () => {
       "utf8"
     );
     expect(
-      JSON.parse(packageJson).devDependencies["@coat/integration-test-template"]
+      JSON.parse(packageJson).devDependencies["@coat/e2e-test-template"]
     ).toBe(
-      "github:coat-dev/cli-integration-tests-template#10797794f09b29692053190bd3c9cce2d44370d9"
+      "github:coat-dev/cli-e2e-tests-template#ce6dc94dbb87f5d4c297f27763621d39d55656c9"
     );
   });
 });

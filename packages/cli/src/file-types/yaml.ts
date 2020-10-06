@@ -16,12 +16,21 @@ function polish(
   const sortedSource = JSON.parse(sortedJsonContent);
   const sortedContent = yaml.safeDump(sortedSource);
 
+  const prettier = getPrettier(context);
+
+  // Check whether prettier can already infer the parser
+  // from the current file path
+  const fileInfo = prettier.getFileInfo.sync(filePath);
+  let filePathForPrettier = filePath;
+  if (!fileInfo.inferredParser) {
+    // Add .yaml extension since prettier was not
+    // able to infer the parser automatically
+    filePathForPrettier = `${filePath}.yaml`;
+  }
+
   // Format with prettier
-  return getPrettier(context).format(sortedContent, {
-    // Add .yaml extension to infer json parser in prettier
-    // since files might have different extensions
-    // (e.g. .graphqlconfig, file.config, etc.)
-    filepath: `${filePath}.yaml`,
+  return prettier.format(sortedContent, {
+    filepath: filePathForPrettier,
   });
 }
 

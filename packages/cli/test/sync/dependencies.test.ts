@@ -3,7 +3,10 @@ import path from "path";
 import fsExtra from "fs-extra";
 import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
 import { runSyncTest, prepareCliTest } from "../utils/run-cli-test";
-import { PACKAGE_JSON_FILENAME } from "../../src/constants";
+import {
+  COAT_MANIFEST_FILENAME,
+  PACKAGE_JSON_FILENAME,
+} from "../../src/constants";
 import execa from "execa";
 import { getPackageVersion } from "../utils/get-package-version";
 import { runCli } from "../utils/run-cli";
@@ -63,25 +66,25 @@ describe("coat sync - dependencies", () => {
         name: projectName,
         dependencies: {
           dependencies: {
-            lodash: "4.0.0",
+            "no-op": "1.0.3",
           },
         },
       },
       packageJson: {
         name: projectName,
         dependencies: {
-          lodash: "3.0.0",
+          "no-op": "1.0.1",
         },
       },
     });
 
-    // Run npm install to install lodash@3.0.0 dependency
+    // Run npm install to install no-op@1.0.1 dependency
     await execa("npm", ["install"], { cwd });
 
-    const lodashVersionBefore = await getPackageVersion("lodash", cwd);
-    expect(lodashVersionBefore).toBe("3.0.0");
+    const noOpVersionBefore = await getPackageVersion("no-op", cwd);
+    expect(noOpVersionBefore).toBe("1.0.1");
 
-    const { task } = runCli(["sync"], cwd);
+    const { task } = runCli(["sync"], { cwd });
     await task;
 
     const packageJsonContent = await fs.readFile(
@@ -91,12 +94,12 @@ describe("coat sync - dependencies", () => {
     expect(JSON.parse(packageJsonContent)).toEqual({
       name: projectName,
       dependencies: {
-        lodash: "4.0.0",
+        "no-op": "1.0.3",
       },
     });
 
-    const lodashVersionAfter = await getPackageVersion("lodash", cwd);
-    expect(lodashVersionAfter).toBe("4.0.0");
+    const noOpVersionAfter = await getPackageVersion("no-op", cwd);
+    expect(noOpVersionAfter).toBe("1.0.3");
   });
 
   test.each`
@@ -243,7 +246,7 @@ describe("coat sync - dependencies", () => {
     expect(beforeStatResult.isDirectory()).toBe(true);
 
     // Run sync
-    const { task } = runCli(["sync"], cwd);
+    const { task } = runCli(["sync"], { cwd });
     await task;
 
     // Ensure that package.json is updated
@@ -369,5 +372,81 @@ describe("coat sync - dependencies", () => {
         oldPeerDependencyToOverride: localDependency8Path,
       },
     });
+  });
+
+  test("should remove dependencies after they are no longer managed by coat", async () => {
+    const projectName = "test-project";
+    const { cwd, task: firstSyncRun } = await runSyncTest({
+      coatManifest: {
+        name: projectName,
+        dependencies: {
+          dependencies: {
+            "local-dependency": localDependency1Path,
+          },
+          devDependencies: {
+            "local-dependency-dev": localDependency1Path,
+          },
+          optionalDependencies: {
+            "local-dependency-optional": localDependency1Path,
+          },
+          peerDependencies: {
+            "local-dependency-peer": localDependency1Path,
+          },
+        },
+      },
+    });
+    await firstSyncRun;
+
+    let packageJsonContent = await fs.readFile(
+      path.join(cwd, PACKAGE_JSON_FILENAME),
+      "utf8"
+    );
+    expect(JSON.parse(packageJsonContent)).toEqual({
+      name: projectName,
+      version: "1.0.0",
+      dependencies: {
+        "local-dependency": localDependency1Path,
+      },
+      devDependencies: {
+        "local-dependency-dev": localDependency1Path,
+      },
+      optionalDependencies: {
+        "local-dependency-optional": localDependency1Path,
+      },
+      peerDependencies: {
+        "local-dependency-peer": localDependency1Path,
+      },
+    });
+
+    let nodeModules = await fs.readdir(path.join(cwd, "node_modules"));
+    expect(nodeModules).toContain("local-dependency");
+    expect(nodeModules).toContain("local-dependency-dev");
+    expect(nodeModules).toContain("local-dependency-optional");
+    expect(nodeModules).not.toContain("local-dependency-peer");
+
+    // Update coat manifest to remove all dependency entries again
+    await fs.writeFile(
+      path.join(cwd, COAT_MANIFEST_FILENAME),
+      JSON.stringify({ name: "test" })
+    );
+
+    // Run coat sync again
+    const { task: secondSyncRun } = runCli(["sync"], { cwd });
+    await secondSyncRun;
+
+    packageJsonContent = await fs.readFile(
+      path.join(cwd, PACKAGE_JSON_FILENAME),
+      "utf8"
+    );
+    expect(JSON.parse(packageJsonContent)).toEqual({
+      name: projectName,
+      version: "1.0.0",
+    });
+
+    nodeModules = await fs.readdir(path.join(cwd, "node_modules"));
+    expect(nodeModules).not.toContain("local-dependency");
+    expect(nodeModules).not.toContain("local-dependency-dev");
+    expect(nodeModules).not.toContain("local-dependency-optional");
+    expect(nodeModules).not.toContain("local-dependency-peer");
   });
 });

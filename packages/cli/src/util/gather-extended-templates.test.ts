@@ -22,12 +22,22 @@ resolveFromMock.mockImplementation(
   (cwd, template) => `${cwd}/${template}/index.js`
 );
 
+type CoatStrictTemplate = CoatManifestStrict | (() => CoatManifestStrict);
+
 const testExtendedTemplates: {
-  [template: string]: CoatManifestStrict | (() => CoatManifestStrict);
+  [template: string]:
+    | CoatStrictTemplate
+    | { default: CoatStrictTemplate; __esModule: { value: true } };
 } = {
   [`${testCwd}/template`]: getStrictCoatManifest({
     name: "template",
   }),
+  [`${testCwd}/template-es6`]: {
+    default: getStrictCoatManifest({
+      name: "template",
+    }),
+    __esModule: { value: true },
+  },
   [`${testCwd}/template-fn-result`]: getStrictCoatManifest({
     name: "template-fn",
   }),
@@ -45,7 +55,11 @@ const testExtendedTemplates: {
   // nested-3 (obj): (no extended template)
   [`${testCwd}/nested`]: getStrictCoatManifest({
     name: "nested",
-    extends: ["nested-1", "nested-2", "nested-3"],
+    extends: [
+      "nested-1",
+      ["nested-2", { nested2: "config-value" }],
+      "nested-3",
+    ],
   }),
   [`${testCwd}/nested/nested-1`]: getStrictCoatManifest({
     name: "nested-1",
@@ -75,7 +89,7 @@ const testExtendedTemplates: {
   ),
   [`${testCwd}/nested/nested-2/nested-2-A-result`]: getStrictCoatManifest({
     name: "nested-2-A",
-    extends: ["nested-2-A-1", "nested-2-A-2"],
+    extends: ["nested-2-A-1", ["nested-2-A-2", { nested2A2: "config-value" }]],
   }),
   [`${testCwd}/nested/nested-2/nested-2-A`]: jest.fn<CoatManifestStrict, []>(
     () =>
@@ -157,6 +171,28 @@ describe("sync/gather-extended-templates", () => {
     expect(templates).toEqual([testExtendedTemplates[`${testCwd}/template`]]);
   });
 
+  test("should retrieve a template that is using a es6 module default export", () => {
+    const coatContext: CoatContext = {
+      cwd: testCwd,
+      coatManifest: getStrictCoatManifest({
+        name: "testManifest",
+        extends: ["template-es6"],
+      }),
+      packageJson: {},
+      coatGlobalLockfile: getStrictCoatGlobalLockfile({
+        version: COAT_GLOBAL_LOCKFILE_VERSION,
+      }),
+      coatLocalLockfile: getStrictCoatLocalLockfile({
+        version: COAT_LOCAL_LOCKFILE_VERSION,
+      }),
+    };
+    const templates = gatherExtendedTemplates(coatContext);
+    const expectedTemplate = testExtendedTemplates[
+      `${testCwd}/template-es6`
+    ] as { default: CoatStrictTemplate };
+    expect(templates).toEqual([expectedTemplate.default]);
+  });
+
   test("should retrieve a single extended template exporting a function", () => {
     const coatContext: CoatContext = {
       cwd: testCwd,
@@ -201,7 +237,7 @@ describe("sync/gather-extended-templates", () => {
     ).toHaveBeenCalledTimes(1);
     expect(
       testExtendedTemplates[`${testCwd}/template-fn`]
-    ).toHaveBeenCalledWith(coatContext);
+    ).toHaveBeenCalledWith({ coatContext, config: {} });
   });
 
   test("should resolve nested templates from their own directory to allow for multiple versions of a specific template", () => {
@@ -246,7 +282,7 @@ describe("sync/gather-extended-templates", () => {
     expect(templates).toEqual(templateResults);
   });
 
-  test("should call nested templates that export a function with the coat context", () => {
+  test("should call nested templates that export a function with the coat context and the requested template config", () => {
     const coatContext: CoatContext = {
       cwd: testCwd,
       coatManifest: getStrictCoatManifest({
@@ -269,21 +305,24 @@ describe("sync/gather-extended-templates", () => {
     ).toHaveBeenCalledTimes(1);
     expect(
       testExtendedTemplates[`${testCwd}/nested/nested-1/nested-1-A`]
-    ).toHaveBeenCalledWith(coatContext);
+    ).toHaveBeenCalledWith({ coatContext, config: {} });
 
     expect(
       testExtendedTemplates[`${testCwd}/nested/nested-2`]
     ).toHaveBeenCalledTimes(1);
     expect(
       testExtendedTemplates[`${testCwd}/nested/nested-2`]
-    ).toHaveBeenCalledWith(coatContext);
+    ).toHaveBeenCalledWith({
+      coatContext,
+      config: { nested2: "config-value" },
+    });
 
     expect(
       testExtendedTemplates[`${testCwd}/nested/nested-2/nested-2-A`]
     ).toHaveBeenCalledTimes(1);
     expect(
       testExtendedTemplates[`${testCwd}/nested/nested-2/nested-2-A`]
-    ).toHaveBeenCalledWith(coatContext);
+    ).toHaveBeenCalledWith({ coatContext, config: {} });
 
     expect(
       testExtendedTemplates[
@@ -294,6 +333,9 @@ describe("sync/gather-extended-templates", () => {
       testExtendedTemplates[
         `${testCwd}/nested/nested-2/nested-2-A/nested-2-A-2`
       ]
-    ).toHaveBeenCalledWith(coatContext);
+    ).toHaveBeenCalledWith({
+      coatContext,
+      config: { nested2A2: "config-value" },
+    });
   });
 });

@@ -43,7 +43,7 @@ function stripTasks<
  * @param localTasks Local tasks that are part of the current coat project
  * @param context The context of the current coat project
  */
-export async function removeUnamangedTasksFromLockfiles(
+export async function removeUnmanagedTasksFromLockfiles(
   globalTasks: CoatManifestTaskStrict[],
   localTasks: CoatManifestTaskStrict[],
   context: CoatContext

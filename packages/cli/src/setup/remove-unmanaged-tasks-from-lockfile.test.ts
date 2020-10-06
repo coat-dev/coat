@@ -10,7 +10,7 @@ import {
 } from "../lockfiles/get-strict-coat-lockfiles";
 import { CoatContext } from "../types/coat-context";
 import { getStrictCoatManifest } from "../util/get-strict-coat-manifest";
-import { removeUnamangedTasksFromLockfiles } from "./remove-unmanaged-tasks-from-lockfile";
+import { removeUnmanagedTasksFromLockfiles } from "./remove-unmanaged-tasks-from-lockfile";
 import { CoatTaskType } from "../types/coat-manifest-tasks";
 
 jest.mock("fs");
@@ -44,7 +44,7 @@ describe("setup/remove-unmanaged-tasks-from-lockfile", () => {
   };
 
   test("should work without passing empty local and global tasks", async () => {
-    const newContext = await removeUnamangedTasksFromLockfiles(
+    const newContext = await removeUnmanagedTasksFromLockfiles(
       [],
       [],
       testContext
@@ -53,6 +53,13 @@ describe("setup/remove-unmanaged-tasks-from-lockfile", () => {
       version: COAT_GLOBAL_LOCKFILE_VERSION,
       setup: {},
       files: [],
+      scripts: [],
+      dependencies: {
+        dependencies: [],
+        devDependencies: [],
+        peerDependencies: [],
+        optionalDependencies: [],
+      },
     });
     expect(newContext.coatLocalLockfile).toEqual({
       version: COAT_LOCAL_LOCKFILE_VERSION,
@@ -62,7 +69,7 @@ describe("setup/remove-unmanaged-tasks-from-lockfile", () => {
   });
 
   test("should work with only passing local tasks", async () => {
-    const newContext = await removeUnamangedTasksFromLockfiles(
+    const newContext = await removeUnmanagedTasksFromLockfiles(
       [],
       [
         {
@@ -77,6 +84,13 @@ describe("setup/remove-unmanaged-tasks-from-lockfile", () => {
       version: COAT_GLOBAL_LOCKFILE_VERSION,
       setup: {},
       files: [],
+      scripts: [],
+      dependencies: {
+        dependencies: [],
+        devDependencies: [],
+        peerDependencies: [],
+        optionalDependencies: [],
+      },
     });
     expect(newContext.coatLocalLockfile).toEqual({
       version: COAT_LOCAL_LOCKFILE_VERSION,
@@ -90,7 +104,7 @@ describe("setup/remove-unmanaged-tasks-from-lockfile", () => {
   });
 
   test("should work with only passing global tasks", async () => {
-    const newContext = await removeUnamangedTasksFromLockfiles(
+    const newContext = await removeUnmanagedTasksFromLockfiles(
       [
         {
           id: "oldGlobalTask",
@@ -109,6 +123,13 @@ describe("setup/remove-unmanaged-tasks-from-lockfile", () => {
         },
       },
       files: [],
+      scripts: [],
+      dependencies: {
+        dependencies: [],
+        devDependencies: [],
+        peerDependencies: [],
+        optionalDependencies: [],
+      },
     });
     expect(newContext.coatLocalLockfile).toEqual({
       version: COAT_LOCAL_LOCKFILE_VERSION,
@@ -119,7 +140,7 @@ describe("setup/remove-unmanaged-tasks-from-lockfile", () => {
 
   test("should not modify input context", async () => {
     const testContextCopy = JSON.parse(JSON.stringify(testContext));
-    await removeUnamangedTasksFromLockfiles([], [], testContext);
+    await removeUnmanagedTasksFromLockfiles([], [], testContext);
     expect(testContextCopy).toEqual(testContext);
   });
 });

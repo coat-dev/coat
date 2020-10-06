@@ -10,6 +10,7 @@ import {
   COAT_GLOBAL_LOCKFILE_PATH,
   COAT_LOCAL_LOCKFILE_PATH,
 } from "../constants";
+import { getFileHash } from "../util/get-file-hash";
 
 jest.mock("fs");
 
@@ -24,7 +25,14 @@ describe("lockfiles/get-coat-lockfiles", () => {
       await expect(getCoatGlobalLockfile(testCwd)).resolves
         .toMatchInlineSnapshot(`
               Object {
+                "dependencies": Object {
+                  "dependencies": Array [],
+                  "devDependencies": Array [],
+                  "optionalDependencies": Array [],
+                  "peerDependencies": Array [],
+                },
                 "files": Array [],
+                "scripts": Array [],
                 "setup": Object {},
                 "version": 1,
               }
@@ -37,6 +45,7 @@ describe("lockfiles/get-coat-lockfiles", () => {
         files: [
           {
             path: "a.json",
+            hash: getFileHash(""),
           },
         ],
       };
@@ -49,12 +58,20 @@ describe("lockfiles/get-coat-lockfiles", () => {
       await expect(getCoatGlobalLockfile(testCwd)).resolves
         .toMatchInlineSnapshot(`
               Object {
+                "dependencies": Object {
+                  "dependencies": Array [],
+                  "devDependencies": Array [],
+                  "optionalDependencies": Array [],
+                  "peerDependencies": Array [],
+                },
                 "files": Array [
                   Object {
+                    "hash": "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
                     "once": false,
                     "path": "a.json",
                   },
                 ],
+                "scripts": Array [],
                 "setup": Object {},
                 "version": 1,
               }
@@ -101,6 +118,7 @@ describe("lockfiles/get-coat-lockfiles", () => {
         files: [
           {
             path: "a.json",
+            hash: getFileHash(""),
           },
         ],
       };
@@ -115,6 +133,7 @@ describe("lockfiles/get-coat-lockfiles", () => {
               Object {
                 "files": Array [
                   Object {
+                    "hash": "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
                     "once": false,
                     "path": "a.json",
                   },

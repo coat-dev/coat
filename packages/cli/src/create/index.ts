@@ -1,8 +1,9 @@
-import { promises as fs } from "fs";
-import fsExtra from "fs-extra";
+import fs from "fs-extra";
 import path from "path";
 import execa from "execa";
 import ora from "ora";
+import chalk from "chalk";
+import { PackageJson } from "type-fest";
 import { sync } from "../sync";
 import { getProjectName } from "./get-project-name";
 import { getTemplateInfo } from "./get-template-info";
@@ -12,81 +13,161 @@ import {
   COAT_MANIFEST_FILENAME,
 } from "../constants";
 import { polish as jsonPolish } from "../file-types/json";
+import { addInitialCommit } from "./add-initial-commit";
+import {
+  printCreateCustomizationHelp,
+  printCreateHeader,
+} from "./print-create-messages";
 
 /**
  * Creates and generates a new coat project.
  *
  * @param template The template that should be used for the new project
- * @param projectNameInput The optional project name that has been provided
  * @param directoryInput The optional path to the directory that should be used
+ * @param projectNameInput The optional project name that has been provided
  */
 export async function create(
   template: string,
-  projectNameInput?: string,
-  directoryInput?: string
+  directoryInputUnsanitized?: string,
+  projectNameInputUnsanitized?: string
 ): Promise<void> {
-  const projectName = await getProjectName(projectNameInput);
+  // Prints the coat logo and header
+  printCreateHeader();
 
-  // Use the directoryInput from the cli argument or the project name if
-  // no cli argument has been specified. Since the project name could contain
-  // slashes which would lead to nested folders on Linux & macOS only
-  // the trailing part of the project name should be used if it contains a slash.
-  //
-  // The cli argument from directoryInput is allowed to include path separators,
-  // to enable more flexibility and the creation of projects in absolute paths,
-  // inside nested folders or outside the current root directory.
-  let targetDirectoryIsInferred: boolean;
-  let targetDirectory: string;
-  if (directoryInput) {
-    targetDirectoryIsInferred = false;
-    targetDirectory = directoryInput;
+  const directoryInput = directoryInputUnsanitized?.trim();
+  const projectNameInput = projectNameInputUnsanitized?.trim();
+
+  // Resolve the target directory and project name for the new coat project
+  // from the cli arguments if they are available
+  let targetCwd: string;
+  let projectName: string;
+
+  if (!directoryInput) {
+    // No input for the target directory has been provided,
+    // therefore the user should be prompted for a project name that
+    // will be used as the target directory.
+    //
+    // The projectNameInput argument will be ignored, since it could have
+    // only been passed via an edge case, e.g. when running
+    // `coat create template "" my-project` which should not be supported.
+    projectName = await getProjectName();
+
+    // The project name should be used as the target directory in the current
+    // working directory
+    targetCwd = path.join(process.cwd(), projectName);
   } else {
-    targetDirectoryIsInferred = true;
-    targetDirectory = projectName.split("/").pop() as string;
+    if (path.isAbsolute(directoryInput)) {
+      // If the directory input is a valid absolute path, it should be used directly
+      targetCwd = directoryInput;
+    } else {
+      // Otherwise, the directory input should be treated as a relative path
+      // to the current working directory
+      targetCwd = path.join(process.cwd(), directoryInput);
+    }
+
+    if (projectNameInput) {
+      projectName = projectNameInput;
+    } else {
+      // Retrieve the trailing folder name of the target directory to use it
+      // as the project name
+      const suggestedProjectName = path.basename(targetCwd);
+      if (suggestedProjectName === directoryInput) {
+        // If the suggested project name matches the directory input argument
+        // it should be used directly without prompting the user.
+        //
+        // This should be the most common scenario where create is run like
+        // `coat create template my-project`
+        // where both the directoryInput and suggested project name are "my-project"
+        projectName = suggestedProjectName;
+      } else {
+        // If the suggested project name does not directly match the directory input,
+        // the user should be prompted for a project name and with the trailing folder
+        // name as the suggestion.
+        //
+        // This will likely be a scenario where the user calls coat create like:
+        // (process.cwd = /usr/source/some-project)
+        // `coat create template .`
+        // -> suggested project name will be some-project
+        projectName = await getProjectName(suggestedProjectName);
+      }
+    }
   }
 
-  // Create the directory/directories if necessary
-  await fs.mkdir(targetDirectory, { recursive: true });
+  // Check if a coat manifest file already exists in the project
+  let coatManifestExists = false;
+  try {
+    await fs.readFile(path.join(targetCwd, COAT_MANIFEST_FILENAME));
+    // If this line is reached the coat manifest file already exists
+    coatManifestExists = true;
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      // If the error is not due to a missing file, but e.g. due
+      // to missing permissions it should be thrown to the user
+      throw error;
+    }
+    // The coat manifest file does not exist in the target directory
+  }
 
-  // Check and throw an error if the target directory already contains any files.
-  // This is in order to prevent accidental file loss and overwrites of any existing
-  // files. In the future, a cli option could be provided to `coat create` which
-  // ignores existing files in the target directory and continues without throwing
-  // an error
-  const directoryEntries = await fs.readdir(targetDirectory);
-  if (directoryEntries.length) {
-    throw new Error(
-      "Warning! The specified target diretory is not empty. Aborting to prevent accidental file loss or override."
+  if (coatManifestExists) {
+    console.error(
+      `A coat manifest file already exists in the target directory.\n\nPlease install the template manually via npm and add the name of the template to the existing coat manifest file.`
     );
+    throw new Error("coat manifest file already exists");
   }
 
-  const packageJson = {
-    name: projectName,
-    version: "1.0.0",
-  };
-  // Create the package.json file inside the
-  // target directory.
-  await fs.writeFile(
-    path.join(targetDirectory, PACKAGE_JSON_FILENAME),
-    // package.json does not need to be styled, since npm
-    // will alter and format it while installing dependencies
-    JSON.stringify(packageJson)
+  // Check if a package.json file already exists
+  // in the target directory, otherwise create it
+  let previousPackageJson: PackageJson | undefined;
+  try {
+    const previousPackageJsonRaw = await fs.readFile(
+      path.join(targetCwd, PACKAGE_JSON_FILENAME),
+      "utf-8"
+    );
+    previousPackageJson = JSON.parse(previousPackageJsonRaw);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      // If the error is not due to a missing file, but e.g. due
+      // to missing permissions it should be thrown to the user
+      throw error;
+    }
+    // package.json does not exit in the target directory
+  }
+
+  if (!previousPackageJson) {
+    const packageJson = {
+      name: projectName,
+      version: "1.0.0",
+    };
+    // Create the package.json file inside the
+    // target directory.
+    await fs.outputFile(
+      path.join(targetCwd, PACKAGE_JSON_FILENAME),
+      // package.json does not need to be styled, since npm
+      // will alter and format it while installing dependencies
+      JSON.stringify(packageJson)
+    );
+
+    previousPackageJson = packageJson;
+  }
+
+  console.log(
+    "\nCreating a new %s project in %s\n",
+    chalk.cyan("coat"),
+    chalk.green(targetCwd)
   );
 
-  let targetCwd: string;
-  if (path.isAbsolute(targetDirectory)) {
-    targetCwd = targetDirectory;
-  } else {
-    targetCwd = path.join(process.cwd(), targetDirectory);
-  }
+  // Print getting started guidance for customization
+  printCreateCustomizationHelp();
+
+  console.log(
+    "%s will install the project template and its dependencies into the project directory.\nThis might take a couple of minutes.\n",
+    chalk.cyan("coat")
+  );
 
   const installSpinner = ora(
-    "Installing template into project directory"
+    "Installing template into project directory\n"
   ).start();
   try {
-    // Initialize a git repository in the target directory
-    await execa("git", ["init"], { cwd: targetCwd });
-
     // Run npm install to install the template and its dependencies
     await execa("npm", ["install", "--save-exact", "--save-dev", template], {
       cwd: targetCwd,
@@ -94,10 +175,21 @@ export async function create(
 
     // Templates should have a peerDependency on @coat/cli which could
     // differ from the version which is currently being run.
+    //
     // In order to run setup and sync with the correct @coat/cli version
     // peerDependencies of the template should be retrieved and installed
-    // as devDependencies in the project
-    const templateInfo = await getTemplateInfo(targetCwd);
+    // as devDependencies in the project.
+    //
+    // In addition to the peerDependencies, the templateInfo is also required
+    // to get the resolves template name, since the template string that has
+    // been passed to coat could also be a local file path,
+    // GitHub URL or npm tag
+    const templateInfo = await getTemplateInfo(
+      targetCwd,
+      previousPackageJson,
+      template,
+      installSpinner
+    );
     const peerDependenciesEntries = Object.entries(
       templateInfo.peerDependencies || {}
     );
@@ -120,35 +212,11 @@ export async function create(
       extends: templateInfo.name,
     };
     await fs.writeFile(
-      path.join(targetDirectory, COAT_MANIFEST_FILENAME),
+      path.join(targetCwd, COAT_MANIFEST_FILENAME),
       jsonPolish(coatManifest, COAT_MANIFEST_FILENAME)
     );
   } catch (error) {
     installSpinner.fail();
-    // Remove created project files and the created directory to enable the user
-    // to easily re-run the coat create command again in case
-    // this was a network issue or it should be re-run with fixed
-    // arguments.
-    //
-    // The target directory will only be removed in case it has been
-    // inferred from the project name, if it has been supplied
-    // by the user it is not removed since it might lead to data loss
-    // depending on the provided path. (e.g. when specifying ../a/b/c or
-    // an absolute path as the target directory it should be up to the
-    // user to decide what happens with intermediate directories which might
-    // have been created
-    if (targetDirectoryIsInferred) {
-      await fsExtra.remove(targetCwd);
-    } else {
-      // If the target directory has been specified from the user
-      // it should still be cleaned out to allow the user to run
-      // coat create again without throwing an error due to
-      // existing files in the target directory.
-      // This operation is safe until the check for existing files
-      // above is in place. In case that check gets removed, cleaning
-      // out the target directory should be re-evaluated.
-      await fsExtra.emptyDir(targetCwd);
-    }
 
     // Re-throw error to provide feedback to the user
     throw error;
@@ -169,7 +237,8 @@ export async function create(
     const localCoatVersion = localCoatVersionTask.stdout;
     if (localCoatVersion !== COAT_CLI_VERSION) {
       console.log(
-        "Running coat setup and coat sync with @coat/cli version %s",
+        "Running %s with @coat/cli version %s\n",
+        chalk.cyan("coat sync"),
         localCoatVersion
       );
     }
@@ -186,4 +255,29 @@ export async function create(
     // setup will be triggered implicitly via sync
     await sync(targetCwd);
   }
+
+  // Initialize a git repository and add an initial commit
+  // if the project was not created in an existing git repository
+  await addInitialCommit(targetCwd);
+
+  console.log(
+    "🎊 Your new %s project has been successfully created! 🎊\n",
+    chalk.cyan("coat")
+  );
+
+  const relativePath = path.relative(process.cwd(), targetCwd);
+  // Only log if relativePath exists, i.e. the user is in a different
+  // directory than the project target directory
+  if (relativePath) {
+    console.log(
+      "Get started by changing into your project folder: %s",
+      chalk.cyan(`cd ${relativePath}`)
+    );
+  }
+
+  console.log(
+    "You can ensure your generated files are up to date by running: %s\n",
+    chalk.cyan("coat sync")
+  );
+  console.log("⚡️ Happy hacking! ⚡️\n");
 }

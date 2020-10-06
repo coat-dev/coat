@@ -6,6 +6,8 @@ import {
   CoatManifestFileType,
   CoatManifestFileContentTypesMap,
 } from "../../src/types/coat-manifest-file";
+import stripAnsi from "strip-ansi";
+import { PACKAGE_JSON_FILENAME } from "../../src/constants";
 
 describe("coat sync - files", () => {
   const testPackagesPath = path.join(__dirname, "..", "utils", "test-packages");
@@ -17,7 +19,13 @@ describe("coat sync - files", () => {
         files: [],
       },
     });
-    await task;
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        UPDATED  package.json
+      "
+    `);
   });
 
   test("should merge a file from multiple stages", async () => {
@@ -31,17 +39,28 @@ describe("coat sync - files", () => {
         ].map((templateName) => path.join(testPackagesPath, templateName)),
       },
     });
-    await task;
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  a.json
+        CREATED  b.txt
+        CREATED  c.txt
+        UPDATED  package.json
+      "
+    `);
 
-    const [folderContent, aJson, bTxt, cTxt] = await Promise.all([
+    const [folderContent, aJson, bTxt, cTxt, gitignore] = await Promise.all([
       fs.readdir(cwd),
       fs.readFile(path.join(cwd, "a.json"), "utf8"),
       fs.readFile(path.join(cwd, "b.txt"), "utf8"),
       fs.readFile(path.join(cwd, "c.txt"), "utf8"),
+      fs.readFile(path.join(cwd, ".gitignore"), "utf8"),
     ]);
 
     expect(folderContent).toMatchInlineSnapshot(`
       Array [
+        ".gitignore",
         "a.json",
         "b.txt",
         "c.txt",
@@ -71,6 +90,14 @@ describe("coat sync - files", () => {
       "Text from local-files-3
       "
     `);
+
+    expect(gitignore).toMatchInlineSnapshot(`
+      "node_modules
+
+      # coat local files
+      /.coat
+      "
+    `);
   });
 
   test("should merge from multiple stages with null in-between", async () => {
@@ -85,7 +112,16 @@ describe("coat sync - files", () => {
         ].map((templateName) => path.join(testPackagesPath, templateName)),
       },
     });
-    await task;
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  a.json
+        CREATED  b.txt
+        CREATED  c.txt
+        UPDATED  package.json
+      "
+    `);
 
     const aJson = await fs.readFile(path.join(cwd, "a.json"), "utf8");
     expect(JSON.parse(aJson)).toMatchInlineSnapshot(`
@@ -127,8 +163,17 @@ describe("coat sync - files", () => {
       ),
     ]);
 
-    const { task } = runCli(["sync"], cwd);
-    await task;
+    const { task } = runCli(["sync"], { cwd });
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  a.json
+        CREATED  b.txt
+        CREATED  c.txt
+        UPDATED  package.json
+      "
+    `);
 
     const [aJson, bTxt] = await Promise.all([
       fs.readFile(path.join(cwd, "a.json"), "utf8"),
@@ -182,8 +227,17 @@ describe("coat sync - files", () => {
       ),
     ]);
 
-    const { task } = runCli(["sync"], cwd);
-    await task;
+    const { task } = runCli(["sync"], { cwd });
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  a.json
+        CREATED  b.txt
+        CREATED  c.txt
+        UPDATED  package.json
+      "
+    `);
 
     const [aJson, bTxt] = await Promise.all([
       fs.readFile(path.join(cwd, "a.json"), "utf8"),
@@ -193,7 +247,7 @@ describe("coat sync - files", () => {
     expect(JSON.parse(aJson)).toMatchInlineSnapshot(`
       Object {
         "arrayProperty": Array [
-          "a",
+          null,
           "d",
         ],
         "firstProperty": Object {
@@ -233,8 +287,16 @@ describe("coat sync - files", () => {
       path.join(cwd, "a.json-custom.js")
     );
 
-    const { task } = runCli(["sync"], cwd);
-    await task;
+    const { task } = runCli(["sync"], { cwd });
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  b.txt
+        CREATED  c.txt
+        UPDATED  package.json
+      "
+    `);
 
     await expect(() =>
       fs.readFile(path.join(cwd, "a.json"), "utf8")
@@ -300,7 +362,17 @@ describe("coat sync - files", () => {
         ],
       },
     });
-    await task;
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  a.json
+        CREATED  b.txt
+        CREATED  c.txt
+        CREATED  d.yaml
+        UPDATED  package.json
+      "
+    `);
 
     const [aJson, bTxt, cTxt, dYaml] = await Promise.all([
       fs.readFile(path.join(cwd, "a.json"), "utf8"),
@@ -375,7 +447,15 @@ describe("coat sync - files", () => {
         ),
       },
     });
-    await firstSyncRun;
+    const firstSyncResult = await firstSyncRun;
+    expect(stripAnsi(firstSyncResult.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  a.json
+        CREATED  b.json
+        UPDATED  package.json
+      "
+    `);
 
     // Modify files
     await Promise.all([
@@ -390,8 +470,13 @@ describe("coat sync - files", () => {
     ]);
 
     // Run sync again to verify that files will not be changed
-    const { task: secondSyncRun } = runCli(["sync"], cwd);
-    await secondSyncRun;
+    const { task: secondSyncRun } = runCli(["sync"], { cwd });
+    const secondSyncResult = await secondSyncRun;
+    expect(stripAnsi(secondSyncResult.stdout)).toMatchInlineSnapshot(`
+      "
+      ♻️  Everything up to date️
+      "
+    `);
 
     // Read files
     const [aRaw, bRaw] = await Promise.all([
@@ -409,6 +494,90 @@ describe("coat sync - files", () => {
         "modifiedLocal": true,
       }
     `);
+  });
+
+  test("should not touch files that have existed before in the project", async () => {
+    const cwd = await prepareCliTest({
+      coatManifest: {
+        name: "test",
+        extends: ["local-files-6", "local-files-7"].map((template) =>
+          path.join(testPackagesPath, template)
+        ),
+      },
+    });
+
+    // Place once files before syncing
+    await Promise.all([
+      fs.writeFile(
+        path.join(cwd, "a.json"),
+        JSON.stringify({ globalBeforeSync: true })
+      ),
+      fs.writeFile(
+        path.join(cwd, "b.json"),
+        JSON.stringify({ localBeforeSync: true })
+      ),
+    ]);
+
+    // Run sync
+    const { task } = runCli(["sync"], { cwd });
+    await task;
+
+    // Read files
+    const [aRaw, bRaw] = await Promise.all([
+      fs.readFile(path.join(cwd, "a.json"), "utf-8"),
+      fs.readFile(path.join(cwd, "b.json"), "utf-8"),
+    ]);
+    expect(JSON.parse(aRaw)).toMatchInlineSnapshot(`
+      Object {
+        "globalBeforeSync": true,
+      }
+    `);
+
+    expect(JSON.parse(bRaw)).toMatchInlineSnapshot(`
+      Object {
+        "localBeforeSync": true,
+      }
+    `);
+  });
+
+  test("should generate a package.json file if it did not exist before but package.json properties were added by the project", async () => {
+    const cwd = await prepareCliTest({
+      coatManifest: {
+        name: "test",
+        scripts: [
+          {
+            id: "test",
+            run: "echo test",
+            scriptName: "test",
+          },
+        ],
+      },
+    });
+
+    // Remove the package.json file that has been placed by default
+    await fs.unlink(path.join(cwd, PACKAGE_JSON_FILENAME));
+
+    // Run sync
+    const { task } = runCli(["sync"], { cwd });
+    const result = await task;
+    expect(stripAnsi(result.stdout)).toMatchInlineSnapshot(`
+      "
+        CREATED  .gitignore
+        CREATED  package.json
+      "
+    `);
+
+    const packageJsonRaw = await fs.readFile(
+      path.join(cwd, PACKAGE_JSON_FILENAME),
+      "utf-8"
+    );
+    const packageJson = JSON.parse(packageJsonRaw);
+
+    expect(packageJson).toEqual({
+      scripts: {
+        test: "echo test",
+      },
+    });
   });
 
   // Add once JavaScript files are added or JSON formatting is

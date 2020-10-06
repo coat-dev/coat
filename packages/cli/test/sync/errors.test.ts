@@ -15,7 +15,7 @@ describe("coat sync - errors", () => {
     // Delete coat manifest file
     await fs.unlink(path.join(tmpDir, COAT_MANIFEST_FILENAME));
 
-    const { task } = runCli(["sync"], tmpDir);
+    const { task } = runCli(["sync"], { cwd: tmpDir });
     try {
       await task;
       throw new Error("This error should not be reached. Task should throw");
@@ -24,23 +24,6 @@ describe("coat sync - errors", () => {
         error.stderr.includes("Error: ENOENT: no such file or directory,")
       ).toBe(true);
       expect(error.stderr.includes("coat.json")).toBe(true);
-    }
-  });
-
-  test("should throw an error if package.json is missing", async () => {
-    const tmpDir = await prepareCliTest();
-    // Delete package.json
-    await fs.unlink(path.join(tmpDir, PACKAGE_JSON_FILENAME));
-
-    const { task } = runCli(["sync"], tmpDir);
-    try {
-      await task;
-      throw new Error("This error should not be reached. Task should throw");
-    } catch (error) {
-      expect(
-        error.stderr.includes("Error: ENOENT: no such file or directory,")
-      ).toBe(true);
-      expect(error.stderr.includes("package.json")).toBe(true);
     }
   });
 
@@ -97,7 +80,7 @@ describe("coat sync - errors", () => {
       // Remove coat.json read permissions
       await fs.chmod(path.join(tmpDir, COAT_MANIFEST_FILENAME), "222");
 
-      const { task } = runCli(["sync"], tmpDir);
+      const { task } = runCli(["sync"], { cwd: tmpDir });
       try {
         await task;
         throw new Error("This error should not be reached. Task should throw");
@@ -117,7 +100,7 @@ describe("coat sync - errors", () => {
       // Remove package.json read permissions
       await fs.chmod(path.join(tmpDir, PACKAGE_JSON_FILENAME), "222");
 
-      const { task } = runCli(["sync"], tmpDir);
+      const { task } = runCli(["sync"], { cwd: tmpDir });
       try {
         await task;
         throw new Error("This error should not be reached. Task should throw");
@@ -131,7 +114,7 @@ describe("coat sync - errors", () => {
   );
 
   testExceptWindows(
-    "should throw error when file can't be accessed due to missing read permissions for potential customization files",
+    "should throw error when current files can't be accessed due to missing read permissions",
     async () => {
       const fileFolderName = "some-folder";
       const tmpDir = await prepareCliTest({
@@ -153,7 +136,7 @@ describe("coat sync - errors", () => {
       await fs.mkdir(fileFolderPath);
       await fs.chmod(fileFolderPath, "222");
 
-      const { task } = runCli(["sync"], tmpDir);
+      const { task } = runCli(["sync"], { cwd: tmpDir });
       try {
         await task;
         throw new Error("This error should not be reached. Task should throw");
@@ -162,7 +145,7 @@ describe("coat sync - errors", () => {
           true
         );
         expect(
-          error.stderr.includes(path.join("some-folder", "file.json-custom.js"))
+          error.stderr.includes(path.join("some-folder", "file.json"))
         ).toBe(true);
       }
     }

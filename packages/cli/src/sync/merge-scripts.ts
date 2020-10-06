@@ -15,18 +15,30 @@ import { CoatManifestStrict } from "../types/coat-manifest";
  */
 export function mergeScripts(
   scripts: CoatManifestStrict["scripts"][]
-): Record<string, string> {
+): {
+  scripts: Record<string, string>;
+  parallelScriptPrefixes: string[];
+} {
   // Group scripts by scriptName
   const groupedScripts = groupBy(flatten(scripts), "scriptName");
 
-  return Object.entries(groupedScripts).reduce<Record<string, string>>(
+  return Object.entries(groupedScripts).reduce<{
+    scripts: Record<string, string>;
+    parallelScriptPrefixes: string[];
+  }>(
     (accumulator, [scriptName, scripts]) => {
       if (scripts.length === 1) {
-        accumulator[scriptName] = scripts[0].run;
+        accumulator.scripts[scriptName] = scripts[0].run;
       } else {
         // Create sub-scripts which will be run via coat run
         const scriptIdPrefix = `${scriptName}-`;
         const scriptNamePrefix = `${scriptName}:`;
+
+        // Add scriptNamePrefix to parallelScriptPrefixes to be able to
+        // later delete potentially existing scripts from
+        // the current package.json file
+        accumulator.parallelScriptPrefixes.push(scriptNamePrefix);
+
         scripts.forEach((script) => {
           let scriptNameToUse = scriptNamePrefix;
           if (script.id.startsWith(scriptIdPrefix)) {
@@ -34,16 +46,19 @@ export function mergeScripts(
           } else {
             scriptNameToUse += script.id;
           }
-          accumulator[scriptNameToUse] = script.run;
+          accumulator.scripts[scriptNameToUse] = script.run;
         });
 
         // Merge the script by adding the coat run
         // command to run all scripts in parallel.
-        accumulator[scriptName] = `coat run ${scriptName}:*`;
+        accumulator.scripts[scriptName] = `coat run ${scriptName}:*`;
       }
       return accumulator;
       /* eslint-enable no-param-reassign */
     },
-    {}
+    {
+      scripts: {},
+      parallelScriptPrefixes: [],
+    }
   );
 }

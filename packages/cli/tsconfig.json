@@ -7,10 +7,11 @@
     "moduleResolution": "node",
     "noEmit": true,
     "noUnusedLocals": true,
+    "skipLibCheck": true,
     "noUnusedParameters": true,
     "resolveJsonModule": true,
     "strict": true,
     "target": "esnext"
   },
-  "include": ["src", "test"]
+  "exclude": ["build"]
 }
