@@ -126,10 +126,11 @@ export async function sync(cwd: string): Promise<void> {
   ];
   keysToRemove.forEach((key) => {
     if (
-      !Object.keys(packageJsonFileContent[key] as Record<string, unknown>)
-        .length
+      !Object.keys(
+        (packageJsonFileContent as Record<string, Record<string, string>>)[key]
+      ).length
     ) {
-      delete packageJsonFileContent[key];
+      delete (packageJsonFileContent as Record<string, unknown>)[key];
     }
   });
 
