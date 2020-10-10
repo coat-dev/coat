@@ -59,10 +59,10 @@ jobs:
       - name: Decrease npm retry factors on macOS
         if: matrix.os == 'macos-latest'
         run: |
-          echo "::set-env name=npm_config_fetch_retries::50"
-          echo "::set-env name=npm_config_fetch_retry_factor::2"
-          echo "::set-env name=npm_config_fetch_retry_mintimeout::50"
-          echo "::set-env name=npm_config_fetch_retry_maxtimeout::6000"
+          echo "npm_config_fetch_retries=50" >> $GITHUB_ENV
+          echo "npm_config_fetch_retry_factor=2" >> $GITHUB_ENV
+          echo "npm_config_fetch_retry_mintimeout=50" >> $GITHUB_ENV
+          echo "npm_config_fetch_retry_maxtimeout=6000" >> $GITHUB_ENV
       - name: Run all tests
         run: npm run test:all -- --ci --no-cache --runInBand --verbose
         working-directory: ./packages/cli
