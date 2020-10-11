@@ -212,8 +212,6 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
       devDependencies["@babel/core"] = "^7.11.6";
       devDependencies["@babel/preset-env"] = "^7.11.5";
       devDependencies["@babel/preset-typescript"] = "^7.10.4";
-      // Jest
-      devDependencies["babel-jest"] = "^26.3.0";
 
       // Scripts
       scripts.push(
