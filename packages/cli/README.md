@@ -96,6 +96,7 @@ For more usage information, including [customization](TODO) please check out the
 
 `coat` projects can extend one or multiple templates that specify which files should be placed and which setup tasks need to run.
 
+Adjust text here a bit it's weird
 Since this first public release of `coat` is very early to gather feedback, there is currently only one official template - a template to create and maintain a [TypeScript package](packages/template-ts-package/README.md).
 
 You can however create your own coat templates and even reference local JavaScript files in your `coat.json` manifest file. Check out the [template-ts-package](packages/template-ts-package/README.md) template to view how a coat template is structured.
