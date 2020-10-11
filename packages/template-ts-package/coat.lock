@@ -26,8 +26,8 @@ files:
       fxSZnVg1JXiEGv1w/4+1LpWhyUWeFgVRnyX8grd7X6S0JOseqVFI+GZS4O8s7QGhF0D2c/RfzdmEEbCDjdrbcw==
     path: .gitignore
   - hash: >-
-      v6k2mOMGfxAiWynQV41T6+OVgJ+7hD3aD6cU7ELcBc/hVxF6poFxWQrEfSs241+mNEemPO+r3//OzpDvimYRzg==
-    path: jest.config.js
+      My194NNHkJfUbK2noROeqy0WWRf02X52rbcepOM9IcDa99Ien9Rywh3fL9+nvliUPbLGp+tNzfsdStScIcOSCQ==
+    path: jest.config.json
   - once: true
     path: README.md
   - once: true

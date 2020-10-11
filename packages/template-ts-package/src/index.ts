@@ -63,6 +63,9 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
     getTemplateFile("shared/tsconfig.build.json", CoatManifestFileType.Json, {
       destinationPath: "tsconfig.build.json",
     }),
+    getTemplateFile("shared/jest.config.json", CoatManifestFileType.Json, {
+      destinationPath: "jest.config.json",
+    }),
 
     getTemplateFile("shared/src/index.ts", CoatManifestFileType.Text, {
       once: true,
@@ -148,14 +151,13 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
     case CompilerOption.TypeScript:
       // Files
       files.push(
-        getTemplateFile(
-          "typescript/jest.config.js",
-          CoatManifestFileType.Text,
-          {
-            destinationPath: "jest.config.js",
-          }
-        ),
-
+        {
+          file: "jest.config.json",
+          content: {
+            preset: "ts-jest",
+          },
+          type: CoatManifestFileType.Json,
+        },
         {
           file: "tsconfig.json",
           // Node.js 10 compatibility
@@ -182,9 +184,6 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
       files.push(
         getTemplateFile("babel/.babelrc", CoatManifestFileType.Json, {
           destinationPath: ".babelrc",
-        }),
-        getTemplateFile("babel/jest.config.js", CoatManifestFileType.Text, {
-          destinationPath: "jest.config.js",
         }),
 
         {

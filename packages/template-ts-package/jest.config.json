@@ -1,0 +1,9 @@
+{
+  "collectCoverage": true,
+  "collectCoverageFrom": ["src/**/*.ts"],
+  "coverageReporters": ["text"],
+  "modulePathIgnorePatterns": ["<rootDir>/build"],
+  "testEnvironment": "node",
+  "testPathIgnorePatterns": ["/node_modules/", "<rootDir>/files/"],
+  "testRunner": "jest-circus/runner"
+}

@@ -223,8 +223,8 @@ files:
       fxSZnVg1JXiEGv1w/4+1LpWhyUWeFgVRnyX8grd7X6S0JOseqVFI+GZS4O8s7QGhF0D2c/RfzdmEEbCDjdrbcw==
     path: .gitignore
   - hash: >-
-      psaZ0x/4iKWX5uGApnPHcCjUZeOGB25WKcnWa7FzaWIJwv4jDsziNHJe4qQQmNsYJrnBH5LFqqHbwFP6AXtLVQ==
-    path: jest.config.js
+      8E+XQ5ZNeu7TeSHnwg5DcC4Mu6g4DqZwDXLE/Xe7qX3Nyh3kmFYejudAhkUuvTieOeMElSuI+FmM461P6JLYug==
+    path: jest.config.json
   - once: true
     path: README.md
   - once: true
@@ -253,16 +253,16 @@ version: 1
 `;
 
 exports[`@coat/template-ts-package template verification - babel compiler 7`] = `
-"jest.config.js
+"jest.config.json
 ====
-module.exports = {
-  collectCoverage: true,
-  collectCoverageFrom: [\\"src/**/*.ts\\"],
-  coverageReporters: [\\"text\\"],
-  modulePathIgnorePatterns: [\\"<rootDir>/build\\"],
-  testEnvironment: \\"node\\",
-  testRunner: \\"jest-circus/runner\\",
-};
+{
+  \\"collectCoverage\\": true,
+  \\"collectCoverageFrom\\": [\\"src/**/*.ts\\"],
+  \\"coverageReporters\\": [\\"text\\"],
+  \\"modulePathIgnorePatterns\\": [\\"<rootDir>/build\\"],
+  \\"testEnvironment\\": \\"node\\",
+  \\"testRunner\\": \\"jest-circus/runner\\"
+}
 "
 `;
 
@@ -565,8 +565,8 @@ files:
       fxSZnVg1JXiEGv1w/4+1LpWhyUWeFgVRnyX8grd7X6S0JOseqVFI+GZS4O8s7QGhF0D2c/RfzdmEEbCDjdrbcw==
     path: .gitignore
   - hash: >-
-      TksRj5yKKBmaCT8oFg+DgSi2xOYwdVsY8V/4Fo7/IjUqxe1+sQs5HcxU+t7yknado9FlIGiYgpBwY3hFErL4Rg==
-    path: jest.config.js
+      b4aUVkCz3vkKikJ/PR8tzR57PW18bZggYUwMpiVnISeSFvNKmNrTlIQbIJT0l8KbPmQr5rzJJNBE7VUR4LeKUw==
+    path: jest.config.json
   - once: true
     path: README.md
   - once: true
@@ -593,17 +593,17 @@ version: 1
 `;
 
 exports[`@coat/template-ts-package template verification - default config 6`] = `
-"jest.config.js
+"jest.config.json
 ====
-module.exports = {
-  collectCoverage: true,
-  collectCoverageFrom: [\\"src/**/*.ts\\"],
-  coverageReporters: [\\"text\\"],
-  modulePathIgnorePatterns: [\\"<rootDir>/build\\"],
-  preset: \\"ts-jest\\",
-  testEnvironment: \\"node\\",
-  testRunner: \\"jest-circus/runner\\",
-};
+{
+  \\"collectCoverage\\": true,
+  \\"collectCoverageFrom\\": [\\"src/**/*.ts\\"],
+  \\"coverageReporters\\": [\\"text\\"],
+  \\"modulePathIgnorePatterns\\": [\\"<rootDir>/build\\"],
+  \\"preset\\": \\"ts-jest\\",
+  \\"testEnvironment\\": \\"node\\",
+  \\"testRunner\\": \\"jest-circus/runner\\"
+}
 "
 `;
 
@@ -897,8 +897,8 @@ files:
       fxSZnVg1JXiEGv1w/4+1LpWhyUWeFgVRnyX8grd7X6S0JOseqVFI+GZS4O8s7QGhF0D2c/RfzdmEEbCDjdrbcw==
     path: .gitignore
   - hash: >-
-      TksRj5yKKBmaCT8oFg+DgSi2xOYwdVsY8V/4Fo7/IjUqxe1+sQs5HcxU+t7yknado9FlIGiYgpBwY3hFErL4Rg==
-    path: jest.config.js
+      b4aUVkCz3vkKikJ/PR8tzR57PW18bZggYUwMpiVnISeSFvNKmNrTlIQbIJT0l8KbPmQr5rzJJNBE7VUR4LeKUw==
+    path: jest.config.json
   - once: true
     path: README.md
   - once: true
@@ -925,17 +925,17 @@ version: 1
 `;
 
 exports[`@coat/template-ts-package template verification - typescript compiler 6`] = `
-"jest.config.js
+"jest.config.json
 ====
-module.exports = {
-  collectCoverage: true,
-  collectCoverageFrom: [\\"src/**/*.ts\\"],
-  coverageReporters: [\\"text\\"],
-  modulePathIgnorePatterns: [\\"<rootDir>/build\\"],
-  preset: \\"ts-jest\\",
-  testEnvironment: \\"node\\",
-  testRunner: \\"jest-circus/runner\\",
-};
+{
+  \\"collectCoverage\\": true,
+  \\"collectCoverageFrom\\": [\\"src/**/*.ts\\"],
+  \\"coverageReporters\\": [\\"text\\"],
+  \\"modulePathIgnorePatterns\\": [\\"<rootDir>/build\\"],
+  \\"preset\\": \\"ts-jest\\",
+  \\"testEnvironment\\": \\"node\\",
+  \\"testRunner\\": \\"jest-circus/runner\\"
+}
 "
 `;
 
