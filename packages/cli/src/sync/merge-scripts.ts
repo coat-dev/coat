@@ -1,6 +1,6 @@
-import { uniqBy } from "lodash";
 import flatten from "lodash/flatten";
 import groupBy from "lodash/groupBy";
+import uniqBy from "lodash/uniqBy";
 import { CoatManifestStrict } from "../types/coat-manifest";
 
 /**
