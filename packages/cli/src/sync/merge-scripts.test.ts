@@ -104,4 +104,31 @@ describe("sync/merge-scripts", () => {
       "test:4": "test4",
     });
   });
+
+  test("should use latest entry in scripts array if multiple scripts share the same id", () => {
+    const result = mergeScripts([
+      [
+        {
+          id: "test",
+          run: "test1",
+          scriptName: "test",
+        },
+        {
+          id: "test",
+          run: "test2",
+          scriptName: "test2",
+        },
+      ],
+      [
+        {
+          id: "test",
+          run: "test3",
+          scriptName: "test",
+        },
+      ],
+    ]);
+    expect(result.scripts).toEqual({
+      test: "test3",
+    });
+  });
 });
