@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`@coat/template-ts-package template verification 1`] = `
+exports[`@coat/template-ts-package template verification - babel compiler 1`] = `
 ".babelrc
 ====
 {
@@ -19,7 +19,7 @@ exports[`@coat/template-ts-package template verification 1`] = `
 "
 `;
 
-exports[`@coat/template-ts-package template verification 2`] = `
+exports[`@coat/template-ts-package template verification - babel compiler 2`] = `
 ".eslintrc
 ====
 {
@@ -29,7 +29,6 @@ exports[`@coat/template-ts-package template verification 2`] = `
   },
   \\"extends\\": [
     \\"eslint:recommended\\",
-    \\"plugin:@typescript-eslint/eslint-recommended\\",
     \\"plugin:@typescript-eslint/recommended\\",
     \\"prettier\\",
     \\"prettier/@typescript-eslint\\"
@@ -46,12 +45,13 @@ exports[`@coat/template-ts-package template verification 2`] = `
     }
   ],
   \\"parser\\": \\"@typescript-eslint/parser\\",
-  \\"plugins\\": [\\"@typescript-eslint\\"]
+  \\"plugins\\": [\\"@typescript-eslint\\"],
+  \\"root\\": true
 }
 "
 `;
 
-exports[`@coat/template-ts-package template verification 3`] = `
+exports[`@coat/template-ts-package template verification - babel compiler 3`] = `
 ".gitignore
 ====
 # Logs
@@ -179,20 +179,20 @@ dist
 "
 `;
 
-exports[`@coat/template-ts-package template verification 4`] = `
+exports[`@coat/template-ts-package template verification - babel compiler 4`] = `
 "README.md
 ====
 # test-project
 "
 `;
 
-exports[`@coat/template-ts-package template verification 5`] = `
+exports[`@coat/template-ts-package template verification - babel compiler 5`] = `
 "coat.json
 ====
 {\\"name\\":\\"test-project\\"}"
 `;
 
-exports[`@coat/template-ts-package template verification 6`] = `
+exports[`@coat/template-ts-package template verification - babel compiler 6`] = `
 "coat.lock
 ====
 dependencies:
@@ -217,13 +217,13 @@ files:
       hHs8Ro19pcVjDAWfZTsTCzYcMScqbit0swZQzIwdn1M1u6TbZxxw581Q+SM0LjyPaNKBRtkF05gDnxv3fAzWug==
     path: .babelrc
   - hash: >-
-      iDYrApDp+Opz+I20u+89aLll/AS837GT7aSsNiqmFawDSULRe6v4kzIREzCtu1AxxXdpZIJKzM5H+BROvrs+aQ==
+      18VlJXZ5M6991m08/5HH27cJattIDvAmLFGUIabEP5WH+o53D67XmVrVo7cGQqGtJwvrnyGsZRp52lgiwAIMZw==
     path: .eslintrc
   - hash: >-
       fxSZnVg1JXiEGv1w/4+1LpWhyUWeFgVRnyX8grd7X6S0JOseqVFI+GZS4O8s7QGhF0D2c/RfzdmEEbCDjdrbcw==
     path: .gitignore
   - hash: >-
-      QHEKgQldMPHG2z4M4TgWMtjG51Sjk9sSsjNFBsgPNLXOWdagKOs/EninMt8WCMXgT0fdHEPooI7fTiReuUKfFA==
+      psaZ0x/4iKWX5uGApnPHcCjUZeOGB25WKcnWa7FzaWIJwv4jDsziNHJe4qQQmNsYJrnBH5LFqqHbwFP6AXtLVQ==
     path: jest.config.js
   - once: true
     path: README.md
@@ -232,10 +232,10 @@ files:
   - once: true
     path: src/index.ts
   - hash: >-
-      TwESwha/yeUsLsK5sHTYsMVFGSdfM4QRlCLPWrr/PQIeW6fIGz81LCnOijxrw24q1enaBvJLJXv8SogQ8W1EDQ==
+      Wvn79Ah1EmIDyTVVi4uDZAucomOUsQXNPCqWdj1KXckHWjaLhGHD4rwesjGVVa/0FM9rEvtFq1OsiftbNpA1hw==
     path: tsconfig.build.json
   - hash: >-
-      li5LAkECzXaUH0j/5vTUQ1YfaMIeFn1S0MlDqKpMc7c0SYXsdC2lzWKVsED8ROL6sjPIjBY1bSVbDwfSwqNw3g==
+      mmM9PGwqLSxLRIDBzKFNtJqqM/1Fh/TOzubHlC6su7WHv1peDWQglI014mldKMdHNri6F4wbp5NGN26XCTHkFw==
     path: tsconfig.json
 scripts:
   - build
@@ -252,21 +252,21 @@ version: 1
 "
 `;
 
-exports[`@coat/template-ts-package template verification 7`] = `
+exports[`@coat/template-ts-package template verification - babel compiler 7`] = `
 "jest.config.js
 ====
 module.exports = {
   collectCoverage: true,
-  modulePathIgnorePatterns: [\\"<rootDir>/build\\"],
   collectCoverageFrom: [\\"src/**/*.ts\\"],
   coverageReporters: [\\"text\\"],
+  modulePathIgnorePatterns: [\\"<rootDir>/build\\"],
   testEnvironment: \\"node\\",
   testRunner: \\"jest-circus/runner\\",
 };
 "
 `;
 
-exports[`@coat/template-ts-package template verification 8`] = `
+exports[`@coat/template-ts-package template verification - babel compiler 8`] = `
 "package.json
 ====
 {
@@ -285,17 +285,17 @@ exports[`@coat/template-ts-package template verification 8`] = `
     \\"jest-circus\\": \\"^26.4.2\\",
     \\"prettier\\": \\"^2.1.1\\",
     \\"rimraf\\": \\"^3.0.2\\",
-    \\"typescript\\": \\"^4.0.2\\"
+    \\"typescript\\": \\"~4.0.2\\"
   },
   \\"files\\": [
     \\"build/\\"
   ],
   \\"scripts\\": {
     \\"build\\": \\"coat run build:*\\",
-    \\"build:babel\\": \\"babel src -d build --extensions \\\\\\".ts,.tsx\\\\\\" --ignore \\\\\\"**/*.test.ts,**/*.test.tsx\\\\\\"\\",
-    \\"build:typedefs\\": \\"tsc -p tsconfig.build.json --declaration --emitDeclarationOnly\\",
+    \\"build:babel\\": \\"babel src -d build --extensions \\\\\\".ts\\\\\\" --ignore \\\\\\"**/*.test.ts\\\\\\"\\",
+    \\"build:typedefs\\": \\"tsc -p tsconfig.build.json\\",
     \\"lint\\": \\"coat run lint:*\\",
-    \\"lint:eslint\\": \\"eslint \\\\\\"src/**/*.{ts,tsx}\\\\\\" --max-warnings 0\\",
+    \\"lint:eslint\\": \\"eslint --ext .ts --max-warnings 0 src\\",
     \\"lint:prettier\\": \\"prettier --check src\\",
     \\"lint:types\\": \\"tsc\\",
     \\"prebuild\\": \\"rimraf build\\",
@@ -306,7 +306,7 @@ exports[`@coat/template-ts-package template verification 8`] = `
 "
 `;
 
-exports[`@coat/template-ts-package template verification 9`] = `
+exports[`@coat/template-ts-package template verification - babel compiler 9`] = `
 "src/index.test.ts
 ====
 import { hello } from \\".\\";
@@ -321,7 +321,7 @@ describe(\\"index\\", () => {
 "
 `;
 
-exports[`@coat/template-ts-package template verification 10`] = `
+exports[`@coat/template-ts-package template verification - babel compiler 10`] = `
 "src/index.ts
 ====
 export function hello(): string {
@@ -331,39 +331,703 @@ export function hello(): string {
 "
 `;
 
-exports[`@coat/template-ts-package template verification 11`] = `
+exports[`@coat/template-ts-package template verification - babel compiler 11`] = `
 "tsconfig.build.json
 ====
 {
   \\"compilerOptions\\": {
+    \\"declaration\\": true,
+    \\"emitDeclarationOnly\\": true,
     \\"isolatedModules\\": false,
-    \\"noEmit\\": false
+    \\"noEmit\\": false,
+    \\"outDir\\": \\"build\\"
   },
   \\"exclude\\": [\\"**/**/*.test.ts\\"],
-  \\"extends\\": \\"./tsconfig.json\\"
+  \\"extends\\": \\"./tsconfig.json\\",
+  \\"include\\": [\\"src\\"]
 }
 "
 `;
 
-exports[`@coat/template-ts-package template verification 12`] = `
+exports[`@coat/template-ts-package template verification - babel compiler 12`] = `
 "tsconfig.json
 ====
 {
   \\"compilerOptions\\": {
-    \\"allowSyntheticDefaultImports\\": true,
     \\"esModuleInterop\\": true,
+    \\"forceConsistentCasingInFileNames\\": true,
     \\"isolatedModules\\": true,
-    \\"lib\\": [\\"dom\\", \\"es5\\", \\"scripthost\\", \\"es2015\\"],
+    \\"lib\\": [\\"DOM\\", \\"ES5\\", \\"ScriptHost\\", \\"ES2015\\"],
     \\"module\\": \\"commonjs\\",
     \\"moduleResolution\\": \\"node\\",
     \\"noEmit\\": true,
-    \\"noUnusedLocals\\": true,
-    \\"noUnusedParameters\\": true,
-    \\"outDir\\": \\"build\\",
     \\"strict\\": true,
-    \\"target\\": \\"esnext\\"
+    \\"target\\": \\"ESNext\\"
+  }
+}
+"
+`;
+
+exports[`@coat/template-ts-package template verification - default config 1`] = `
+".eslintrc
+====
+{
+  \\"env\\": {
+    \\"es6\\": true,
+    \\"node\\": true
   },
+  \\"extends\\": [
+    \\"eslint:recommended\\",
+    \\"plugin:@typescript-eslint/recommended\\",
+    \\"prettier\\",
+    \\"prettier/@typescript-eslint\\"
+  ],
+  \\"overrides\\": [
+    {
+      \\"env\\": {
+        \\"jest\\": true
+      },
+      \\"files\\": [\\"*.test.ts\\"],
+      \\"globals\\": {
+        \\"fail\\": true
+      }
+    }
+  ],
+  \\"parser\\": \\"@typescript-eslint/parser\\",
+  \\"plugins\\": [\\"@typescript-eslint\\"],
+  \\"root\\": true
+}
+"
+`;
+
+exports[`@coat/template-ts-package template verification - default config 2`] = `
+".gitignore
+====
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Directory for instrumented libs generated by jscoverage/JSCover
+lib-cov
+
+# Coverage directory used by tools like istanbul
+coverage
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# Bower dependency directory (https://bower.io/)
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Snowpack dependency directory (https://snowpack.dev/)
+web_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+out
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+# Comment in the public line in if your project uses Gatsby and not Next.js
+# https://nextjs.org/blog/next-9-1#public-directory-support
+# public
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Coat local files
+/.coat
+
+# Build outputs
+/build
+"
+`;
+
+exports[`@coat/template-ts-package template verification - default config 3`] = `
+"README.md
+====
+# test-project
+"
+`;
+
+exports[`@coat/template-ts-package template verification - default config 4`] = `
+"coat.json
+====
+{\\"name\\":\\"test-project\\"}"
+`;
+
+exports[`@coat/template-ts-package template verification - default config 5`] = `
+"coat.lock
+====
+dependencies:
+  devDependencies:
+    - \\"@types/jest\\"
+    - \\"@typescript-eslint/eslint-plugin\\"
+    - \\"@typescript-eslint/parser\\"
+    - eslint
+    - eslint-config-prettier
+    - jest
+    - jest-circus
+    - prettier
+    - rimraf
+    - ts-jest
+    - typescript
+files:
+  - hash: >-
+      18VlJXZ5M6991m08/5HH27cJattIDvAmLFGUIabEP5WH+o53D67XmVrVo7cGQqGtJwvrnyGsZRp52lgiwAIMZw==
+    path: .eslintrc
+  - hash: >-
+      fxSZnVg1JXiEGv1w/4+1LpWhyUWeFgVRnyX8grd7X6S0JOseqVFI+GZS4O8s7QGhF0D2c/RfzdmEEbCDjdrbcw==
+    path: .gitignore
+  - hash: >-
+      TksRj5yKKBmaCT8oFg+DgSi2xOYwdVsY8V/4Fo7/IjUqxe1+sQs5HcxU+t7yknado9FlIGiYgpBwY3hFErL4Rg==
+    path: jest.config.js
+  - once: true
+    path: README.md
+  - once: true
+    path: src/index.test.ts
+  - once: true
+    path: src/index.ts
+  - hash: >-
+      iBs7gseJaH2TqwMp681kwDfa9zzT+kVDtATXxQC0SuMRXhT4YBYD+gTD4UKz9Njr8qswfAZIsIhvYSeCGkXTiA==
+    path: tsconfig.build.json
+  - hash: >-
+      0XSVaBRUX42h0NJUywD/vWuY/Y0BT0TFOkSQcdwTpsu7ncfmkYEmyYC3L08VH6JXCOiy+MpWcmV3arT1ZwEu9Q==
+    path: tsconfig.json
+scripts:
+  - build
+  - lint
+  - \\"lint:eslint\\"
+  - \\"lint:prettier\\"
+  - \\"lint:types\\"
+  - prebuild
+  - prepare
+  - test
+version: 1
+"
+`;
+
+exports[`@coat/template-ts-package template verification - default config 6`] = `
+"jest.config.js
+====
+module.exports = {
+  collectCoverage: true,
+  collectCoverageFrom: [\\"src/**/*.ts\\"],
+  coverageReporters: [\\"text\\"],
+  modulePathIgnorePatterns: [\\"<rootDir>/build\\"],
+  preset: \\"ts-jest\\",
+  testEnvironment: \\"node\\",
+  testRunner: \\"jest-circus/runner\\",
+};
+"
+`;
+
+exports[`@coat/template-ts-package template verification - default config 7`] = `
+"package.json
+====
+{
+  \\"devDependencies\\": {
+    \\"@types/jest\\": \\"^26.0.13\\",
+    \\"@typescript-eslint/eslint-plugin\\": \\"^4.0.1\\",
+    \\"@typescript-eslint/parser\\": \\"^4.0.1\\",
+    \\"eslint\\": \\"^7.8.1\\",
+    \\"eslint-config-prettier\\": \\"^6.11.0\\",
+    \\"jest\\": \\"^26.4.2\\",
+    \\"jest-circus\\": \\"^26.4.2\\",
+    \\"prettier\\": \\"^2.1.1\\",
+    \\"rimraf\\": \\"^3.0.2\\",
+    \\"ts-jest\\": \\"^26.4.1\\",
+    \\"typescript\\": \\"~4.0.2\\"
+  },
+  \\"files\\": [
+    \\"build/\\"
+  ],
+  \\"scripts\\": {
+    \\"build\\": \\"tsc -p tsconfig.build.json\\",
+    \\"lint\\": \\"coat run lint:*\\",
+    \\"lint:eslint\\": \\"eslint --ext .ts --max-warnings 0 src\\",
+    \\"lint:prettier\\": \\"prettier --check src\\",
+    \\"lint:types\\": \\"tsc\\",
+    \\"prebuild\\": \\"rimraf build\\",
+    \\"prepare\\": \\"coat sync && coat run build\\",
+    \\"test\\": \\"jest\\"
+  }
+}
+"
+`;
+
+exports[`@coat/template-ts-package template verification - default config 8`] = `
+"src/index.test.ts
+====
+import { hello } from \\".\\";
+
+describe(\\"index\\", () => {
+  // TODO: Write your first tests
+
+  test(\\"hello should return Hello World\\", () => {
+    expect(hello()).toBe(\\"Hello World\\");
+  });
+});
+"
+`;
+
+exports[`@coat/template-ts-package template verification - default config 9`] = `
+"src/index.ts
+====
+export function hello(): string {
+  // TODO: Add your code in the src folder
+  return \\"Hello World\\";
+}
+"
+`;
+
+exports[`@coat/template-ts-package template verification - default config 10`] = `
+"tsconfig.build.json
+====
+{
+  \\"compilerOptions\\": {
+    \\"declaration\\": true,
+    \\"noEmit\\": false,
+    \\"outDir\\": \\"build\\"
+  },
+  \\"exclude\\": [\\"**/**/*.test.ts\\"],
+  \\"extends\\": \\"./tsconfig.json\\",
   \\"include\\": [\\"src\\"]
+}
+"
+`;
+
+exports[`@coat/template-ts-package template verification - default config 11`] = `
+"tsconfig.json
+====
+{
+  \\"compilerOptions\\": {
+    \\"esModuleInterop\\": true,
+    \\"forceConsistentCasingInFileNames\\": true,
+    \\"lib\\": [\\"DOM\\", \\"ES5\\", \\"ScriptHost\\", \\"ES2015\\"],
+    \\"module\\": \\"commonjs\\",
+    \\"moduleResolution\\": \\"node\\",
+    \\"noEmit\\": true,
+    \\"strict\\": true,
+    \\"target\\": \\"ES2018\\"
+  }
+}
+"
+`;
+
+exports[`@coat/template-ts-package template verification - typescript compiler 1`] = `
+".eslintrc
+====
+{
+  \\"env\\": {
+    \\"es6\\": true,
+    \\"node\\": true
+  },
+  \\"extends\\": [
+    \\"eslint:recommended\\",
+    \\"plugin:@typescript-eslint/recommended\\",
+    \\"prettier\\",
+    \\"prettier/@typescript-eslint\\"
+  ],
+  \\"overrides\\": [
+    {
+      \\"env\\": {
+        \\"jest\\": true
+      },
+      \\"files\\": [\\"*.test.ts\\"],
+      \\"globals\\": {
+        \\"fail\\": true
+      }
+    }
+  ],
+  \\"parser\\": \\"@typescript-eslint/parser\\",
+  \\"plugins\\": [\\"@typescript-eslint\\"],
+  \\"root\\": true
+}
+"
+`;
+
+exports[`@coat/template-ts-package template verification - typescript compiler 2`] = `
+".gitignore
+====
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Directory for instrumented libs generated by jscoverage/JSCover
+lib-cov
+
+# Coverage directory used by tools like istanbul
+coverage
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# Bower dependency directory (https://bower.io/)
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Snowpack dependency directory (https://snowpack.dev/)
+web_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+out
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+# Comment in the public line in if your project uses Gatsby and not Next.js
+# https://nextjs.org/blog/next-9-1#public-directory-support
+# public
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Coat local files
+/.coat
+
+# Build outputs
+/build
+"
+`;
+
+exports[`@coat/template-ts-package template verification - typescript compiler 3`] = `
+"README.md
+====
+# test-project
+"
+`;
+
+exports[`@coat/template-ts-package template verification - typescript compiler 4`] = `
+"coat.json
+====
+{\\"name\\":\\"test-project\\"}"
+`;
+
+exports[`@coat/template-ts-package template verification - typescript compiler 5`] = `
+"coat.lock
+====
+dependencies:
+  devDependencies:
+    - \\"@types/jest\\"
+    - \\"@typescript-eslint/eslint-plugin\\"
+    - \\"@typescript-eslint/parser\\"
+    - eslint
+    - eslint-config-prettier
+    - jest
+    - jest-circus
+    - prettier
+    - rimraf
+    - ts-jest
+    - typescript
+files:
+  - hash: >-
+      18VlJXZ5M6991m08/5HH27cJattIDvAmLFGUIabEP5WH+o53D67XmVrVo7cGQqGtJwvrnyGsZRp52lgiwAIMZw==
+    path: .eslintrc
+  - hash: >-
+      fxSZnVg1JXiEGv1w/4+1LpWhyUWeFgVRnyX8grd7X6S0JOseqVFI+GZS4O8s7QGhF0D2c/RfzdmEEbCDjdrbcw==
+    path: .gitignore
+  - hash: >-
+      TksRj5yKKBmaCT8oFg+DgSi2xOYwdVsY8V/4Fo7/IjUqxe1+sQs5HcxU+t7yknado9FlIGiYgpBwY3hFErL4Rg==
+    path: jest.config.js
+  - once: true
+    path: README.md
+  - once: true
+    path: src/index.test.ts
+  - once: true
+    path: src/index.ts
+  - hash: >-
+      iBs7gseJaH2TqwMp681kwDfa9zzT+kVDtATXxQC0SuMRXhT4YBYD+gTD4UKz9Njr8qswfAZIsIhvYSeCGkXTiA==
+    path: tsconfig.build.json
+  - hash: >-
+      0XSVaBRUX42h0NJUywD/vWuY/Y0BT0TFOkSQcdwTpsu7ncfmkYEmyYC3L08VH6JXCOiy+MpWcmV3arT1ZwEu9Q==
+    path: tsconfig.json
+scripts:
+  - build
+  - lint
+  - \\"lint:eslint\\"
+  - \\"lint:prettier\\"
+  - \\"lint:types\\"
+  - prebuild
+  - prepare
+  - test
+version: 1
+"
+`;
+
+exports[`@coat/template-ts-package template verification - typescript compiler 6`] = `
+"jest.config.js
+====
+module.exports = {
+  collectCoverage: true,
+  collectCoverageFrom: [\\"src/**/*.ts\\"],
+  coverageReporters: [\\"text\\"],
+  modulePathIgnorePatterns: [\\"<rootDir>/build\\"],
+  preset: \\"ts-jest\\",
+  testEnvironment: \\"node\\",
+  testRunner: \\"jest-circus/runner\\",
+};
+"
+`;
+
+exports[`@coat/template-ts-package template verification - typescript compiler 7`] = `
+"package.json
+====
+{
+  \\"devDependencies\\": {
+    \\"@types/jest\\": \\"^26.0.13\\",
+    \\"@typescript-eslint/eslint-plugin\\": \\"^4.0.1\\",
+    \\"@typescript-eslint/parser\\": \\"^4.0.1\\",
+    \\"eslint\\": \\"^7.8.1\\",
+    \\"eslint-config-prettier\\": \\"^6.11.0\\",
+    \\"jest\\": \\"^26.4.2\\",
+    \\"jest-circus\\": \\"^26.4.2\\",
+    \\"prettier\\": \\"^2.1.1\\",
+    \\"rimraf\\": \\"^3.0.2\\",
+    \\"ts-jest\\": \\"^26.4.1\\",
+    \\"typescript\\": \\"~4.0.2\\"
+  },
+  \\"files\\": [
+    \\"build/\\"
+  ],
+  \\"scripts\\": {
+    \\"build\\": \\"tsc -p tsconfig.build.json\\",
+    \\"lint\\": \\"coat run lint:*\\",
+    \\"lint:eslint\\": \\"eslint --ext .ts --max-warnings 0 src\\",
+    \\"lint:prettier\\": \\"prettier --check src\\",
+    \\"lint:types\\": \\"tsc\\",
+    \\"prebuild\\": \\"rimraf build\\",
+    \\"prepare\\": \\"coat sync && coat run build\\",
+    \\"test\\": \\"jest\\"
+  }
+}
+"
+`;
+
+exports[`@coat/template-ts-package template verification - typescript compiler 8`] = `
+"src/index.test.ts
+====
+import { hello } from \\".\\";
+
+describe(\\"index\\", () => {
+  // TODO: Write your first tests
+
+  test(\\"hello should return Hello World\\", () => {
+    expect(hello()).toBe(\\"Hello World\\");
+  });
+});
+"
+`;
+
+exports[`@coat/template-ts-package template verification - typescript compiler 9`] = `
+"src/index.ts
+====
+export function hello(): string {
+  // TODO: Add your code in the src folder
+  return \\"Hello World\\";
+}
+"
+`;
+
+exports[`@coat/template-ts-package template verification - typescript compiler 10`] = `
+"tsconfig.build.json
+====
+{
+  \\"compilerOptions\\": {
+    \\"declaration\\": true,
+    \\"noEmit\\": false,
+    \\"outDir\\": \\"build\\"
+  },
+  \\"exclude\\": [\\"**/**/*.test.ts\\"],
+  \\"extends\\": \\"./tsconfig.json\\",
+  \\"include\\": [\\"src\\"]
+}
+"
+`;
+
+exports[`@coat/template-ts-package template verification - typescript compiler 11`] = `
+"tsconfig.json
+====
+{
+  \\"compilerOptions\\": {
+    \\"esModuleInterop\\": true,
+    \\"forceConsistentCasingInFileNames\\": true,
+    \\"lib\\": [\\"DOM\\", \\"ES5\\", \\"ScriptHost\\", \\"ES2015\\"],
+    \\"module\\": \\"commonjs\\",
+    \\"moduleResolution\\": \\"node\\",
+    \\"noEmit\\": true,
+    \\"strict\\": true,
+    \\"target\\": \\"ES2018\\"
+  }
 }
 "
 `;

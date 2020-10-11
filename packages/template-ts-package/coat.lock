@@ -20,7 +20,7 @@ files:
       hHs8Ro19pcVjDAWfZTsTCzYcMScqbit0swZQzIwdn1M1u6TbZxxw581Q+SM0LjyPaNKBRtkF05gDnxv3fAzWug==
     path: .babelrc
   - hash: >-
-      iDYrApDp+Opz+I20u+89aLll/AS837GT7aSsNiqmFawDSULRe6v4kzIREzCtu1AxxXdpZIJKzM5H+BROvrs+aQ==
+      18VlJXZ5M6991m08/5HH27cJattIDvAmLFGUIabEP5WH+o53D67XmVrVo7cGQqGtJwvrnyGsZRp52lgiwAIMZw==
     path: .eslintrc
   - hash: >-
       fxSZnVg1JXiEGv1w/4+1LpWhyUWeFgVRnyX8grd7X6S0JOseqVFI+GZS4O8s7QGhF0D2c/RfzdmEEbCDjdrbcw==
@@ -35,10 +35,10 @@ files:
   - once: true
     path: src/index.ts
   - hash: >-
-      TwESwha/yeUsLsK5sHTYsMVFGSdfM4QRlCLPWrr/PQIeW6fIGz81LCnOijxrw24q1enaBvJLJXv8SogQ8W1EDQ==
+      Wvn79Ah1EmIDyTVVi4uDZAucomOUsQXNPCqWdj1KXckHWjaLhGHD4rwesjGVVa/0FM9rEvtFq1OsiftbNpA1hw==
     path: tsconfig.build.json
   - hash: >-
-      li5LAkECzXaUH0j/5vTUQ1YfaMIeFn1S0MlDqKpMc7c0SYXsdC2lzWKVsED8ROL6sjPIjBY1bSVbDwfSwqNw3g==
+      mmM9PGwqLSxLRIDBzKFNtJqqM/1Fh/TOzubHlC6su7WHv1peDWQglI014mldKMdHNri6F4wbp5NGN26XCTHkFw==
     path: tsconfig.json
 scripts:
   - build
