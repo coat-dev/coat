@@ -1,3 +1,1 @@
-# @coat/cli
-
-TODO: See #3
+../../README.md
