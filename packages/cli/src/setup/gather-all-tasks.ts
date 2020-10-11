@@ -11,19 +11,23 @@ import { CoatManifestStrict } from "../types/coat-manifest";
 function mergeTasks(tasks: CoatManifestTaskStrict[]): CoatManifestTaskStrict[] {
   // If multiple tasks share the same id, the latest task
   // to use the id should replace the earliest task in the array
-  return tasks.reduce<CoatManifestTaskStrict[]>((accumulator, task) => {
-    const savedTaskIndex = accumulator.findIndex(
-      (savedTask) => savedTask.id === task.id
-    );
-    if (savedTaskIndex === -1) {
-      // Task does not exist yet, save it in the resulting array
-      accumulator.push(task);
-    } else {
-      // Replace earlier task with current task version
-      accumulator[savedTaskIndex] = task;
-    }
-    return accumulator;
-  }, []);
+  return tasks.reduce<{
+    result: CoatManifestTaskStrict[];
+    indexMap: Record<string, number>;
+  }>(
+    (accumulator, task) => {
+      const savedTaskIndex = accumulator.indexMap[task.id];
+      if (typeof savedTaskIndex === "undefined") {
+        // Task does not exist yet, save it in the resulting array
+        accumulator.indexMap[task.id] = accumulator.result.push(task) - 1;
+      } else {
+        // Replace earlier task with current task version
+        accumulator.result[savedTaskIndex] = task;
+      }
+      return accumulator;
+    },
+    { result: [], indexMap: {} }
+  ).result;
 }
 
 /**

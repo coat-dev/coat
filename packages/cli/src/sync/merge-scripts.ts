@@ -1,3 +1,4 @@
+import { uniqBy } from "lodash";
 import flatten from "lodash/flatten";
 import groupBy from "lodash/groupBy";
 import { CoatManifestStrict } from "../types/coat-manifest";
@@ -19,8 +20,11 @@ export function mergeScripts(
   scripts: Record<string, string>;
   parallelScriptPrefixes: string[];
 } {
+  // Use the latest script entry for scripts that share the same id
+  const uniqueScripts = uniqBy(flatten(scripts).reverse(), "id");
+
   // Group scripts by scriptName
-  const groupedScripts = groupBy(flatten(scripts), "scriptName");
+  const groupedScripts = groupBy(uniqueScripts, "scriptName");
 
   return Object.entries(groupedScripts).reduce<{
     scripts: Record<string, string>;
