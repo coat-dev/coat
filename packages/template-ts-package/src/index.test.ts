@@ -10,7 +10,10 @@ import createTemplate from ".";
 // Add more thorough tests and e2e tests
 // that don't rely on coat cli internals
 
-jest.mock("@coat/cli/build/util/gather-extended-templates").mock("execa");
+jest
+  .mock("@coat/cli/build/util/gather-extended-templates")
+  .mock("execa")
+  .mock("ora");
 
 jest.spyOn(console, "log").mockImplementation(() => {
   // Empty mock function
@@ -29,13 +32,21 @@ describe("@coat/template-ts-package", () => {
   let testCwd: string;
   let removeCallback: () => void;
 
-  beforeAll(() => {
+  beforeEach(() => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true });
     testCwd = tmpDir.name;
     removeCallback = tmpDir.removeCallback;
+
+    gatherExtendedTemplatesMock.mockImplementation((coatContext) => [
+      getStrictCoatManifest(
+        typeof createTemplate === "function"
+          ? createTemplate({ coatContext, config: {} })
+          : createTemplate
+      ),
+    ]);
   });
 
-  afterAll(() => {
+  afterEach(() => {
     removeCallback();
   });
 
@@ -63,13 +74,26 @@ describe("@coat/template-ts-package", () => {
     }
   }
 
-  test("template verification", async () => {
+  test.each`
+    description              | config
+    ${"default config"}      | ${{}}
+    ${"typescript compiler"} | ${{ compiler: "typescript" }}
+    ${"babel compiler"}      | ${{ compiler: "babel" }}
+  `("template verification - $description", async ({ config }) => {
     await Promise.all([
       fs.outputFile(
         path.join(testCwd, "coat.json"),
         JSON.stringify({ name: "test-project" })
       ),
       fs.outputFile(path.join(testCwd, "package.json"), JSON.stringify({})),
+    ]);
+
+    gatherExtendedTemplatesMock.mockImplementation((coatContext) => [
+      getStrictCoatManifest(
+        typeof createTemplate === "function"
+          ? createTemplate({ coatContext, config })
+          : createTemplate
+      ),
     ]);
 
     await sync(testCwd);

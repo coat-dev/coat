@@ -42,10 +42,10 @@
   },
   "scripts": {
     "build": "coat run build:*",
-    "build:babel": "babel src -d build --extensions \".ts,.tsx\" --ignore \"**/*.test.ts,**/*.test.tsx\"",
-    "build:typedefs": "tsc -p tsconfig.build.json --declaration --emitDeclarationOnly",
+    "build:babel": "babel src -d build --extensions \".ts\" --ignore \"**/*.test.ts\"",
+    "build:typedefs": "tsc -p tsconfig.build.json",
     "lint": "coat run lint:*",
-    "lint:eslint": "eslint \"src/**/*.{ts,tsx}\" --max-warnings 0",
+    "lint:eslint": "eslint --ext .ts --max-warnings 0 src",
     "lint:prettier": "prettier --check src",
     "lint:types": "tsc",
     "prebuild": "rimraf build",

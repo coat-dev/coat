@@ -1,4 +1,11 @@
 {
   "name": "@coat/template-ts-package",
-  "extends": "./build"
+  "extends": [
+    [
+      "./build",
+      {
+        "compiler": "babel"
+      }
+    ]
+  ]
 }
