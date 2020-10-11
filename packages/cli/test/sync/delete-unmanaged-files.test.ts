@@ -145,7 +145,7 @@ describe("coat sync - delete unmanaged files", () => {
       const secondSyncResult = await secondSyncRun;
       expect(stripAnsi(secondSyncResult.stdout)).toMatchInlineSnapshot(`
         "
-        ♻️  Everything up to date️
+        ♻️ Everything up to date
         "
       `);
 
@@ -291,7 +291,7 @@ describe("coat sync - delete unmanaged files", () => {
       const secondSyncResult = await secondSyncRun;
       expect(stripAnsi(secondSyncResult.stdout)).toMatchInlineSnapshot(`
         "
-        ♻️  Everything up to date️
+        ♻️ Everything up to date
         "
       `);
 

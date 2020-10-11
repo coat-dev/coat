@@ -63,7 +63,7 @@ describe("sync/update-files-on-disk", () => {
       version: COAT_LOCAL_LOCKFILE_VERSION,
     }),
   };
-  const upToDateMessage = "\n♻️  Everything up to date️\n";
+  const upToDateMessage = "\n♻️ Everything up to date\n";
 
   async function getCurrentFilesForTest(
     context: CoatContext,

@@ -428,7 +428,7 @@ export async function updateFilesOnDisk(
     );
   } else {
     // No file operation is necessary
-    logMessages.push("♻️  Everything up to date️");
+    logMessages.push("♻️ Everything up to date");
   }
   logMessages.push("");
 
