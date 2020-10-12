@@ -492,7 +492,7 @@ describe("sync", () => {
     const testTemplates = [
       ...templates,
       getStrictCoatManifest({
-        name: "remove-pjson",
+        name: "remove-package-json",
         files: [
           {
             file: PACKAGE_JSON_FILENAME,

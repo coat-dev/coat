@@ -6,7 +6,7 @@ import execa from "execa";
  * all lines with a certain label and writes
  * the result to the passed stream.
  *
- * The stream should not be asynchrounous, and this
+ * The stream should not be asynchronous, and this
  * function is currently only able to handle process.stdout
  * and process.stdin safely.
  *
@@ -66,9 +66,9 @@ function createStreamPrefixHandler(
 
     // Write all lines to the stream.
     //
-    // Although stream.write is an asynchrounous method,
+    // Although stream.write is an asynchronous method,
     // using it with process.stdout and process.stderr is
-    // synchrounous and does not need to be awaited.
+    // synchronous and does not need to be awaited.
     stream.write(lines.join("\n"));
   };
 }
@@ -83,7 +83,7 @@ export async function runMultipleScripts(
   // script run fails
   await Promise.all(
     scripts.map(async (script) => {
-      // Run scripts in silent mode to surpress
+      // Run scripts in silent mode to suppress
       // any npm specific output
       const npmArgs = ["run", "--silent", script];
 

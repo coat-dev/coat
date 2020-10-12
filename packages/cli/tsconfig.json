@@ -12,6 +12,6 @@
     "resolveJsonModule": true,
     "strict": true,
     "outDir": "build",
-    "target": "esnext"
+    "target": "ESNext"
   }
 }

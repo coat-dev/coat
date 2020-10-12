@@ -168,7 +168,7 @@ describe("create", () => {
       create({
         template: "template",
         directory: "targetDir",
-        projectName: "project-namme",
+        projectName: "project-name",
       })
     ).rejects.toHaveProperty("message", "coat manifest file already exists");
 

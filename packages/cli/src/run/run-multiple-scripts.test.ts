@@ -95,7 +95,7 @@ describe("run/run-multiple-scripts", () => {
     test("should prefix stdout with script name as a label", async () => {
       await runMultipleScripts(testCwd, ["script-1"]);
 
-      // memory-streams does not contain type defintions for
+      // memory-streams does not contain type definitions for
       // the append function
       //
       // @ts-expect-error
@@ -123,7 +123,7 @@ describe("run/run-multiple-scripts", () => {
     test("should prefix stderr with script name as a label", async () => {
       await runMultipleScripts(testCwd, ["script-1"]);
 
-      // memory-streams does not contain type defintions for
+      // memory-streams does not contain type definitions for
       // the append function
       //
       // @ts-expect-error

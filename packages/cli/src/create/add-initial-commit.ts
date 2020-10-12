@@ -28,7 +28,7 @@ export async function addInitialCommit(cwd: string): Promise<void> {
   // Initialize a new git repository
   await execa("git", ["init"], { cwd });
 
-  // Add all untracked files
+  // Add all files that are not ignored
   await execa("git", ["add", "--all"], { cwd });
 
   // Add an initial commit with all generated files

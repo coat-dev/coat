@@ -39,7 +39,7 @@ describe("coat sync - lockfile", () => {
     });
 
     test("should add generated files to the lockfile", async () => {
-      // Test with a few files, some from a template, two in a subfolder
+      // Test with a few files, some from a template, two in a sub folder
       const { cwd, task } = await runSyncTest({
         coatManifest: {
           name: "project",
@@ -159,7 +159,7 @@ describe("coat sync - lockfile", () => {
     });
 
     test("should add generated files to the lockfile", async () => {
-      // Test with a few files, some from a template, two in a subfolder
+      // Test with a few files, some from a template, two in a sub folder
       const { cwd, task } = await runSyncTest({
         coatManifest: {
           name: "project",

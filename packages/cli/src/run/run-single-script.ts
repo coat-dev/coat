@@ -13,7 +13,7 @@ export async function runSingleScript(
   script: string,
   args?: string[]
 ): Promise<void> {
-  // Run scripts in silent mode to surpress
+  // Run scripts in silent mode to suppress
   // any npm specific output
   const npmArgs = ["run", "--silent", script];
 

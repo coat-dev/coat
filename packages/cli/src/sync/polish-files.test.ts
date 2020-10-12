@@ -33,7 +33,7 @@ describe("sync/polish-files", () => {
           {
             // @ts-expect-error
             type: "UNKNOWN",
-            content: { asta: "1,2,3" },
+            content: { astra: "1,2,3" },
             file: "filename.unknown",
           },
         ],

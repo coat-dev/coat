@@ -14,14 +14,14 @@ interface CoatLockfileFileEntryBase extends JsonObject {
 
 interface CoatLockfileOnceFileEntry extends CoatLockfileFileEntryBase {
   /**
-   * Whether the file was generated only once or is continously managed
+   * Whether the file was generated only once or is continuously managed
    */
   once: true;
 }
 
 interface CoatLockfileContinuousFileEntry extends CoatLockfileFileEntryBase {
   /**
-   * Whether the file was generated only once or is continously managed
+   * Whether the file was generated only once or is continuously managed
    */
   once?: false;
   /**

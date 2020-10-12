@@ -56,7 +56,7 @@ function applyDependencies(
  * Merges all dependencies that have been declared in the coat project
  * and its templates.
  *
- * Dependencies are only overriden if the current version doesn't satisfy
+ * Dependencies are only overridden if the current version doesn't satisfy
  * a newer declared version.
  * Example:
  *

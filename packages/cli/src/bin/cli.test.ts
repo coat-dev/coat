@@ -12,7 +12,7 @@ jest.spyOn(process, "cwd").mockImplementation(() => "mock-cwd");
 const exitMock = jest.spyOn(process, "exit").mockImplementation(
   // @ts-expect-error
   (): never => {
-    // Empty mock functino
+    // Empty mock function
   }
 );
 
