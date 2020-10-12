@@ -1,4 +1,4 @@
-
+<!-- 
 <p align="center">
   <img alt="coat" src="https://i.imgur.com/FscVxuq.png" width="546">
 </p>
@@ -17,7 +17,7 @@
   <a href="https://github.com/coat-dev/coat/actions">
     <img src="https://img.shields.io/npm/l/@coat/cli">
   </a>
-</p>
+</p> -->
 
 <!-- TODO: Smaller logo + animated gif of changing configuration file -->
 
@@ -105,7 +105,22 @@ It is planned to support more languages and frameworks with official `coat` temp
 
 ## Documentation
 * How coat works
+* Customization
+  * Customization for each file type
+* Creating a template
+* CLI commands
+* API Reference
+  * Template types
 ## Motivation
+* Configuration left behind after starting projects
+* Configuration files touched rarely, leading to effort when an upgrade is needed
+* Rare touching makes it harder for tooling authors to innovate and create breaking changes (Webpack blog post reference)
 ## Roadmap
+* Additional templates
+* Utils for creating templates
+*	Support yarn as package manager
 ## How to contribute / Contributing
+* No official guide for now, in the works
+* Creating a template best way for now
 ## License
+coat is [MIT licensed.](./LICENSE)
