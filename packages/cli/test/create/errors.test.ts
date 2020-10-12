@@ -41,7 +41,7 @@ describe("coat create - errors", () => {
     }
   });
 
-  test("should throw error if target directory contanis a coat manifest file", async () => {
+  test("should throw error if target directory contains a coat manifest file", async () => {
     const tmpDir = getTmpDir();
     const targetFolder = path.join(tmpDir, "project-name");
     await fs.outputFile(path.join(targetFolder, COAT_MANIFEST_FILENAME), "{}");

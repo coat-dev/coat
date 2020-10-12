@@ -16,7 +16,7 @@ describe("ui/center-text", () => {
   });
 
   test("should leave string untouched if width is smaller than the input string length", () => {
-    const input = "abcdefghijk";
+    const input = "a simple test string";
     const result = centerText(input, 5);
     expect(result).toBe(input);
   });

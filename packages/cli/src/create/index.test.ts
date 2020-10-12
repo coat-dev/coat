@@ -160,7 +160,7 @@ describe("create", () => {
     await fs.outputFile(path.join("targetDir", "coat.json"), "{}");
 
     await expect(
-      create("template", "targetDir", "project-namme")
+      create("template", "targetDir", "project-name")
     ).rejects.toHaveProperty("message", "coat manifest file already exists");
 
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);

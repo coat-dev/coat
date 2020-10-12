@@ -29,7 +29,7 @@
 
 >**Note**: `coat` is still in experimental stage and while it is already used in production at [ORDA](https://www.orda-app.com), there might be breaking changes before reaching 1.0.0.
 
-## 🙏 I want your feedback!
+## 🙏 I need your feedback!
 
 I'd love to hear your feedback about `coat`. If you encounter any issues, created a template and want to add it to this README or want to submit a feature request please open a GitHub issue or tweet to me at [@peterjuras](https://twitter.com/peterjuras) 🐦
 

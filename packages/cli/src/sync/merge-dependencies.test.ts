@@ -306,7 +306,7 @@ describe("sync/merge-dependencies", () => {
       );
     });
 
-    test("should work with pre-release versions and be overriden by a higher stable version", () => {
+    test("should work with pre-release versions and be overridden by a higher stable version", () => {
       const result = mergeDependencies([
         {
           dependencies: {},

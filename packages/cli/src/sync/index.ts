@@ -239,7 +239,7 @@ export async function sync(cwd: string): Promise<void> {
   const polishedFiles = polishFiles(mergedFiles, context);
 
   // Generate new coat lockfile files property from merged files
-  const lockFileCanditates = [
+  const lockFileCandidates = [
     ...Object.values(onceAlreadyPlaced),
     ...polishedFiles,
   ];
@@ -248,9 +248,9 @@ export async function sync(cwd: string): Promise<void> {
   const {
     localLockFileEntries,
     globalLockFileEntries,
-  } = lockFileCanditates.reduce<{
-    localLockFileEntries: typeof lockFileCanditates;
-    globalLockFileEntries: typeof lockFileCanditates;
+  } = lockFileCandidates.reduce<{
+    localLockFileEntries: typeof lockFileCandidates;
+    globalLockFileEntries: typeof lockFileCandidates;
   }>(
     (accumulator, file) => {
       if (file.local) {
