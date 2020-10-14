@@ -12,6 +12,7 @@ const unitTestsProject = {
 const e2eTestsProject = {
   ...sharedConfig,
   displayName: "E2E tests",
+  modulePathIgnorePatterns: ["<rootDir>/test/utils/test-packages"],
   testPathIgnorePatterns: ["/node_modules/", "<rootDir>/src/"],
   globalSetup: "./test/utils/e2e-setup.ts",
   globalTeardown: "./test/utils/e2e-teardown.ts",
