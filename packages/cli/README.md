@@ -1,4 +1,4 @@
-<!-- 
+
 <p align="center">
   <img alt="coat" src="https://i.imgur.com/FscVxuq.png" width="546">
 </p>
@@ -14,12 +14,28 @@
   <a href="https://github.com/coat-dev/coat/actions">
     <img src="https://github.com/coat-dev/coat/workflows/@coat/cli/badge.svg?branch=main&event=push">
   </a>
+  <a href="CODE_OF_CONDUCT.md">
+    <img src="https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg">
+  </a>
+
   <a href="https://github.com/coat-dev/coat/actions">
     <img src="https://img.shields.io/npm/l/@coat/cli">
   </a>
-</p> -->
+</p>
 
-<!-- TODO: Smaller logo + animated gif of changing configuration file -->
+<!-- TODO: Smaller logo + animated gif of changing configuration file + customization -->
+
+## TODOs:
+
+* [ ] Intro logo area
+* [x] Intro text
+* [x] Usage
+* [x] Templates
+* [ ] Documentation
+* [ ] Motivation
+* [ ] Roadmap
+* [ ] Contributing
+* [X] License
 
 `coat` aims to make maintaining projects more fun than starting new ones.
 
@@ -36,8 +52,6 @@ I'd love to hear your feedback about `coat`. If you encounter any issues, create
 ## Table of content
 
 - Update at the end! or search for extension that does it
-- [I want your feedback!](#i-want-your-feedback-)
-- [TOC](#toc)
 - [Templates](#templates)
 - [Installation | Usage | Getting started](#installation---usage---getting-started)
 - [Motivation](#motivation)
@@ -96,10 +110,9 @@ For more usage information, including [customization](TODO) please check out the
 
 `coat` projects can extend one or multiple templates that specify which files should be placed and which setup tasks need to run.
 
-Adjust text here a bit it's weird
-Since this first public release of `coat` is very early to gather feedback, there is currently only one official template - a template to create and maintain a [TypeScript package](packages/template-ts-package/README.md).
+Since this early public release of `coat` is aimed to gather feedback, there is currently only one official template - a template to create and maintain a [TypeScript package](packages/template-ts-package/README.md).
 
-You can however create your own coat templates and even reference local JavaScript files in your `coat.json` manifest file. Check out the [template-ts-package](packages/template-ts-package/README.md) template to view how a coat template is structured.
+You can however create your own coat templates and even reference local JavaScript files that export a coat template in your `coat.json` manifest file. Check out the [template-ts-package](packages/template-ts-package/README.md) template to get an idea of how a coat template is structured.
 
 It is planned to support more languages and frameworks with official `coat` templates. Please check the [roadmap](TODO) below for more information.
 
@@ -111,16 +124,34 @@ It is planned to support more languages and frameworks with official `coat` temp
 * CLI commands
 * API Reference
   * Template types
+* FAQ
+  * Another generator?
 ## Motivation
 * Configuration left behind after starting projects
 * Configuration files touched rarely, leading to effort when an upgrade is needed
 * Rare touching makes it harder for tooling authors to innovate and create breaking changes (Webpack blog post reference)
 ## Roadmap
 * Additional templates
-* Utils for creating templates
+* Fostering template creation
+  * Utils for creating templates
+  * Templating in templates
 *	Support yarn as package manager
+
 ## How to contribute / Contributing
-* No official guide for now, in the works
-* Creating a template best way for now
+
+When contributing to this repository, please first discuss the change you wish to make via an issue before opening a pull request. Please read the [code of conduct](CODE_OF_CONDUCT.md) before contributing.
+
+Until `coat` reaches 1.0.0 not all changes that are planned and added are tracked via issues, therefore the best way to contribute until then is to create coat templates or file issues with bugs or feedback. A more detailed guide on how to contribute to `coat` is in the works.
+
+### How to run and build `coat`
+
+After cloning the repository, run the following commands to set up the repository:
+
+* `npm install`
+* `npx lerna bootstrap`
+
+You will find the build outputs in each package's build folder.
+
 ## License
+
 coat is [MIT licensed.](./LICENSE)
