@@ -17,7 +17,7 @@
   <a href="CODE_OF_CONDUCT.md">
     <img src="https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg">
   </a>
-  <a href="LICENSE.md">
+  <a href="LICENSE">
     <img src="https://img.shields.io/npm/l/@coat/cli">
   </a>
 </p>
@@ -149,7 +149,7 @@ TODO: Higher level links to individual markdown files for sections.
 
 When contributing to this repository, please first discuss the change you wish to make via an issue before opening a pull request. Please read the [code of conduct](CODE_OF_CONDUCT.md) before contributing.
 
-Until `coat` reaches 1.0.0 not all changes that are planned and added are tracked via issues, therefore the best way to contribute until then is to create coat templates or file issues with bugs or feedback. A more detailed guide on how to contribute to `coat` is in the works.
+Until `coat` reaches 1.0.0 not all changes that are planned are tracked via issues, therefore the best way to contribute until then is to create coat templates or file issues with bugs or feedback. A more detailed guide on how to contribute to `coat` is in the works.
 
 ### How to build `coat`
 
