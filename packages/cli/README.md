@@ -17,8 +17,7 @@
   <a href="CODE_OF_CONDUCT.md">
     <img src="https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg">
   </a>
-
-  <a href="https://github.com/coat-dev/coat/actions">
+  <a href="LICENSE.md">
     <img src="https://img.shields.io/npm/l/@coat/cli">
   </a>
 </p>
@@ -31,10 +30,10 @@
 * [x] Intro text
 * [x] Usage
 * [x] Templates
-* [ ] Documentation
 * [ ] Motivation
+* [ ] Documentation
 * [ ] Roadmap
-* [ ] Contributing
+* [X] Contributing
 * [X] License
 
 `coat` aims to make maintaining projects more fun than starting new ones.
@@ -116,7 +115,16 @@ You can however create your own coat templates and even reference local JavaScri
 
 It is planned to support more languages and frameworks with official `coat` templates. Please check the [roadmap](TODO) below for more information.
 
+## Motivation
+
+* Configuration left behind after starting projects
+* Configuration files touched rarely, leading to effort when an upgrade is needed
+* Rare touching makes it harder for tooling authors to innovate and create breaking changes (Webpack blog post reference)
+
 ## Documentation
+
+TODO: Higher level links to individual markdown files for sections.
+
 * How coat works
 * Customization
   * Customization for each file type
@@ -126,32 +134,32 @@ It is planned to support more languages and frameworks with official `coat` temp
   * Template types
 * FAQ
   * Another generator?
-## Motivation
-* Configuration left behind after starting projects
-* Configuration files touched rarely, leading to effort when an upgrade is needed
-* Rare touching makes it harder for tooling authors to innovate and create breaking changes (Webpack blog post reference)
-## Roadmap
+  * JS only?
+
+## 🛣 Roadmap
+
+* Categorize roadmap like VSCode
+
 * Additional templates
-* Fostering template creation
-  * Utils for creating templates
+* Fostering template creation  * Utils for creating templates
   * Templating in templates
 *	Support yarn as package manager
 
-## How to contribute / Contributing
+## 👥 Contributing
 
 When contributing to this repository, please first discuss the change you wish to make via an issue before opening a pull request. Please read the [code of conduct](CODE_OF_CONDUCT.md) before contributing.
 
 Until `coat` reaches 1.0.0 not all changes that are planned and added are tracked via issues, therefore the best way to contribute until then is to create coat templates or file issues with bugs or feedback. A more detailed guide on how to contribute to `coat` is in the works.
 
-### How to run and build `coat`
+### How to build `coat`
 
-After cloning the repository, run the following commands to set up the repository:
+After cloning the repository, run the following commands at the root of the repository to set up and build and the code:
 
 * `npm install`
 * `npx lerna bootstrap`
 
 You will find the build outputs in each package's build folder.
 
-## License
+## 🖋️ License
 
 coat is [MIT licensed.](./LICENSE)
