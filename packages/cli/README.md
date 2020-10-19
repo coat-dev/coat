@@ -103,7 +103,7 @@ To see how coat manages your configuration automatically, try switching from com
 ```
 5. Run `coat sync` and observe how the project files have been updated.
 
-For more usage information, including [customization](TODO) please check out the [documentation section](TODO) below.
+For more usage information, including [customization](TODO) and [examples](TODO) please check out the [documentation section](TODO) below.
 
 ## 📋 coat templates
 
@@ -126,6 +126,15 @@ It is planned to support more languages and frameworks with official `coat` temp
 TODO: Higher level links to individual markdown files for sections.
 
 * How coat works
+* Examples
+  * Single file with customization export
+  * Single file with customization function
+  * Multiple file types
+  * File merged from multiple templates (two templates + coat manifest specifies something directly)
+  * Setup task
+  * Local files + local setup task
+  * Multiple scripts
+  * Dependencies (Two classes dev + normal)
 * Customization
   * Customization for each file type
 * Creating a template
@@ -144,6 +153,13 @@ TODO: Higher level links to individual markdown files for sections.
 * Fostering template creation  * Utils for creating templates
   * Templating in templates
 *	Support yarn as package manager
+* Allow comments in outputted files
+* Allow comments in coat manifest
+* Allow multiple file types for coat manifest (jsonc, js, ts)
+* JavaScript config files
+
+- Issue only
+  * Write file type when updating / creating files
 
 ## 👥 Contributing
 
