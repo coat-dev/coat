@@ -31,6 +31,10 @@ if (projectToRun) {
 // by coat run
 process.env.npm_config_loglevel = "notice";
 
+// Unset TERM_PROGRAM environment variable, to achieve
+// consistent test results across platforms
+process.env.TERM_PROGRAM = "";
+
 module.exports = {
   projects: projectsToRun,
   collectCoverage: true,

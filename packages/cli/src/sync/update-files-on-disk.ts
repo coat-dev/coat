@@ -428,7 +428,12 @@ export async function updateFilesOnDisk(
     );
   } else {
     // No file operation is necessary
-    logMessages.push("♻️ Everything up to date");
+    //
+    // iTerm has issues with rendering the recycling (and some other emojis) at
+    // the correct width, therefore we add an extra space to the log output
+    // See: https://gitlab.com/gnachman/iterm2/-/issues/8735
+    const emojiSpace = process.env.TERM_PROGRAM === "iTerm.app" ? "  " : " ";
+    logMessages.push(`♻️${emojiSpace}Everything up to date`);
   }
   logMessages.push("");
 

@@ -43,9 +43,16 @@ promptsMock.mockReturnValue({
 });
 
 describe("sync/update-files-on-disk", () => {
+  let oldProcessEnv: typeof process.env;
+
+  beforeEach(() => {
+    oldProcessEnv = process.env;
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
     vol.reset();
+    process.env = oldProcessEnv;
   });
 
   const platformRoot = path.parse(process.cwd()).root;
@@ -86,6 +93,20 @@ describe("sync/update-files-on-disk", () => {
     expect(promptsMock).toHaveBeenCalledTimes(0);
     expect(consoleLogSpy).toHaveBeenCalledTimes(1);
     expect(consoleLogSpy).toHaveBeenLastCalledWith(upToDateMessage);
+  });
+
+  test("should add extra space to up to date message if running inside iTerm", async () => {
+    process.env = {
+      ...process.env,
+      TERM_PROGRAM: "iTerm.app",
+    };
+    await updateFilesOnDisk([], [], {}, testContext);
+
+    expect(promptsMock).toHaveBeenCalledTimes(0);
+    expect(consoleLogSpy).toHaveBeenCalledTimes(1);
+    expect(consoleLogSpy).toHaveBeenLastCalledWith(
+      "\n♻️  Everything up to date\n"
+    );
   });
 
   test("should place all files without prompting if files don't exist yet", async () => {
