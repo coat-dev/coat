@@ -1,0 +1,4 @@
+{
+  "name": "single-file-with-customization-function-example",
+  "extends": "./coat-template"
+}

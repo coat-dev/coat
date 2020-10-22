@@ -1,0 +1,4 @@
+node_modules
+
+# coat local files
+/.coat

@@ -1,0 +1,7 @@
+files:
+  - once: true
+    path: .gitignore
+setup:
+  github-repo-creation:
+    repositoryUrl: "https://www.example.com"
+version: 1

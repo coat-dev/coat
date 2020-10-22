@@ -1,0 +1,14 @@
+{
+  "name": "multiple-templates-example",
+  "extends": ["./coat-template-1", "./coat-template-2"],
+  "files": [
+    {
+      "file": "config.json",
+      "type": "JSON",
+      "content": {
+        "a": 3,
+        "c": 1
+      }
+    }
+  ]
+}
