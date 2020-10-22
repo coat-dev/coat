@@ -57,7 +57,7 @@ export function createProgram(): InstanceType<CommandConstructor> {
     .allowUnknownOption()
     .helpOption(
       undefined,
-      '\n\nYou can run multiple scripts by specifying a wildcard, e.g. coat run build:* will run all scripts that are prefixed with build: inside the package.json scripts object.\n\nAll arguments after the first dash ("-") will be passed to each script, e.g. "coat run build --watch" will call the build script with "--watch"'
+      '\n\nYou can run multiple scripts by specifying a wildcard, e.g. "coat run build:*" will run all scripts that are prefixed with build: inside the package.json scripts object.\n\nAll arguments after the first dash ("-") will be passed to each script, e.g. "coat run build --watch" will call the build script with "--watch"'
     )
     .action(async (scriptPattern, otherScriptPatterns) => {
       try {

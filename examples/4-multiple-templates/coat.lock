@@ -1,0 +1,7 @@
+files:
+  - once: true
+    path: .gitignore
+  - hash: >-
+      fYBJJdEoxQsTUbpg47WgPfPXxtjXe5JxAkV9qfvYVIlqNTeHWZvlsmSr5bd8VLazrNm+VNCMW8q/8j7tuGzM2g==
+    path: config.json
+version: 1

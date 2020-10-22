@@ -115,17 +115,18 @@ You can however create your own coat templates and even reference local JavaScri
 
 It is planned to support more languages and frameworks with official `coat` templates. Please check the [roadmap](TODO) below for more information.
 
-## Motivation
+## 🌟 Motivation
 
 * Configuration left behind after starting projects
 * Configuration files touched rarely, leading to effort when an upgrade is needed
 * Rare touching makes it harder for tooling authors to innovate and create breaking changes (Webpack blog post reference)
 
-## Documentation
+## 📚 Documentation
 
 TODO: Higher level links to individual markdown files for sections.
 
 * How coat works
+  * Image with templates, coat manifest & customization file
 * Examples
   * Single file with customization export
   * Single file with customization function
@@ -135,15 +136,24 @@ TODO: Higher level links to individual markdown files for sections.
   * Local files + local setup task
   * Multiple scripts
   * Dependencies (Two classes dev + normal)
-* Customization
+* Customization X
   * Customization for each file type
-* Creating a template
+    * JSON
+    * TEXT
+    * YAML
+  * Explanation: Why not in-place?
 * CLI commands
+  * sync
+  * create
+  * run
+  * setup
+* coat manifest reference
+* Creating a template
 * API Reference
   * Template types
 * FAQ
   * Another generator?
-  * JS only?
+  * JS only? (-> No)
 
 ## 🛣 Roadmap
 
@@ -156,10 +166,13 @@ TODO: Higher level links to individual markdown files for sections.
 * Allow comments in outputted files
 * Allow comments in coat manifest
 * Allow multiple file types for coat manifest (jsonc, js, ts)
-* JavaScript config files
+* New file type: JavaScript config files
+* Allow multiple file types for customization (ts, json, custom directly for text)
+* Hashless file updates (mechanism that is used for package.json, allowing in-place editing for files edited by tools)
 
 - Issue only
   * Write file type when updating / creating files
+  * Allow default exports for customization files
 
 ## 👥 Contributing
 

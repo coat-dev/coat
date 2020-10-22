@@ -1,0 +1,13 @@
+files:
+  - once: true
+    path: .gitignore
+  - hash: >-
+      O1sbk+uggdajCUUPelevuZ85v4F2tZMLWhnp3IfZpNErCr3eNPTH9tk9T3sZJWODtKAbBH5Jt4TLFebofoarUA==
+    path: config.json
+  - hash: >-
+      IBrijuIKSVP7AMyG2WP1RsK3khubgBlIfCmcSO7AqC39Vt+MFFr74NNNaHR/N6792vapc28/SDhSUQUaFw+I5g==
+    path: config.yaml
+  - hash: >-
+      RIGa2oASaHTzb4UjbJFGGq7ehS54Ivk45V+C3buoTE5m6fSu+LT4k3Iuu1Seu0NwCossMQwfvqizFgRGqjHjGA==
+    path: example.txt
+version: 1

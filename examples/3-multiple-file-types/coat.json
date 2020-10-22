@@ -1,0 +1,4 @@
+{
+  "name": "multiple-file-types-example",
+  "extends": "./coat-template"
+}
