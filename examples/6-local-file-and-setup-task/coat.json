@@ -1,0 +1,4 @@
+{
+  "name": "global-setup-task-example",
+  "extends": "./coat-template"
+}

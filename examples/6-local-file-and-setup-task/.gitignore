@@ -1,0 +1,9 @@
+node_modules
+
+# coat local files
+/.coat
+
+.env
+.env-custom.js
+.envrc
+.envrc-custom.js
