@@ -1,5 +1,3 @@
-const readline = require("readline");
-
 /**
  * Prompts the user and returns the answer in a Promise
  *
@@ -8,7 +6,7 @@ const readline = require("readline");
  */
 async function prompt(question) {
   return new Promise((resolve) => {
-    const rl = readline.createInterface({
+    const rl = require("readline").createInterface({
       input: process.stdin,
       output: process.stdout,
     });
@@ -75,6 +73,16 @@ module.exports = ({ coatContext }) => {
   // Check whether the setup task has already been run
   // to detect whether we should place an .env file or a .envrc file
   const envVarToolSetupTaskId = "environment-var-tool-selection";
+
+  // Task results are stored in coat's lockfiles. Since the task
+  // in this example is a local task, the `coatLocalLockfile` property
+  // must be used to access the tasks results in the `setup` property.
+  //
+  // The `coatLocalLockfile.setup` property holds task results as
+  // a map by their task ids, e.g.:
+  // {
+  //   "environment-var-tool-selection": { "type": 1 }
+  // }
   const setupTaskResult =
     coatContext.coatLocalLockfile.setup[envVarToolSetupTaskId];
 

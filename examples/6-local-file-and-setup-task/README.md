@@ -2,23 +2,26 @@
 
 An example for a coat project using a local coat template that specifies and runs a single [local task](TODO: Link to task descriptions) and a [local file](TODO: Link to local file explanation).
 
-Local tasks are run once per clone of the project. In this example, we want to give collaborators of this coat project the choice of using [`autoenv`]() or [`direnv`]() for managing the environment variables.
+Local tasks are run once per clone of the project. In this example, we want to give collaborators of this coat project the choice of using [`autoenv`](https://github.com/inishchith/autoenv) or [`direnv`](https://github.com/direnv/direnv) for managing the environment variables.
 
-Local files are meant to be customizable per user. While they can be checked in if that's desired, their respective customization files should not be checked in to git to allow collaborators to customize the files based on their needs. In this example, the `.autoenv.zsh` or `.envrc` file - depending on the chosen tool from the local task - will be a local file, to allow collaborators to individually customize their environment variables.
+Local files are meant to be customizable per user. They and their customization files should not be checked in to the git repository, because the contents of the files might be different for each collaborator of the repository. In this example, the `.env` or `.envrc` file - depending on the chosen tool from the local task - will be a local file, to allow collaborators to individually customize their environment variables.
 
 ## Playing with the example
 
 Ensure that `coat` is [installed correctly](TODO) before trying out the example.
 
-* Run `coat sync` and the fake local setup task is run automatically. After choosing
+* Run `coat sync` and the fake local setup task is run automatically. After choosing the desired environment management tool either a `.envrc` or `.env` file is created.
 * Run `coat sync` again after running it once to see that the task will not be run again.
-* Delete the `coat.lock` file after running `coat sync` once to make `coat sync` run the setup task again.
+* Inspect the local lockfile, stored in `.coat/coat.lock`. You can see the task result based on your input when first running `coat sync`. Try changing the value of the local setup task result from 1 to 2 (or vice versa) and run `coat sync` to see how local files are updated.
+* Delete the `.coat/coat.lock` file after running `coat sync` once to make `coat sync` run the setup task again.
 * Modify the `run` function inside the template to adjust the tasks behavior.
 
 ## Explanation
 
 * The coat project specified in `coat.json` extends a single coat template exported in `coat-template.js`.
-* The coat template in `coat-template.js` specifies a global task that fakes the creation of a GitHub repository
-* When running `coat sync`, `coat` checks if there are any tasks that have to be run. By default tasks are run if there is no previous task result stored in the lockfile, therefore the `github-repo-creation` task is run on sync.
-* The run function fakes the creation of a GitHub repository and returns an object as a task result which includes the `repositoryUrl`. This property is available inside a template creation function as part of the coat context and is stored in the `coat.lock` file.
-* After running `coat sync` once, additional runs of `coat sync` will no longer run the task, since the previous result exists in the lockfile.
+* The coat template in `coat-template.js` specifies a local task that asks the user which environment management tool should be used.
+* When running `coat sync`, `coat` checks if there are any tasks that have to be run. By default tasks are run if there is no previous task result stored in the lockfile, therefore the `environment-var-tool-selection` task is run on sync.
+* `environment-var-tool-selection` is a local task - which means that it is meant to be run once per clone or individual collaborator of a project as compared to global tasks - which are meant to be run once for a project. Local tasks and files are tracked in the local lockfile stored in `.coat/coat.lock`. Since the `.coat` directory should be ignored and not checked into the git repository, each collaborator will have a fresh local lockfile after cloning the repository.
+* The run function of the local task asks which environment management tool should be used and returns an object as a task result which includes the `type`. This property is available inside a template creation function as part of the coat context and is stored in the local `.coat/coat.lock` file.
+* The template creation function can be called multiple times during a single `coat sync` execution. In this case it is called once to execute the setup task and once to merge files. The second time it is called, the previous task results for the local task will contain the type of the env var tool that should be used, which allows the template to specify the correct file which should be generated by coat.
+* After running `coat sync` once, additional runs of `coat sync` will no longer run the task, since the previous result exists in the local lockfile.
