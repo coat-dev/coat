@@ -1,0 +1,4 @@
+{
+  "name": "multiple-npm-scripts-example",
+  "extends": "./coat-template"
+}

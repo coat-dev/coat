@@ -1,0 +1,8 @@
+files:
+  - once: true
+    path: .gitignore
+scripts:
+  - build
+  - "build:transpile-to-js"
+  - "build:type-definitions"
+version: 1

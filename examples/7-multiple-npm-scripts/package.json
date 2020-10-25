@@ -1,0 +1,9 @@
+{
+  "name": "multiple-npm-scripts-example",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "coat run build:*",
+    "build:transpile-to-js": "echo \"[FAKE] Transpiling to JavaScript, e.g. using babel ...\"",
+    "build:type-definitions": "echo \"[FAKE] Generating type definitions, e.g. using flow or TypeScript ...\""
+  }
+}
