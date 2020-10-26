@@ -8,9 +8,7 @@ TODO
 
 ## Examples
 
-Explanation of how to try out examples
-
-TODO: List of examples with links
+You can find examples of coat projects and coat templates in the [examples folder](../examples/README.md).
 
 ## Customization
 
@@ -101,27 +99,27 @@ node_modules
 custom_ignore_entry.txt
 ```
 
-## File Types
+### File Types
 
-### JSON
+#### JSON
 
 Expected return value: **JSON object**
 
 Default merge behavior: Properties are deeply merged, arrays are replaced.
 
-### TEXT
+#### TEXT
 
 Expected return value: **string**
 
 Default merge behavior: The old string value is fully replaced.
 
-### YAML
+#### YAML
 
 Expected return value: **JSON object**
 
 Default merge behavior: Properties are deeply merged, arrays are replaced.
 
-## Why can't I edit files directly and merge them in-place?
+### Why can't I edit files directly and merge them in-place?
 
 Some files could be easily edited and merged in place. For example, adding a deep property to a JSON object or adding a line to a .gitignore file might make it easier to work inside a coat project.
 
@@ -135,7 +133,7 @@ The existence of a `.gitignore-custom.js` file - that is applied and merged last
 
 `*` - Note: I do not recommend to check in `node_modules` in JavaScript projects. I've simply seen teams do it - and if it works for them they should be able to do so.
 
-### Exceptions to the rule
+#### Exceptions to the rule
 
 As mentioned above, the `package.json` file in coat projects is merged in-place. The rationale behind this is that it is a file that is often **modified by tooling** in addition to being edited by users directly. In this particular example, users often add or remove dependencies by calling `npm install X`. Forcing the user to find out the latest version of a dependency and adding it to a customization file would be too much to ask and decrease developer productivity - which `coat` aims to increase as a goal.
 
@@ -189,3 +187,59 @@ export default templateFunction;
 ```
 
 **Note:** Until TODO! is implemented, `coat sync` will prompt before updating the file each time the content of the file has changed, since user modifications are disallowed by default and coat tries to prevent accidental file loss.
+
+## CLI commands
+
+### `sync`
+
+Usage: `coat sync`
+
+Runs all necessary setup tasks and generates all files of a coat project. Must be run inside a coat project folder that contains a coat manifest file (coat.json).
+
+Arguments: None
+
+Options: None
+
+### `create`
+
+**Usage:** `coat create <template> [dir] [projectName]`
+
+Creates a new project based on the coat template.
+
+Arguments:
+
+| Argument      | Type                  | Default                                                                                  | Description                                                                                                                                        |
+|---------------|-----------------------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| **`template`**    | **string (Required)** | /                                                                                        | The name of coat template from the npm registry (e.g. `@coat/template-ts-package`)                                                                 |
+| `dir`         | string                | By default a new folder will be created based on the project name that will be prompted. | The directory where coat should create a project. Resolves to a relative path from the current working directory, but absolute paths work as well. |
+| `projectName` | string                | Uses the `dir` argument, if it is not a complex path expression.                         | The name of your new project.                                                                                                                      |
+
+Options: None
+
+### `run`
+
+Usage: `coat run <scriptPattern> [otherScriptPatterns...]`
+
+Runs one or multiple package.json scripts in parallel. You can run multiple scripts by specifying a wildcard, e.g. coat run build:* will run all scripts that are prefixed with build: inside the package.json scripts object. All arguments after the first dash ("-") will be passed to each script, e.g. `coat run build --watch` will call the build script with `--watch`
+
+If a script name or pattern do not conflict with a built-in coat cli command, you can also omit the "run" command to execute the script or pattern:
+
+```sh
+coat run build
+# or without run
+coat build
+```
+
+Arguments: None
+
+Options: None
+
+### `setup`
+
+Usage: `coat setup`
+
+Sequentially runs all setup tasks of the current coat project, even if they have already been run previously. Must be run inside a coat project folder that contains a coat manifest file (coat.json).
+
+Arguments: None
+
+Options: None

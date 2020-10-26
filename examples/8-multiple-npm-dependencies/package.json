@@ -1,0 +1,10 @@
+{
+  "name": "multiple-npm-dependencies-example",
+  "version": "1.0.0",
+  "dependencies": {
+    "noop": "0.2.2"
+  },
+  "devDependencies": {
+    "node-noop": "1.0.0"
+  }
+}

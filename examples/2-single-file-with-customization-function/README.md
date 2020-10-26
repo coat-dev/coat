@@ -1,6 +1,6 @@
 # coat example - single-file-with-customization-function
 
-An example for a coat project using a local coat template that generates a single continuously managed file named `config.json`.
+An example for a coat project using a local coat template that generates a single continuously managed file named `config.json` with a customization file using a customization function.
 
 ## Playing with the example
 

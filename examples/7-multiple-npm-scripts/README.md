@@ -13,4 +13,4 @@ Ensure that `coat` is [installed correctly](TODO) before trying out the example.
 ## Explanation
 
 * The coat project specified in `coat.json` extends a single coat template exported in `coat-template.js`.
-* TODO
+* The coat template specifies two scripts. Since both have `build` as the `scriptName` property, they will be merged by coat to be executed together when the `build` script is run via `npm run` or `coat run`.

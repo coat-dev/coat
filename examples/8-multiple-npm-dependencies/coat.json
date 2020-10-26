@@ -1,0 +1,4 @@
+{
+  "name": "multiple-npm-dependencies-example",
+  "extends": "./coat-template"
+}
