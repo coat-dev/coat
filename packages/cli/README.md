@@ -127,7 +127,7 @@ TODO: Higher level links to individual markdown files for sections.
 
 * How coat works
   * Image with templates, coat manifest & customization file
-* Examples
+* Examples X
   * Single file with customization export
   * Single file with customization function
   * Multiple file types
@@ -142,7 +142,7 @@ TODO: Higher level links to individual markdown files for sections.
     * TEXT
     * YAML
   * Explanation: Why not in-place?
-* CLI commands
+* CLI commands X
   * sync
   * create
   * run
@@ -160,7 +160,8 @@ TODO: Higher level links to individual markdown files for sections.
 * Categorize roadmap like VSCode
 
 * Additional templates
-* Fostering template creation  * Utils for creating templates
+* Fostering template creation
+  * Utils for creating templates
   * Templating in templates
 *	Support yarn as package manager
 * Allow comments in outputted files
@@ -170,7 +171,7 @@ TODO: Higher level links to individual markdown files for sections.
 * Allow multiple file types for customization (ts, json, custom directly for text)
 * Hashless file updates (mechanism that is used for package.json, allowing in-place editing for files edited by tools)
 
-- Issue only
+* Issue only
   * Write file type when updating / creating files
   * Allow default exports for customization files
 

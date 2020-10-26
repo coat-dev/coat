@@ -1,6 +1,6 @@
 # coat example - local-file-and-setup-task
 
-An example for a coat project using a local coat template that specifies and runs a single [local task](TODO: Link to task descriptions) and a [local file](TODO: Link to local file explanation).
+An example for a coat project using a local coat template that specifies and runs a single [local task](TODO: Link to task descriptions) and generates a [local file](TODO: Link to local file explanation).
 
 Local tasks are run once per clone of the project. In this example, we want to give collaborators of this coat project the choice of using [`autoenv`](https://github.com/inishchith/autoenv) or [`direnv`](https://github.com/direnv/direnv) for managing the environment variables.
 

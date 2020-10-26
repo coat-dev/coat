@@ -1,0 +1,9 @@
+dependencies:
+  dependencies:
+    - noop
+  devDependencies:
+    - node-noop
+files:
+  - once: true
+    path: .gitignore
+version: 1
