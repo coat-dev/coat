@@ -243,3 +243,180 @@ Sequentially runs all setup tasks of the current coat project, even if they have
 Arguments: None
 
 Options: None
+
+## Template reference
+
+The following sections explain the properties that a coat template can specify. A template can have the following property types:
+
+```ts
+interface CoatManifest {
+  name: string;
+  extends?: string | (string | [string, Record<string, unknown>])[];
+  // See `files` below for more detail
+  files?: CoatManifestFile[]
+  // See `setup` below for more detail
+  setup?: CoatManifestTask[]
+  // See `scripts` below for more detail
+  scripts?: CoatManifestScript[]
+  dependencies?: {
+    dependencies?: Record<string, string>;
+    devDependencies?: Record<string, string>;
+    peerDependencies?: Record<string, string>;
+    optionalDependencies?: Record<string, string>;
+  }
+}
+```
+
+### `name`
+
+The name of the coat template or project. Useful for debugging purposes to show the origin in case an error occurs.
+
+### `extends`
+
+The coat template or templates that are extended by a template or project. The string expression is passed to node's require function, therefore local files that export a template can be referenced as well. Examples:
+
+```ts
+const template = {
+  // ...
+  // Extends the @coat/template-ts-package template from node_modules
+  extends: "@coat/template-ts-package",
+  //
+  // Extends @coat/template-ts-package from "node_modules" and a local
+  // template in the ./templates folder relative from the project directory
+  extends: [
+    "@coat/template-ts-package",
+    "./templates/my-template.js"
+  ]
+}
+```
+
+Templates can accept a configuration object which is passed to the template in a tuple:
+
+```ts
+const template = {
+  // ...
+  // Config example
+  extends: [
+    ["@coat/template-ts-package", { "compiler": "babel" }]
+  ]
+}
+```
+
+### `files`
+
+Generated files are the heart of a coat project. An entry in the `files` array can have the following properties:
+
+#### `file`
+
+**Required**
+
+Type: `string`
+
+The *relative* path of the generated file from the coat project directory.
+
+Examples:
+```ts
+const template = {
+  files: [{
+    // Example #1
+    file: "config.json" // placed next to coat.json
+    // Example #2
+    file: "sub-folder-1/sub-folder-2/config.json" // Placed inside two sub-folders relative to the directory that houses coat.json
+    //
+    // ... other file properties ...
+  }]
+}
+```
+
+Restrictions:
+
+* The file path must not be absolute.
+* The file path must not lead to a parent folder outside of the coat project directory.
+
+#### `type`
+
+**Required**
+
+Type: One of `JSON` | `YAML` | `TEXT`
+
+The type of the file which determines the type of the `content` property and how the file will be merged. `@coat/cli` exports the `CoatManifestFileType` enum, which holds the types as accessible constants. `TEXT` is the most generic file type and can be used for all files or use cases where a more specific file type is unavailable (like gradle build configurations, Podfile specifications, etc.).
+
+Examples:
+```ts
+import { CoatManifestFileType } from "@coat/cli";
+
+const template = {
+  files: [{
+    // Example #1
+    file: "config.json",
+    type: "JSON", // or CoatManifestFileType.Json
+    // ...
+    // Example #2
+    file: ".gitignore",
+    type: CoatManifestFileType.Text // or "TEXT"
+    // ... other file properties ...
+  }]
+}
+```
+
+Restrictions:
+
+* If there are multiple entries of a file in a coat projects (by multiple templates specifying file entries with the same `file` path property), they must have the same `type` property.
+
+#### `content`
+
+**Required**
+
+Type: Depends on `file.type`:
+
+`type` | `content` type | Comment
+----------- | -------------- | -------
+`JSON` | `JsonObject` | A JavaScript object without any non-serializable properties (e.g. Functions)
+`YAML` | `JsonObject` | Same as for `JSON`
+`TEXT` | `string` | The string content (including new lines) of the resulting file.
+
+Examples:
+
+```ts
+import { CoatManifestFileType } from "@coat/cli";
+
+const template = {
+  files: [{
+    // Example 1
+    file: "config.json",
+    type: CoatManifestFileType.Json,
+    content: {
+      myConfigProperty: "myConfigValue",
+      deepConfigProperty: {
+        deepProp: ["value"]
+      }
+    }
+    // ...
+    // Example 2
+    file: ".gitignore",
+    type: CoatManifestFileType.Text,
+    // Ignores node_modules and build folders
+    content: "node_modules\nbuild"
+    // ...
+  }]
+}
+```
+
+TODO: Continue here
+TODO: Function explanation as well
+
+#### File types
+
+TODO
+
+### `setup`
+
+TODO
+
+### `scripts`
+
+TODO
+
+### `dependencies`
+
+TODO
