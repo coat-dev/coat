@@ -42,7 +42,7 @@
 * **Full customization:** All files that are managed by coat are fully customizable by creating a [customization file](add link to customization section) next to them. This enables you to keep your project configuration up-to-date while customizing the file outputs exactly to your project's needs.
 * **Setup your team for success:** `coat` projects and templates can run setup tasks that are run once for a project (e.g. setting up secrets on your CI system) or once per developer (e.g. setting up a local database that the project depends on) to ensure that your and your team's development environment is always in sync.
 
->**Note**: `coat` is still in experimental stage and while it is already used in production at [ORDA](https://www.orda-app.com), there might be breaking changes before reaching 1.0.0.
+>**Note**: `coat` is still in experimental stage and while it is already used in production, there might be breaking changes before reaching 1.0.0.
 
 ## 🙏 I need your feedback!
 
