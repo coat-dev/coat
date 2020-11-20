@@ -1,5 +1,10 @@
 {
   "extends": ["config:base", "group:allNonMajor"],
   "schedule": "before 7am on Friday",
-  "lockFileMaintenance": { "enabled": true }
+  "lockFileMaintenance": { "enabled": true },
+  "force": {
+    "constraints": {
+      "node": "< 15.0.0"
+    }
+  }
 }
