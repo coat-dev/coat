@@ -12,9 +12,7 @@ export interface CoatManifestFileContentTypesMap {
   [CoatManifestFileType.Yaml]: JsonObject;
 }
 
-export type CoatManifestFileContentType = ValueOf<
-  CoatManifestFileContentTypesMap
->;
+export type CoatManifestFileContentType = ValueOf<CoatManifestFileContentTypesMap>;
 
 export interface CoatManifestFileBase<FileType extends CoatManifestFileType> {
   /**
