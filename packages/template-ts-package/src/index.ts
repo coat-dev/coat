@@ -98,18 +98,18 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
   // Shared dependencies
   const devDependencies: Record<string, string> = {
     // Eslint
-    eslint: "^7.8.1",
-    "@typescript-eslint/eslint-plugin": "^4.0.1",
-    "@typescript-eslint/parser": "^4.0.1",
-    "eslint-config-prettier": "^6.11.0",
+    eslint: "^7.13.0",
+    "@typescript-eslint/eslint-plugin": "^4.8.1",
+    "@typescript-eslint/parser": "^4.8.1",
+    "eslint-config-prettier": "^6.15.0",
 
     // Jest
-    jest: "^26.4.2",
-    "@types/jest": "^26.0.13",
-    "jest-circus": "^26.4.2",
+    jest: "^26.6.3",
+    "@types/jest": "^26.0.15",
+    "jest-circus": "^26.6.3",
 
-    prettier: "^2.1.1",
-    typescript: "~4.0.2",
+    prettier: "^2.2.0",
+    typescript: "~4.1.2",
     rimraf: "^3.0.2",
   };
 
@@ -170,7 +170,7 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
       // Dependencies
       //
       // Jest
-      devDependencies["ts-jest"] = "^26.4.1";
+      devDependencies["ts-jest"] = "^26.4.4";
 
       // Scripts
       scripts.push({
@@ -208,10 +208,10 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
       // Dependencies
       //
       // Babel
-      devDependencies["@babel/cli"] = "^7.11.6";
-      devDependencies["@babel/core"] = "^7.11.6";
-      devDependencies["@babel/preset-env"] = "^7.11.5";
-      devDependencies["@babel/preset-typescript"] = "^7.10.4";
+      devDependencies["@babel/cli"] = "^7.12.1";
+      devDependencies["@babel/core"] = "^7.12.3";
+      devDependencies["@babel/preset-env"] = "^7.12.1";
+      devDependencies["@babel/preset-typescript"] = "^7.12.1";
 
       // Scripts
       scripts.push(
