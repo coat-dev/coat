@@ -17,6 +17,7 @@ import {
 } from "../constants";
 import { groupFiles } from "./group-files";
 import { jsonFileFunctions } from "../file-types/json";
+import { JsonObject } from "type-fest";
 
 jest.mock("fs").mock("import-from");
 
@@ -146,17 +147,29 @@ describe("sync/merge-files", () => {
   });
 
   test("should call content function with result from previously merged file entries", async () => {
-    const file1 = jest.fn(() => ({
+    const file1 = jest.fn<
+      JsonObject,
+      [JsonObject | null | undefined, typeof jsonFileFunctions.merge]
+    >(() => ({
       value1: 1,
     }));
-    const file2 = jest.fn(() => ({
+    const file2 = jest.fn<
+      JsonObject,
+      [JsonObject | null | undefined, typeof jsonFileFunctions.merge]
+    >(() => ({
       value2: 2,
     }));
-    const file3 = jest.fn((input) => ({
+    const file3 = jest.fn<
+      JsonObject,
+      [JsonObject | null | undefined, typeof jsonFileFunctions.merge]
+    >((input) => ({
       ...input,
       value3: 3,
     }));
-    const file4 = jest.fn((input, merge) => merge(input, { z: 5 }));
+    const file4 = jest.fn<
+      JsonObject | null,
+      [JsonObject | null | undefined, typeof jsonFileFunctions.merge]
+    >((input, merge) => merge(input, { z: 5 }));
     const files = groupFiles(
       [
         {
@@ -209,13 +222,22 @@ describe("sync/merge-files", () => {
   });
 
   test("should not place file if last file content function returns null", async () => {
-    const file1 = jest.fn(() => ({
+    const file1 = jest.fn<
+      JsonObject,
+      [JsonObject | null | undefined, typeof jsonFileFunctions.merge]
+    >(() => ({
       value1: 1,
     }));
-    const file2 = jest.fn(() => ({
+    const file2 = jest.fn<
+      JsonObject,
+      [JsonObject | null | undefined, typeof jsonFileFunctions.merge]
+    >(() => ({
       value2: 2,
     }));
-    const file3 = jest.fn(() => null);
+    const file3 = jest.fn<
+      null,
+      [JsonObject | null | undefined, typeof jsonFileFunctions.merge]
+    >(() => null);
     const files = groupFiles(
       [
         {

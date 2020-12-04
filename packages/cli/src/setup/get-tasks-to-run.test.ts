@@ -10,6 +10,7 @@ import { CoatContext } from "../types/coat-context";
 import {
   CoatManifestTaskStrict,
   CoatTaskType,
+  CoatTaskRunOptions,
 } from "../types/coat-manifest-tasks";
 import { getStrictCoatManifest } from "../util/get-strict-coat-manifest";
 import { getTasksToRun } from "./get-tasks-to-run";
@@ -125,12 +126,20 @@ describe("setup/get-tasks-to-run", () => {
   test("should call shouldRun function with previous task results", async () => {
     const global1Run = jest.fn();
     const local1Run = jest.fn();
-    const global1ShouldRun = jest.fn(async () => true);
-    const local1ShouldRun = jest.fn(async () => false);
+    const global1ShouldRun = jest.fn<Promise<boolean>, [CoatTaskRunOptions]>(
+      async () => true
+    );
+    const local1ShouldRun = jest.fn<Promise<boolean>, [CoatTaskRunOptions]>(
+      async () => false
+    );
     const global2Run = jest.fn();
     const local2Run = jest.fn();
-    const global2ShouldRun = jest.fn(async () => true);
-    const local2ShouldRun = jest.fn(async () => false);
+    const global2ShouldRun = jest.fn<Promise<boolean>, [CoatTaskRunOptions]>(
+      async () => true
+    );
+    const local2ShouldRun = jest.fn<Promise<boolean>, [CoatTaskRunOptions]>(
+      async () => false
+    );
 
     const inputTasks: CoatManifestTaskStrict[] = [
       {
