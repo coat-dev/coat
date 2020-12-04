@@ -1,7 +1,7 @@
 import { JsonObject } from "type-fest";
 import { CoatContext } from "./coat-context";
 
-interface CoatTaskRunOptions {
+export interface CoatTaskRunOptions {
   previousResults: {
     global: { [taskId: string]: JsonObject };
     local: { [taskId: string]: JsonObject };

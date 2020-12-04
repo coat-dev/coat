@@ -20,6 +20,7 @@ import { getStrictCoatManifest } from "../util/get-strict-coat-manifest";
 import * as getContextImport from "../util/get-context";
 import * as getAllTemplatesImport from "../util/get-all-templates";
 import * as getTasksToRunImport from "./get-tasks-to-run";
+import { CoatTaskRunOptions } from "../types/coat-manifest-tasks";
 
 jest.mock("fs");
 
@@ -156,8 +157,12 @@ describe("setup", () => {
   });
 
   test("should run tasks with context and no previous results on first run", async () => {
-    const globalTaskRun = jest.fn(() => ({}));
-    const localTaskRun = jest.fn(() => ({}));
+    const globalTaskRun = jest.fn<Record<string, never>, [CoatTaskRunOptions]>(
+      () => ({})
+    );
+    const localTaskRun = jest.fn<Record<string, never>, [CoatTaskRunOptions]>(
+      () => ({})
+    );
 
     const context: CoatContext = {
       ...testContext,
@@ -512,10 +517,12 @@ describe("setup", () => {
   });
 
   test("should work with tasks that don't return any result", async () => {
-    const globalTaskRun = jest.fn(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const globalTaskRun = jest.fn((_options: CoatTaskRunOptions) => {
       // Empty function
     });
-    const localTaskRun = jest.fn(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const localTaskRun = jest.fn((_options: CoatTaskRunOptions) => {
       // Empty function
     });
 
