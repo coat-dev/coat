@@ -9,7 +9,7 @@
     "boxen": "4.2.0",
     "chalk": "4.1.0",
     "commander": "6.2.0",
-    "execa": "4.1.0",
+    "execa": "5.0.0",
     "fs-extra": "9.0.1",
     "immer": "8.0.0",
     "import-from": "3.0.0",

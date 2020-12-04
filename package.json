@@ -7,7 +7,7 @@
   "devDependencies": {
     "@types/prettier": "2.1.5",
     "@types/prompts": "2.0.9",
-    "execa": "4.1.0",
+    "execa": "5.0.0",
     "lerna": "3.22.1",
     "prettier": "2.2.0",
     "prompts": "2.4.0",
