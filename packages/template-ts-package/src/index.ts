@@ -101,7 +101,7 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
     eslint: "^7.13.0",
     "@typescript-eslint/eslint-plugin": "^4.8.1",
     "@typescript-eslint/parser": "^4.8.1",
-    "eslint-config-prettier": "^6.15.0",
+    "eslint-config-prettier": "^7.0.0",
 
     // Jest
     jest: "^26.6.3",
