@@ -97,7 +97,7 @@ describe("lockfiles/write-lockfiles", () => {
         path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
         "utf-8"
       );
-      const newLockfile = yaml.safeLoad(lockfileContent);
+      const newLockfile = yaml.load(lockfileContent);
       expect(newLockfile).not.toHaveProperty("files");
     });
 
@@ -126,7 +126,7 @@ describe("lockfiles/write-lockfiles", () => {
         path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
         "utf-8"
       );
-      const newLockfile = yaml.safeLoad(lockfileContent);
+      const newLockfile = yaml.load(lockfileContent);
       expect(newLockfile).toHaveProperty("files", [
         {
           path: "a.json",
@@ -154,7 +154,7 @@ describe("lockfiles/write-lockfiles", () => {
         path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
         "utf-8"
       );
-      const newLockfile = yaml.safeLoad(lockfileContent);
+      const newLockfile = yaml.load(lockfileContent);
       expect(newLockfile).not.toHaveProperty("setup");
     });
 
@@ -183,7 +183,7 @@ describe("lockfiles/write-lockfiles", () => {
           path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
           "utf-8"
         );
-        const newLockfile = yaml.safeLoad(lockfileContent);
+        const newLockfile = yaml.load(lockfileContent);
         expect(newLockfile).toHaveProperty("dependencies");
         expect(newLockfile).not.toHaveProperty(
           `dependencies.${dependencyGroup}`
@@ -207,7 +207,7 @@ describe("lockfiles/write-lockfiles", () => {
         path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
         "utf-8"
       );
-      const newLockfile = yaml.safeLoad(lockfileContent);
+      const newLockfile = yaml.load(lockfileContent);
       expect(newLockfile).not.toHaveProperty("dependencies");
     });
   });
@@ -274,7 +274,7 @@ describe("lockfiles/write-lockfiles", () => {
         path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH),
         "utf-8"
       );
-      const newLockfile = yaml.safeLoad(lockfileContent);
+      const newLockfile = yaml.load(lockfileContent);
       expect(newLockfile).not.toHaveProperty("files");
     });
 
@@ -303,7 +303,7 @@ describe("lockfiles/write-lockfiles", () => {
         path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH),
         "utf-8"
       );
-      const newLockfile = yaml.safeLoad(lockfileContent);
+      const newLockfile = yaml.load(lockfileContent);
       expect(newLockfile).toHaveProperty("files", [
         {
           path: "a.json",
@@ -331,7 +331,7 @@ describe("lockfiles/write-lockfiles", () => {
         path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH),
         "utf-8"
       );
-      const newLockfile = yaml.safeLoad(lockfileContent);
+      const newLockfile = yaml.load(lockfileContent);
       expect(newLockfile).not.toHaveProperty("setup");
     });
   });

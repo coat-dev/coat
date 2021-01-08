@@ -14,7 +14,7 @@ function polish(
   // Sort properties
   const sortedJsonContent = jsonStableStringify(source);
   const sortedSource = JSON.parse(sortedJsonContent);
-  const sortedContent = yaml.safeDump(sortedSource);
+  const sortedContent = yaml.dump(sortedSource);
 
   const prettier = getPrettier(context);
 

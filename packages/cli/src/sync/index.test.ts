@@ -466,7 +466,7 @@ describe("sync", () => {
       // Put unmanaged file into global lockfile
       fs.outputFile(
         path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
-        yaml.safeDump({
+        yaml.dump({
           version: 1,
           files: [
             {
@@ -499,7 +499,7 @@ describe("sync", () => {
       // Add unmanaged file to local lockfile
       fs.outputFile(
         path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH),
-        yaml.safeDump({
+        yaml.dump({
           version: COAT_LOCAL_LOCKFILE_VERSION,
           files: [
             {
