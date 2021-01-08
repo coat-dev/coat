@@ -49,7 +49,7 @@ describe("lockfiles/get-coat-lockfiles", () => {
           },
         ],
       };
-      const lockfileYaml = yaml.safeDump(lockfile);
+      const lockfileYaml = yaml.dump(lockfile);
       await fs.outputFile(
         path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
         lockfileYaml
@@ -87,7 +87,7 @@ describe("lockfiles/get-coat-lockfiles", () => {
           },
         ],
       };
-      const lockfileYaml = yaml.safeDump(lockfile);
+      const lockfileYaml = yaml.dump(lockfile);
       const lockfilePath = path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH);
       await fs.outputFile(lockfilePath, lockfileYaml);
       await fs.chmod(lockfilePath, "000");
@@ -122,7 +122,7 @@ describe("lockfiles/get-coat-lockfiles", () => {
           },
         ],
       };
-      const lockfileYaml = yaml.safeDump(lockfile);
+      const lockfileYaml = yaml.dump(lockfile);
       await fs.outputFile(
         path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH),
         lockfileYaml
@@ -153,7 +153,7 @@ describe("lockfiles/get-coat-lockfiles", () => {
           },
         ],
       };
-      const lockfileYaml = yaml.safeDump(lockfile);
+      const lockfileYaml = yaml.dump(lockfile);
       const lockfilePath = path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH);
       await fs.outputFile(lockfilePath, lockfileYaml);
       await fs.chmod(lockfilePath, "000");

@@ -293,7 +293,7 @@ describe("setup", () => {
       fs.readFile(path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH), "utf-8"),
     ]);
 
-    expect(yaml.safeLoad(globalLockfileOnDisk)).toEqual({
+    expect(yaml.load(globalLockfileOnDisk)).toEqual({
       version: 1,
       setup: {
         globalTask: {
@@ -301,7 +301,7 @@ describe("setup", () => {
         },
       },
     });
-    expect(yaml.safeLoad(localLockfileOnDisk)).toEqual({
+    expect(yaml.load(localLockfileOnDisk)).toEqual({
       version: 1,
       setup: {
         localTask: {
@@ -343,7 +343,7 @@ describe("setup", () => {
       "utf-8"
     );
 
-    expect(yaml.safeLoad(globalLockfileOnDisk)).toEqual({
+    expect(yaml.load(globalLockfileOnDisk)).toEqual({
       version: 1,
       setup: {
         globalTask1: {
@@ -372,11 +372,11 @@ describe("setup", () => {
     await Promise.all([
       fs.outputFile(
         path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
-        yaml.safeDump(globalLockfile)
+        yaml.dump(globalLockfile)
       ),
       fs.outputFile(
         path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH),
-        yaml.safeDump(localLockfile)
+        yaml.dump(localLockfile)
       ),
     ]);
 
@@ -408,7 +408,7 @@ describe("setup", () => {
       fs.readFile(path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH), "utf-8"),
     ]);
 
-    expect(yaml.safeLoad(globalLockfileOnDisk)).toEqual({
+    expect(yaml.load(globalLockfileOnDisk)).toEqual({
       version: 1,
       setup: {
         globalTask: {
@@ -416,7 +416,7 @@ describe("setup", () => {
         },
       },
     });
-    expect(yaml.safeLoad(localLockfileOnDisk)).toEqual({
+    expect(yaml.load(localLockfileOnDisk)).toEqual({
       version: 1,
       setup: {
         localTask: {
@@ -447,11 +447,11 @@ describe("setup", () => {
     await Promise.all([
       fs.outputFile(
         path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
-        yaml.safeDump(globalLockfile)
+        yaml.dump(globalLockfile)
       ),
       fs.outputFile(
         path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH),
-        yaml.safeDump(localLockfile)
+        yaml.dump(localLockfile)
       ),
     ]);
 
@@ -492,7 +492,7 @@ describe("setup", () => {
       fs.readFile(path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH), "utf-8"),
     ]);
 
-    expect(yaml.safeLoad(globalLockfileOnDisk)).toEqual({
+    expect(yaml.load(globalLockfileOnDisk)).toEqual({
       version: 1,
       setup: {
         globalTask1: {
@@ -503,7 +503,7 @@ describe("setup", () => {
         },
       },
     });
-    expect(yaml.safeLoad(localLockfileOnDisk)).toEqual({
+    expect(yaml.load(localLockfileOnDisk)).toEqual({
       version: 1,
       setup: {
         localTask1: {
