@@ -45,4 +45,5 @@ module.exports = {
   // uncomment these lines below:
   // globalSetup: "./test/utils/e2e-setup.ts",
   // globalTeardown: "./test/utils/e2e-teardown.ts",
+  // setupFilesAfterEnv: ["./test/utils/e2e-setup-test-env.ts"],
 };
