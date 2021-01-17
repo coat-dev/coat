@@ -97,7 +97,7 @@ export async function prepareCliTest(
     filePromises.push(
       fs.writeFile(
         path.join(tmpDir, COAT_GLOBAL_LOCKFILE_PATH),
-        yaml.safeDump(options.coatGlobalLockfile)
+        yaml.dump(options.coatGlobalLockfile)
       )
     );
   }
@@ -105,7 +105,7 @@ export async function prepareCliTest(
     filePromises.push(
       fs.outputFile(
         path.join(tmpDir, COAT_LOCAL_LOCKFILE_PATH),
-        yaml.safeDump(options.coatLocalLockfile)
+        yaml.dump(options.coatLocalLockfile)
       )
     );
   }

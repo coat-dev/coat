@@ -42,7 +42,7 @@ export async function getCoatGlobalLockfile(
       path.join(cwd, COAT_GLOBAL_LOCKFILE_PATH),
       "utf-8"
     );
-    lockfile = yaml.safeLoad(lockfileRaw) as CoatGlobalLockfile;
+    lockfile = yaml.load(lockfileRaw) as CoatGlobalLockfile;
   } catch (error) {
     // Throw if error is anything other than "not found"
     if (error.code !== "ENOENT") {
@@ -73,7 +73,7 @@ export async function getCoatLocalLockfile(
       path.join(cwd, COAT_LOCAL_LOCKFILE_PATH),
       "utf-8"
     );
-    lockfile = yaml.safeLoad(lockfileRaw) as CoatGlobalLockfileStrict;
+    lockfile = yaml.load(lockfileRaw) as CoatGlobalLockfileStrict;
   } catch (error) {
     // Throw if error is anything other than "not found"
     if (error.code !== "ENOENT") {
