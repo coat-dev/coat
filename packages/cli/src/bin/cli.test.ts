@@ -62,7 +62,7 @@ describe("coat cli", () => {
       await program.parseAsync(["create", ...input], { from: "user" });
 
       expect(create).toHaveBeenCalledTimes(1);
-      expect(create).toHaveBeenCalledWith(...args, {});
+      expect(create).toHaveBeenCalledWith(...args);
     }
   );
 

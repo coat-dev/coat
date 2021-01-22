@@ -11,10 +11,7 @@ import { sync } from "../sync";
  */
 export function createProgram(): InstanceType<CommandConstructor> {
   const program = new Command("coat");
-  program
-    .version(COAT_CLI_VERSION)
-    .passCommandToAction(false)
-    .allowUnknownOption();
+  program.version(COAT_CLI_VERSION).allowUnknownOption();
 
   program
     .command("create <template> [dir] [projectName]")
@@ -23,7 +20,9 @@ export function createProgram(): InstanceType<CommandConstructor> {
       undefined,
       '\n\nArguments:\ntemplate (required): The name of coat template from the npm registry (e.g. "@coat/template-ts-package")\n\ndir (optional): The directory where coat should create a project. Resolves to a relative path from the current working directory\n\nprojectName (optional): The name of your new project. Will use the trailing folder name of the project directory by default'
     )
-    .action(create);
+    .action(async (template, directoryInput, projectNameInput) => {
+      await create(template, directoryInput, projectNameInput);
+    });
 
   program
     .command("setup")
