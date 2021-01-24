@@ -50,8 +50,7 @@ async function publishCli(): Promise<void> {
 
   // Publish the package to npm
   console.log("Running npm publish in packages/cli");
-  // TODO: Remove dry run after script is tested
-  await execa("npm", ["publish", "--dry-run"], {
+  await execa("npm", ["publish"], {
     cwd: cliDir,
     stdio: "inherit",
   });
@@ -152,8 +151,7 @@ async function publishTemplateTsPackage(): Promise<void> {
 
   // Publish the package to npm
   console.log("Running npm publish in packages/template-ts-package");
-  // TODO: Remove dry run after script is tested
-  await execa("npm", ["publish", "--dry-run"], {
+  await execa("npm", ["publish"], {
     cwd: templateTsPackageDir,
     stdio: "inherit",
   });
