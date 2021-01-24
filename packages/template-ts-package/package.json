@@ -47,7 +47,6 @@
     "lint:prettier": "prettier --check src",
     "lint:types": "tsc",
     "prebuild": "rimraf build",
-    "prepare": "coat run build && coat sync",
     "test": "jest",
     "watch-build": "coat run npm:watch-build:*",
     "watch-build:babel": "npm run build:babel -- --watch",
