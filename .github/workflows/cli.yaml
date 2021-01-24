@@ -13,10 +13,10 @@ jobs:
         run: |
           npm ci
           npx --no-install lerna bootstrap
-      - name: Lint
-        run: npx --no-install lerna run lint --stream
       - name: Build
         run: npx --no-install lerna run build --stream
+      - name: Lint
+        run: npx --no-install lerna run lint --stream
       - name: Test
         run: |
           npx --no-install lerna run test --stream -- -- \
