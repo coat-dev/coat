@@ -13,19 +13,21 @@ jobs:
         run: |
           npm ci
           npx --no-install lerna bootstrap
+      - name: Build
+        run: npx --no-install lerna run build --stream
       - name: Lint
         run: npx --no-install lerna run lint --stream
       - name: Test
         run: |
           npx --no-install lerna run test --stream -- -- \
-          --ci \
-          --no-cache \
-          --runInBand \
-          --verbose \
-          --coverageReporters json \
-          --coverageReporters lcov \
-          --coverageReporters text \
-          --coverageReporters clover
+            --ci \
+            --no-cache \
+            --runInBand \
+            --verbose \
+            --coverageReporters json \
+            --coverageReporters lcov \
+            --coverageReporters text \
+            --coverageReporters clover
       - name: Upload test coverage information
         run: bash <(curl -s https://codecov.io/bash)
       - name: Build package artifacts

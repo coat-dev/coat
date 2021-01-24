@@ -140,11 +140,6 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
       run: "jest",
       scriptName: "test",
     },
-    {
-      id: "prepare-sync-and-build",
-      run: "coat sync && coat run build",
-      scriptName: "prepare",
-    },
   ];
 
   switch (config.compiler) {

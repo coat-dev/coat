@@ -245,7 +245,6 @@ scripts:
   - lint:prettier
   - lint:types
   - prebuild
-  - prepare
   - test
 version: 1
 "
@@ -297,7 +296,6 @@ exports[`@coat/template-ts-package template verification - babel compiler 8`] = 
     \\"lint:prettier\\": \\"prettier --check src\\",
     \\"lint:types\\": \\"tsc\\",
     \\"prebuild\\": \\"rimraf build\\",
-    \\"prepare\\": \\"coat sync && coat run build\\",
     \\"test\\": \\"jest\\"
   }
 }
@@ -584,7 +582,6 @@ scripts:
   - lint:prettier
   - lint:types
   - prebuild
-  - prepare
   - test
 version: 1
 "
@@ -632,7 +629,6 @@ exports[`@coat/template-ts-package template verification - default config 7`] = 
     \\"lint:prettier\\": \\"prettier --check src\\",
     \\"lint:types\\": \\"tsc\\",
     \\"prebuild\\": \\"rimraf build\\",
-    \\"prepare\\": \\"coat sync && coat run build\\",
     \\"test\\": \\"jest\\"
   }
 }
@@ -916,7 +912,6 @@ scripts:
   - lint:prettier
   - lint:types
   - prebuild
-  - prepare
   - test
 version: 1
 "
@@ -964,7 +959,6 @@ exports[`@coat/template-ts-package template verification - typescript compiler 7
     \\"lint:prettier\\": \\"prettier --check src\\",
     \\"lint:types\\": \\"tsc\\",
     \\"prebuild\\": \\"rimraf build\\",
-    \\"prepare\\": \\"coat sync && coat run build\\",
     \\"test\\": \\"jest\\"
   }
 }
