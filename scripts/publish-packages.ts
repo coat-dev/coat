@@ -183,6 +183,16 @@ async function publishTemplateTsPackage(): Promise<void> {
   );
 }
 
+async function pushHeadAndTags(): Promise<void> {
+  const coatRootDir = path.join(__dirname, "..");
+
+  await execa("git", ["push"], { cwd: coatRootDir, stdio: "inherit" });
+  await execa("git", ["push", "--tags"], {
+    cwd: coatRootDir,
+    stdio: "inherit",
+  });
+}
+
 async function main(): Promise<void> {
   const { packages } = await prompts({
     name: "packages",
@@ -207,6 +217,8 @@ async function main(): Promise<void> {
   if (packages.includes(Package.TemplateTsPackage)) {
     await publishTemplateTsPackage();
   }
+
+  await pushHeadAndTags();
 }
 
 if (require.main === module) {
