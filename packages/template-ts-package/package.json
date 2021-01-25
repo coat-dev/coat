@@ -48,7 +48,7 @@
     "lint:types": "tsc",
     "prebuild": "rimraf build",
     "test": "jest",
-    "watch-build": "coat run npm:watch-build:*",
+    "watch-build": "coat run build:* --watch",
     "watch-build:babel": "npm run build:babel -- --watch",
     "watch-build:typedefs": "npm run build:typedefs -- --watch",
     "watch-lint:tsc": "npm run lint:types -- --watch"
