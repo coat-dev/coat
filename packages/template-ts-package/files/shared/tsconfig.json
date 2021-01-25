@@ -6,6 +6,7 @@
     "strict": true,
     "lib": ["DOM", "ES5", "ScriptHost", "ES2015"],
     "noEmit": true,
+    "outDir": "build",
     "forceConsistentCasingInFileNames": true
   }
 }

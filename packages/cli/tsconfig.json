@@ -11,7 +11,7 @@
     "noUnusedParameters": true,
     "resolveJsonModule": true,
     "strict": true,
+    "outDir": "build",
     "target": "esnext"
-  },
-  "exclude": ["build"]
+  }
 }
