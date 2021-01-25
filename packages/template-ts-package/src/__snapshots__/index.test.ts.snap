@@ -231,10 +231,10 @@ files:
   - once: true
     path: src/index.ts
   - hash: >-
-      Wvn79Ah1EmIDyTVVi4uDZAucomOUsQXNPCqWdj1KXckHWjaLhGHD4rwesjGVVa/0FM9rEvtFq1OsiftbNpA1hw==
+      dEjl1diD30UVpPa+Eqopj6sUzG4fZFuRB3Yw9DRQMnrlFJzFralwcjSjCph7gJT89UmQiE/UO6zwaoKB7e5jEA==
     path: tsconfig.build.json
   - hash: >-
-      mmM9PGwqLSxLRIDBzKFNtJqqM/1Fh/TOzubHlC6su7WHv1peDWQglI014mldKMdHNri6F4wbp5NGN26XCTHkFw==
+      hJ6j7yCY25tYeYP5U7xfPlPmTWlkI6yoYOoBB2hyYbyPAf+xiYQ+mkX9QWa2tCTFtYyuwsPQ12VZD3AjV5Rylg==
     path: tsconfig.json
 scripts:
   - build
@@ -335,8 +335,7 @@ exports[`@coat/template-ts-package template verification - babel compiler 11`] =
     \\"declaration\\": true,
     \\"emitDeclarationOnly\\": true,
     \\"isolatedModules\\": false,
-    \\"noEmit\\": false,
-    \\"outDir\\": \\"build\\"
+    \\"noEmit\\": false
   },
   \\"exclude\\": [\\"**/**/*.test.ts\\"],
   \\"extends\\": \\"./tsconfig.json\\",
@@ -357,6 +356,7 @@ exports[`@coat/template-ts-package template verification - babel compiler 12`] =
     \\"module\\": \\"commonjs\\",
     \\"moduleResolution\\": \\"node\\",
     \\"noEmit\\": true,
+    \\"outDir\\": \\"build\\",
     \\"strict\\": true,
     \\"target\\": \\"ESNext\\"
   }
@@ -570,10 +570,10 @@ files:
   - once: true
     path: src/index.ts
   - hash: >-
-      iBs7gseJaH2TqwMp681kwDfa9zzT+kVDtATXxQC0SuMRXhT4YBYD+gTD4UKz9Njr8qswfAZIsIhvYSeCGkXTiA==
+      zN51ATJNBuF7EqPvKtnvN8DjhfuWBsojjSkOl2y67qI9j8LmkNmsh0DBkLk3qDJm8dQ025+bGUNNfZBmxx81Gg==
     path: tsconfig.build.json
   - hash: >-
-      0XSVaBRUX42h0NJUywD/vWuY/Y0BT0TFOkSQcdwTpsu7ncfmkYEmyYC3L08VH6JXCOiy+MpWcmV3arT1ZwEu9Q==
+      baIFGU4pqXu749Y7zvK1NP/VzP27ZlZ0TrsD86m3alSj0LHNsrZp+On4Rod2U299a2NkQykBpjpKbBBJTtvQqA==
     path: tsconfig.json
 scripts:
   - build
@@ -666,8 +666,7 @@ exports[`@coat/template-ts-package template verification - default config 10`] =
 {
   \\"compilerOptions\\": {
     \\"declaration\\": true,
-    \\"noEmit\\": false,
-    \\"outDir\\": \\"build\\"
+    \\"noEmit\\": false
   },
   \\"exclude\\": [\\"**/**/*.test.ts\\"],
   \\"extends\\": \\"./tsconfig.json\\",
@@ -687,6 +686,7 @@ exports[`@coat/template-ts-package template verification - default config 11`] =
     \\"module\\": \\"commonjs\\",
     \\"moduleResolution\\": \\"node\\",
     \\"noEmit\\": true,
+    \\"outDir\\": \\"build\\",
     \\"strict\\": true,
     \\"target\\": \\"ES2018\\"
   }
@@ -900,10 +900,10 @@ files:
   - once: true
     path: src/index.ts
   - hash: >-
-      iBs7gseJaH2TqwMp681kwDfa9zzT+kVDtATXxQC0SuMRXhT4YBYD+gTD4UKz9Njr8qswfAZIsIhvYSeCGkXTiA==
+      zN51ATJNBuF7EqPvKtnvN8DjhfuWBsojjSkOl2y67qI9j8LmkNmsh0DBkLk3qDJm8dQ025+bGUNNfZBmxx81Gg==
     path: tsconfig.build.json
   - hash: >-
-      0XSVaBRUX42h0NJUywD/vWuY/Y0BT0TFOkSQcdwTpsu7ncfmkYEmyYC3L08VH6JXCOiy+MpWcmV3arT1ZwEu9Q==
+      baIFGU4pqXu749Y7zvK1NP/VzP27ZlZ0TrsD86m3alSj0LHNsrZp+On4Rod2U299a2NkQykBpjpKbBBJTtvQqA==
     path: tsconfig.json
 scripts:
   - build
@@ -996,8 +996,7 @@ exports[`@coat/template-ts-package template verification - typescript compiler 1
 {
   \\"compilerOptions\\": {
     \\"declaration\\": true,
-    \\"noEmit\\": false,
-    \\"outDir\\": \\"build\\"
+    \\"noEmit\\": false
   },
   \\"exclude\\": [\\"**/**/*.test.ts\\"],
   \\"extends\\": \\"./tsconfig.json\\",
@@ -1017,6 +1016,7 @@ exports[`@coat/template-ts-package template verification - typescript compiler 1
     \\"module\\": \\"commonjs\\",
     \\"moduleResolution\\": \\"node\\",
     \\"noEmit\\": true,
+    \\"outDir\\": \\"build\\",
     \\"strict\\": true,
     \\"target\\": \\"ES2018\\"
   }
