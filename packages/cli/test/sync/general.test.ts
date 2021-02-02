@@ -16,18 +16,16 @@ describe("coat sync - general", () => {
     ]);
 
     expect(helpArgument.stdout).toEqual(helpCommand.stdout);
-    expect(helpArgument.stdout).toMatchInlineSnapshot(`
-      "Usage: coat sync [options]
 
-      Generates all files of the current coat project.
-
-      Options:
-        -h, --help  
-        
-        Gathers all files of the extended templates, merges them and places them in the project directory.
-        
-        Generated files can be extended by placing a file next to it with the \\"-custom.js\\" suffix and exporting a function that returns the customized content."
-    `);
+    const helpLines = [
+      "Usage: coat sync [options]",
+      "Generates all files of the current coat project.",
+      "Gathers all files of the extended templates, merges them and places them in the project directory.",
+      'Generated files can be extended by placing a file next to it with the "-custom.js" suffix and exporting a function that returns the customized content.',
+    ];
+    helpLines.forEach((helpLine) => {
+      expect(helpArgument.stdout).toContain(helpLine);
+    });
   });
 
   test("should not run sync when help function is called", async () => {

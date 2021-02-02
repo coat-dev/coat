@@ -14,10 +14,8 @@ import {
 } from "../constants";
 import { polish as jsonPolish } from "../file-types/json";
 import { addInitialCommit } from "./add-initial-commit";
-import {
-  printCreateCustomizationHelp,
-  printCreateHeader,
-} from "./print-create-messages";
+import { printCreateCustomizationHelp } from "./print-create-customization-help";
+import { getCoatHeader } from "../bin/get-coat-header";
 
 /**
  * Creates and generates a new coat project.
@@ -31,8 +29,8 @@ export async function create(
   directoryInputUnsanitized?: string,
   projectNameInputUnsanitized?: string
 ): Promise<void> {
-  // Prints the coat logo and header
-  printCreateHeader();
+  // Print the coat logo and header
+  console.log(getCoatHeader());
 
   const directoryInput = directoryInputUnsanitized?.trim();
   const projectNameInput = projectNameInputUnsanitized?.trim();

@@ -4,6 +4,7 @@ import { create } from "../create";
 import { run } from "../run";
 import { setup } from "../setup";
 import { sync } from "../sync";
+import { getCoatHeader } from "./get-coat-header";
 
 /**
  * Creates a command CLI program to run coat commands
@@ -96,6 +97,9 @@ export function createProgram(): InstanceType<CommandConstructor> {
       }
     }
   });
+
+  // Add coat logo to help command output
+  program.addHelpText("beforeAll", getCoatHeader());
 
   return program;
 }
