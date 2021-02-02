@@ -8,23 +8,6 @@ import {
   TerminalSize,
 } from "../ui/get-usable-terminal-size";
 import { fillLastLine } from "../ui/fill-last-line";
-import { createCoatLogo } from "../ui/create-coat-logo";
-
-/**
- * Prints the coat logo, description and the website url in
- * a pretty box.
- * On tiny terminal sizes, a shorter version is printed.
- */
-export function printCreateHeader(): void {
-  const usableTerminalSize = getUsableTerminalSize(process.stdout);
-
-  if (usableTerminalSize.size === TerminalSize.Tiny) {
-    const tinyLogo = `🚀 ${chalk.cyan("coat")} 🚀`;
-    console.log(`\n${tinyLogo}`);
-  } else {
-    console.log(createCoatLogo());
-  }
-}
 
 /**
  * Prints getting started guidance for the customization of the generated

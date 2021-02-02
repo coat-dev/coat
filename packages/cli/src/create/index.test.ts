@@ -21,7 +21,8 @@ jest
   .mock("./get-template-info")
   .mock("./get-project-name")
   .mock("./add-initial-commit")
-  .mock("./print-create-messages")
+  .mock("./print-create-customization-help")
+  .mock("../bin/get-coat-header")
   .mock("../sync");
 
 const execaMock = (execa as unknown) as jest.Mock;
