@@ -21,8 +21,8 @@ export function createProgram(): InstanceType<CommandConstructor> {
       undefined,
       '\n\nArguments:\ntemplate (required): The name of coat template from the npm registry (e.g. "@coat/template-ts-package")\n\ndir (optional): The directory where coat should create a project. Resolves to a relative path from the current working directory\n\nprojectName (optional): The name of your new project. Will use the trailing folder name of the project directory by default'
     )
-    .action(async (template, directoryInput, projectNameInput) => {
-      await create(template, directoryInput, projectNameInput);
+    .action(async (template, directory, projectName) => {
+      await create({ template, directory, projectName });
     });
 
   program

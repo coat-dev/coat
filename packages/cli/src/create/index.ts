@@ -20,27 +20,31 @@ import { getCoatHeader } from "../bin/get-coat-header";
 /**
  * Creates and generates a new coat project.
  *
- * @param template The template that should be used for the new project
- * @param directoryInput The optional path to the directory that should be used
- * @param projectNameInput The optional project name that has been provided
+ * @param options.template The template that should be used for the new project
+ * @param options.directory The optional path to the directory that should be used
+ * @param options.projectName The optional project name that has been provided
  */
-export async function create(
-  template: string,
-  directoryInputUnsanitized?: string,
-  projectNameInputUnsanitized?: string
-): Promise<void> {
+export async function create({
+  template,
+  directory,
+  projectName,
+}: {
+  template: string;
+  directory?: string;
+  projectName?: string;
+}): Promise<void> {
   // Print the coat logo and header
   console.log(getCoatHeader());
 
-  const directoryInput = directoryInputUnsanitized?.trim();
-  const projectNameInput = projectNameInputUnsanitized?.trim();
+  const directoryInputSanitized = directory?.trim();
+  const projectNameInputSanitized = projectName?.trim();
 
   // Resolve the target directory and project name for the new coat project
   // from the cli arguments if they are available
   let targetCwd: string;
-  let projectName: string;
+  let usableProjectName: string;
 
-  if (!directoryInput) {
+  if (!directoryInputSanitized) {
     // No input for the target directory has been provided,
     // therefore the user should be prompted for a project name that
     // will be used as the target directory.
@@ -48,35 +52,35 @@ export async function create(
     // The projectNameInput argument will be ignored, since it could have
     // only been passed via an edge case, e.g. when running
     // `coat create template "" my-project` which should not be supported.
-    projectName = await getProjectName();
+    usableProjectName = await getProjectName();
 
     // The project name should be used as the target directory in the current
     // working directory
-    targetCwd = path.join(process.cwd(), projectName);
+    targetCwd = path.join(process.cwd(), usableProjectName);
   } else {
-    if (path.isAbsolute(directoryInput)) {
+    if (path.isAbsolute(directoryInputSanitized)) {
       // If the directory input is a valid absolute path, it should be used directly
-      targetCwd = directoryInput;
+      targetCwd = directoryInputSanitized;
     } else {
       // Otherwise, the directory input should be treated as a relative path
       // to the current working directory
-      targetCwd = path.join(process.cwd(), directoryInput);
+      targetCwd = path.join(process.cwd(), directoryInputSanitized);
     }
 
-    if (projectNameInput) {
-      projectName = projectNameInput;
+    if (projectNameInputSanitized) {
+      usableProjectName = projectNameInputSanitized;
     } else {
       // Retrieve the trailing folder name of the target directory to use it
       // as the project name
       const suggestedProjectName = path.basename(targetCwd);
-      if (suggestedProjectName === directoryInput) {
+      if (suggestedProjectName === directoryInputSanitized) {
         // If the suggested project name matches the directory input argument
         // it should be used directly without prompting the user.
         //
         // This should be the most common scenario where create is run like
         // `coat create template my-project`
         // where both the directoryInput and suggested project name are "my-project"
-        projectName = suggestedProjectName;
+        usableProjectName = suggestedProjectName;
       } else {
         // If the suggested project name does not directly match the directory input,
         // the user should be prompted for a project name and with the trailing folder
@@ -86,7 +90,7 @@ export async function create(
         // (process.cwd = /usr/source/some-project)
         // `coat create template .`
         // -> suggested project name will be some-project
-        projectName = await getProjectName(suggestedProjectName);
+        usableProjectName = await getProjectName(suggestedProjectName);
       }
     }
   }
@@ -133,7 +137,7 @@ export async function create(
 
   if (!previousPackageJson) {
     const packageJson = {
-      name: projectName,
+      name: usableProjectName,
       version: "1.0.0",
     };
     // Create the package.json file inside the
@@ -206,7 +210,7 @@ export async function create(
 
     // Write the coat manifest file
     const coatManifest = {
-      name: projectName,
+      name: usableProjectName,
       extends: templateInfo.name,
     };
     await fs.writeFile(

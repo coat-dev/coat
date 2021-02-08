@@ -57,14 +57,14 @@ describe("create", () => {
   });
 
   test("should prompt for a project name if no target dir is specified", async () => {
-    await create("my-template");
+    await create({ template: "my-template" });
 
     const dir = await fs.readdir(".");
     expect(dir).toEqual(["prompted-name"]);
   });
 
   test("should prompt for the project name if target dir is a relative path", async () => {
-    await create("my-template", ".");
+    await create({ template: "my-template", directory: "." });
 
     const dir = await fs.readdir(".");
     dir.sort();
@@ -78,7 +78,9 @@ describe("create", () => {
     await fs.outputFile(COAT_MANIFEST_FILENAME, "{}");
     await fs.chmod(COAT_MANIFEST_FILENAME, 0o000);
 
-    await expect(create("my-template", ".")).rejects.toHaveProperty(
+    await expect(
+      create({ template: "my-template", directory: "." })
+    ).rejects.toHaveProperty(
       "message",
       expect.stringMatching(/EACCES: permission denied, open '.*coat.json'/)
     );
@@ -88,7 +90,9 @@ describe("create", () => {
     await fs.outputFile(PACKAGE_JSON_FILENAME, "{}");
     await fs.chmod(PACKAGE_JSON_FILENAME, 0o000);
 
-    await expect(create("my-template", ".")).rejects.toHaveProperty(
+    await expect(
+      create({ template: "my-template", directory: "." })
+    ).rejects.toHaveProperty(
       "message",
       expect.stringMatching(/EACCES: permission denied, open '.*package.json'/)
     );
@@ -99,14 +103,17 @@ describe("create", () => {
       throw new Error("Install error");
     });
 
-    await expect(() => create("my-template")).rejects.toHaveProperty(
-      "message",
-      "Install error"
-    );
+    await expect(() =>
+      create({ template: "my-template" })
+    ).rejects.toHaveProperty("message", "Install error");
   });
 
   test("should create package.json and coat.json files in the specified target dir", async () => {
-    await create("my-template", "targetDir", "project-name");
+    await create({
+      template: "my-template",
+      directory: "targetDir",
+      projectName: "project-name",
+    });
 
     const dir = await fs.readdir("targetDir");
     dir.sort();
@@ -131,7 +138,7 @@ describe("create", () => {
   test("should not create package.json if it already exists", async () => {
     await fs.outputFile(PACKAGE_JSON_FILENAME, "{}");
 
-    await create("my-template", ".");
+    await create({ template: "my-template", directory: "." });
 
     const packageJsonRaw = await fs.readFile(PACKAGE_JSON_FILENAME, "utf-8");
     const packageJson = JSON.parse(packageJsonRaw);
@@ -140,7 +147,7 @@ describe("create", () => {
   });
 
   test("should use the target directory as the project name if no project name is specified", async () => {
-    await create("template", "project-name");
+    await create({ template: "template", directory: "project-name" });
     const [dirs, coatManifest] = await Promise.all([
       fs.readdir("."),
       fs.readFile(path.join("project-name", COAT_MANIFEST_FILENAME), "utf-8"),
@@ -152,7 +159,11 @@ describe("create", () => {
 
   test("should work with absolute target dir paths", async () => {
     const targetDir = path.join(process.cwd(), "target-dir");
-    await create("template", targetDir, "project-name");
+    await create({
+      template: "template",
+      directory: targetDir,
+      projectName: "project-name",
+    });
     const dirs = await fs.readdir(process.cwd());
     expect(dirs).toEqual(["target-dir"]);
   });
@@ -161,7 +172,11 @@ describe("create", () => {
     await fs.outputFile(path.join("targetDir", "coat.json"), "{}");
 
     await expect(
-      create("template", "targetDir", "project-namme")
+      create({
+        template: "template",
+        directory: "targetDir",
+        projectName: "project-namme",
+      })
     ).rejects.toHaveProperty("message", "coat manifest file already exists");
 
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
@@ -171,7 +186,7 @@ describe("create", () => {
   });
 
   test("should add the template as a devDependency in the target dir", async () => {
-    await create("template", "project-name");
+    await create({ template: "template", directory: "project-name" });
 
     expect(execa).toHaveBeenCalledTimes(3);
     expect(execa).toHaveBeenCalledWith(
@@ -184,7 +199,7 @@ describe("create", () => {
   });
 
   test("should initialize a git repository in the target dir", async () => {
-    await create("template", "project-name");
+    await create({ template: "template", directory: "project-name" });
 
     expect(addInitialCommit).toHaveBeenCalledTimes(1);
     expect(addInitialCommit).toHaveBeenCalledWith(
@@ -200,7 +215,7 @@ describe("create", () => {
         "peer-b": "*",
       },
     }));
-    await create("template", "project-name");
+    await create({ template: "template", directory: "project-name" });
 
     expect(execa).toHaveBeenCalledTimes(4);
     expect(execa).toHaveBeenCalledWith(
@@ -239,7 +254,7 @@ describe("create", () => {
       });
       consoleLogSpy.mockClear();
 
-      await create("template", "project-name");
+      await create({ template: "template", directory: "project-name" });
 
       expect(consoleLogSpy).toHaveBeenCalledWith(
         "Running %s with @coat/cli version %s\n",
@@ -263,7 +278,7 @@ describe("create", () => {
       });
       consoleLogSpy.mockClear();
 
-      await create("template", "project-name");
+      await create({ template: "template", directory: "project-name" });
 
       const hasLogMessage = consoleLogSpy.mock.calls.some((consoleLine) =>
         consoleLine
@@ -278,7 +293,11 @@ describe("create", () => {
       // Use an absolute path as the target dir to make the assertion below
       // environment agnostic
       const targetDir = "/opt/coat-cli/test/target-dir";
-      await create("template", targetDir, "project-name");
+      await create({
+        template: "template",
+        directory: targetDir,
+        projectName: "project-name",
+      });
       expect(execaMock).toHaveBeenCalledWith(
         "npx",
         ["--no-install", "coat", "sync"],
@@ -307,13 +326,15 @@ describe("create", () => {
         };
       });
 
-      await create(
-        "template",
-        "/absolute/test/path/project-name",
-        "project-name"
-      );
+      await create({
+        template: "template",
+        directory: "/absolute/test/path/project-name",
+        projectName: "project-name",
+      });
       expect(sync).toHaveBeenCalledTimes(1);
-      expect(sync).toHaveBeenCalledWith("/absolute/test/path/project-name");
+      expect(sync).toHaveBeenCalledWith({
+        cwd: "/absolute/test/path/project-name",
+      });
     });
   });
 });

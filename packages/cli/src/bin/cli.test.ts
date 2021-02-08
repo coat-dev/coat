@@ -50,10 +50,10 @@ describe("coat cli", () => {
   });
 
   test.each`
-    input                                 | args                                      | explanation
-    ${["template"]}                       | ${["template", undefined, undefined]}     | ${"template"}
-    ${["template", "projectName"]}        | ${["template", "projectName", undefined]} | ${"template & projectName"}
-    ${["template", "projectName", "dir"]} | ${["template", "projectName", "dir"]}     | ${"template, projectName & dir"}
+    input                                 | args                                                                          | explanation
+    ${["template"]}                       | ${{ template: "template", directory: undefined, projectName: undefined }}     | ${"template"}
+    ${["template", "projectName"]}        | ${{ template: "template", directory: "projectName", projectName: undefined }} | ${"template & projectName"}
+    ${["template", "projectName", "dir"]} | ${{ template: "template", directory: "projectName", projectName: "dir" }}     | ${"template, projectName & dir"}
   `(
     "should call create function with $explanation",
     async ({ input, args }) => {
@@ -62,7 +62,7 @@ describe("coat cli", () => {
       await program.parseAsync(["create", ...input], { from: "user" });
 
       expect(create).toHaveBeenCalledTimes(1);
-      expect(create).toHaveBeenCalledWith(...args);
+      expect(create).toHaveBeenCalledWith(args);
     }
   );
 
