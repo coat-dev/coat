@@ -81,7 +81,7 @@ describe("coat cli", () => {
     await program.parseAsync(["setup"], { from: "user" });
 
     expect(setup).toHaveBeenCalledTimes(1);
-    expect(setup).toHaveBeenCalledWith("mock-cwd", true);
+    expect(setup).toHaveBeenCalledWith({ cwd: "mock-cwd", force: true });
   });
 
   test.each`

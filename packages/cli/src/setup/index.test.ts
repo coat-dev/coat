@@ -24,14 +24,13 @@ import { CoatTaskRunOptions } from "../types/coat-manifest-tasks";
 
 jest.mock("fs");
 
+const getContextSpy = jest.spyOn(getContextImport, "getContext");
+const getAllTemplatesSpy = jest.spyOn(getAllTemplatesImport, "getAllTemplates");
+const getTasksToRunSpy = jest.spyOn(getTasksToRunImport, "getTasksToRun");
 const platformRoot = path.parse(process.cwd()).root;
 const testCwd = path.join(platformRoot, "test");
 
 describe("setup", () => {
-  let getContextSpy: jest.SpyInstance;
-  let getAllTemplatesSpy: jest.SpyInstance;
-  let getTasksToRunSpy: jest.SpyInstance;
-
   beforeEach(async () => {
     // Prepare coat files in test cwd
     await Promise.all([
@@ -44,15 +43,11 @@ describe("setup", () => {
         JSON.stringify({})
       ),
     ]);
-
-    getContextSpy = jest.spyOn(getContextImport, "getContext");
-    getAllTemplatesSpy = jest.spyOn(getAllTemplatesImport, "getAllTemplates");
-    getTasksToRunSpy = jest.spyOn(getTasksToRunImport, "getTasksToRun");
   });
 
   afterEach(() => {
     vol.reset();
-    jest.restoreAllMocks();
+    jest.clearAllMocks();
   });
 
   const testContext: CoatContext = {
@@ -70,28 +65,28 @@ describe("setup", () => {
   };
 
   test("should load context", async () => {
-    await setup(testCwd, false);
+    await setup({ cwd: testCwd, force: false });
 
     expect(getContextSpy).toHaveBeenCalledTimes(1);
     expect(getContextSpy).toHaveBeenLastCalledWith(testCwd);
   });
 
   test("should load all templates", async () => {
-    await setup(testCwd, false);
+    await setup({ cwd: testCwd, force: false });
 
     expect(getAllTemplatesSpy).toHaveBeenCalledTimes(1);
     expect(getAllTemplatesSpy).toHaveBeenLastCalledWith(testContext);
   });
 
   test("should call getTasksToRun with force = false if force is set to false", async () => {
-    await setup(testCwd, false);
+    await setup({ cwd: testCwd, force: false });
 
     expect(getTasksToRunSpy).toHaveBeenCalledTimes(1);
     expect(getTasksToRunSpy).toHaveBeenLastCalledWith([], testContext, false);
   });
 
   test("should call getTasksToRun with force = true if force is set to true", async () => {
-    await setup(testCwd, true);
+    await setup({ cwd: testCwd, force: true });
 
     expect(getTasksToRunSpy).toHaveBeenCalledTimes(1);
     expect(getTasksToRunSpy).toHaveBeenLastCalledWith([], testContext, true);
@@ -134,8 +129,8 @@ describe("setup", () => {
         },
       }),
     };
-    getContextSpy.mockImplementationOnce(() => context);
-    await setup(testCwd, true);
+    getContextSpy.mockImplementationOnce(async () => context);
+    await setup({ cwd: testCwd, force: true });
 
     expect(globalTaskRun).toHaveBeenCalledTimes(1);
     expect(globalTaskRun).toHaveBeenLastCalledWith({
@@ -181,8 +176,8 @@ describe("setup", () => {
         ],
       },
     };
-    getContextSpy.mockImplementationOnce(() => context);
-    await setup(testCwd, false);
+    getContextSpy.mockImplementationOnce(async () => context);
+    await setup({ cwd: testCwd, force: false });
 
     expect(globalTaskRun).toHaveBeenCalledTimes(1);
     expect(globalTaskRun).toHaveBeenLastCalledWith({
@@ -250,8 +245,8 @@ describe("setup", () => {
         },
       }),
     };
-    getContextSpy.mockImplementationOnce(() => context);
-    await setup(testCwd, false);
+    getContextSpy.mockImplementationOnce(async () => context);
+    await setup({ cwd: testCwd, force: false });
 
     expect(globalTaskRun).not.toHaveBeenCalled();
     expect(localTaskRun).not.toHaveBeenCalled();
@@ -278,8 +273,8 @@ describe("setup", () => {
         ],
       },
     };
-    getContextSpy.mockImplementationOnce(() => context);
-    const newContext = await setup(testCwd, false);
+    getContextSpy.mockImplementationOnce(async () => context);
+    const newContext = await setup({ cwd: testCwd, force: false });
 
     expect(newContext.coatGlobalLockfile).toHaveProperty("setup", {
       globalTask: { globalResult: true },
@@ -333,10 +328,10 @@ describe("setup", () => {
         ],
       },
     };
-    getContextSpy.mockImplementationOnce(() => context);
-    await expect(() => setup(testCwd, false)).rejects.toMatchInlineSnapshot(
-      `[Error: Error in globalTask2]`
-    );
+    getContextSpy.mockImplementationOnce(async () => context);
+    await expect(() =>
+      setup({ cwd: testCwd, force: false })
+    ).rejects.toMatchInlineSnapshot(`[Error: Error in globalTask2]`);
 
     const globalLockfileOnDisk = await fs.readFile(
       path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
@@ -400,8 +395,8 @@ describe("setup", () => {
       coatLocalLockfile: localLockfile,
     };
 
-    getContextSpy.mockImplementationOnce(() => context);
-    await setup(testCwd, false);
+    getContextSpy.mockImplementationOnce(async () => context);
+    await setup({ cwd: testCwd, force: false });
 
     const [globalLockfileOnDisk, localLockfileOnDisk] = await Promise.all([
       fs.readFile(path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH), "utf-8"),
@@ -484,8 +479,8 @@ describe("setup", () => {
       coatLocalLockfile: localLockfile,
     };
 
-    getContextSpy.mockImplementationOnce(() => context);
-    await setup(testCwd, false);
+    getContextSpy.mockImplementationOnce(async () => context);
+    await setup({ cwd: testCwd, force: false });
 
     const [globalLockfileOnDisk, localLockfileOnDisk] = await Promise.all([
       fs.readFile(path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH), "utf-8"),
@@ -543,8 +538,8 @@ describe("setup", () => {
         ],
       },
     };
-    getContextSpy.mockImplementationOnce(() => context);
-    await setup(testCwd, false);
+    getContextSpy.mockImplementationOnce(async () => context);
+    await setup({ cwd: testCwd, force: false });
 
     expect(globalTaskRun).toHaveBeenCalledTimes(1);
     expect(globalTaskRun).toHaveBeenLastCalledWith({

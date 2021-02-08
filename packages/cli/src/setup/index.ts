@@ -13,10 +13,17 @@ import { removeUnmanagedTasksFromLockfiles } from "./remove-unmanaged-tasks-from
  * When running setup with the force = true option, all tasks will be
  * run regardless of whether they have been run before.
  *
- * @param cwd The working directory of the current coat project
- * @param force Whether to run tasks although they have been run before (e.g. when running the `coat setup` command directly)
+ * @param options.cwd The working directory of the current coat project
+ * @param options.force Whether to run tasks although they have been run before (e.g. when running the `coat setup` command directly)
  */
-export async function setup(cwd: string, force: boolean): Promise<CoatContext> {
+export async function setup({
+  cwd,
+  force,
+}: {
+  cwd: string;
+  force?: boolean;
+}): Promise<CoatContext> {
+  const forceFlag = !!force;
   // Get context from cwd
   let context = await getContext(cwd);
 
@@ -26,7 +33,7 @@ export async function setup(cwd: string, force: boolean): Promise<CoatContext> {
 
   // TODO: See #38
   // Let user interactively select which tasks should be run
-  const tasksToRun = await getTasksToRun(allTasks, context, force);
+  const tasksToRun = await getTasksToRun(allTasks, context, forceFlag);
 
   // Run tasks sequentially to provide earlier task results
   // to following tasks

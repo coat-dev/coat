@@ -588,7 +588,10 @@ describe("sync", () => {
     await sync(testCwd);
 
     expect(setupSpy).toHaveBeenCalledTimes(1);
-    expect(setupSpy).toHaveBeenLastCalledWith(testCwd, false);
+    expect(setupSpy).toHaveBeenLastCalledWith({
+      cwd: testCwd,
+      force: false,
+    });
   });
 
   test("should work without a package.json file on disk", async () => {

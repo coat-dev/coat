@@ -33,7 +33,7 @@ export function createProgram(): InstanceType<CommandConstructor> {
       "\n\nGathers all setup tasks of the extended templates and runs them in sequential order."
     )
     .action(async () => {
-      await setup(process.cwd(), true);
+      await setup({ cwd: process.cwd(), force: true });
     });
 
   program

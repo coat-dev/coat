@@ -43,9 +43,10 @@ import { getNormalizedFilePath } from "../util/get-normalized-file-path";
  */
 export async function sync(cwd: string): Promise<void> {
   // Run setup tasks that have not been run before
+  //
   // TODO: See #36
   // Let user skip setup tasks if they should be run later
-  let context = await setup(cwd, false);
+  let context = await setup({ cwd, force: false });
 
   // Gather all extended templates
   const allTemplates = getAllTemplates(context);
