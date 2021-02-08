@@ -90,6 +90,14 @@ const updateFilesOnDiskMock = (updateFilesOnDisk as unknown) as jest.Mock;
 const groupFilesSpy = jest.spyOn(groupFilesImport, "groupFiles");
 const { groupFiles } = groupFilesImport;
 
+const mergeScriptsSpy = jest.spyOn(mergeScriptsImport, "mergeScripts");
+const mergeDependenciesSpy = jest.spyOn(
+  mergeDependenciesImport,
+  "mergeDependencies"
+);
+const mergeFilesSpy = jest.spyOn(mergeFilesImport, "mergeFiles");
+const setupSpy = jest.spyOn(setupImport, "setup");
+
 const coatManifest: CoatManifestStrict = getStrictCoatManifest({
   name: "test-manifest",
   extends: templates.map((_, index) => `./template-${index}.js`),
@@ -132,25 +140,12 @@ const packageJson = {
 const execaMock = (execa as unknown) as jest.Mock;
 
 describe("sync", () => {
-  let mergeScriptsSpy: jest.SpyInstance;
-  let mergeDependenciesSpy: jest.SpyInstance;
-  let mergeFilesSpy: jest.SpyInstance;
-  let setupSpy: jest.SpyInstance;
-
   afterEach(() => {
     vol.reset();
     jest.clearAllMocks();
   });
 
   beforeEach(async () => {
-    mergeScriptsSpy = jest.spyOn(mergeScriptsImport, "mergeScripts");
-    mergeDependenciesSpy = jest.spyOn(
-      mergeDependenciesImport,
-      "mergeDependencies"
-    );
-    mergeFilesSpy = jest.spyOn(mergeFilesImport, "mergeFiles");
-    setupSpy = jest.spyOn(setupImport, "setup");
-
     // Place template files
     await Promise.all([
       fs.outputFile(
@@ -182,7 +177,7 @@ describe("sync", () => {
   });
 
   test("should call mergeDependencies with current dependencies, extended templates and deps from the current coat manifest", async () => {
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
     expect(mergeDependenciesSpy).toHaveBeenCalledTimes(2);
 
     const templateDeps = templates.map((template) => template.dependencies);
@@ -199,7 +194,7 @@ describe("sync", () => {
 
   test("should add entry for package.json and current coatManifest files to the mergeFiles call", async () => {
     const testContext = await getContext(testCwd);
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
     expect(mergeFilesSpy).toHaveBeenCalledTimes(1);
 
     const packageJsonFileEntry = {
@@ -223,7 +218,7 @@ describe("sync", () => {
           packageJsonFileEntry,
           ...getDefaultFiles(),
           ...templateFiles,
-          ...(coatManifestFiles as CoatManifestFile[]),
+          ...coatManifestFiles,
         ]) as CoatManifestFile[],
         testContext
       ),
@@ -231,8 +226,7 @@ describe("sync", () => {
     );
   });
 
-  test("should call updateFilesOnDisk with the correct files", async () => {
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
 
     expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(1);
     expect(updateFilesOnDiskMock.mock.calls[0]).toEqual([
@@ -370,7 +364,7 @@ describe("sync", () => {
   });
 
   test("should run npm install in project directory if dependencies are changed", async () => {
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
     expect(execa).toHaveBeenCalledTimes(1);
 
     expect(execa).toHaveBeenCalledWith("npm", ["install"], {
@@ -382,7 +376,7 @@ describe("sync", () => {
     execaMock.mockImplementationOnce(() => {
       throw new Error("Install error");
     });
-    await expect(() => sync(testCwd)).rejects.toMatchInlineSnapshot(
+    await expect(() => sync({ cwd: testCwd })).rejects.toMatchInlineSnapshot(
       `[Error: Install error]`
     );
   });
@@ -403,7 +397,7 @@ describe("sync", () => {
         dependencies: {},
       })
     );
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
     expect(execa).not.toHaveBeenCalled();
   });
 
@@ -427,7 +421,7 @@ describe("sync", () => {
     // Update package.json to be without dependencies
     await fs.outputFile(path.join(testCwd, PACKAGE_JSON_FILENAME), "{}");
 
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
     expect(execa).not.toHaveBeenCalled();
   });
 
@@ -448,7 +442,7 @@ describe("sync", () => {
     gatherExtendedTemplatesMock.mockImplementationOnce(() => testTemplates);
     gatherExtendedTemplatesMock.mockImplementationOnce(() => testTemplates);
 
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
     try {
       await fs.stat(path.join(testCwd, PACKAGE_JSON_FILENAME));
       throw new Error(
@@ -480,7 +474,7 @@ describe("sync", () => {
       fs.outputFile(path.join(testCwd, unmanagedFilePath), ""),
     ]);
 
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
 
     expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(1);
     expect(updateFilesOnDiskMock.mock.calls[0][1]).toEqual([
@@ -513,7 +507,7 @@ describe("sync", () => {
       fs.outputFile(path.join(testCwd, unmanagedFilePath), ""),
     ]);
 
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
 
     expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(1);
     expect(updateFilesOnDiskMock.mock.calls[0][1]).toEqual([
@@ -551,7 +545,7 @@ describe("sync", () => {
     gatherExtendedTemplatesMock.mockImplementationOnce(() => newTemplates);
     gatherExtendedTemplatesMock.mockImplementationOnce(() => newTemplates);
 
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
 
     expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(1);
     expect(updateFilesOnDiskMock.mock.calls[0][0]).toContainEqual(
@@ -568,7 +562,7 @@ describe("sync", () => {
     gatherExtendedTemplatesMock.mockImplementationOnce(() => newTemplates);
     gatherExtendedTemplatesMock.mockImplementationOnce(() => newTemplates);
 
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
 
     expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(2);
 
@@ -585,7 +579,7 @@ describe("sync", () => {
   });
 
   test("should call setup with force = false", async () => {
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
 
     expect(setupSpy).toHaveBeenCalledTimes(1);
     expect(setupSpy).toHaveBeenLastCalledWith({
@@ -598,7 +592,7 @@ describe("sync", () => {
     // Remove package.json file before testing
     await fs.unlink(path.join(testCwd, PACKAGE_JSON_FILENAME));
 
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
 
     // group files will still be called with the new package.json file,
     // since the coat properties add properties to package.json
@@ -636,7 +630,7 @@ describe("sync", () => {
     gatherExtendedTemplatesMock.mockImplementationOnce(() => []);
     gatherExtendedTemplatesMock.mockImplementationOnce(() => []);
 
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
 
     // group files will still be called with the new package.json file,
     // since the coat properties add properties to package.json
@@ -694,7 +688,7 @@ describe("sync", () => {
       ),
     ]);
 
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
 
     expect(mergeFilesSpy).toHaveBeenLastCalledWith(
       expect.objectContaining({

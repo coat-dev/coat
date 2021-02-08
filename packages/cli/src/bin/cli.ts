@@ -44,7 +44,7 @@ export function createProgram(): InstanceType<CommandConstructor> {
       '\n\nGathers all files of the extended templates, merges them and places them in the project directory.\n\nGenerated files can be extended by placing a file next to it with the "-custom.js" suffix and exporting a function that returns the customized content.'
     )
     .action(async () => {
-      await sync(process.cwd());
+      await sync({ cwd: process.cwd() });
     });
 
   program

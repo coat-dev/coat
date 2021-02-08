@@ -39,9 +39,13 @@ import { getNormalizedFilePath } from "../util/get-normalized-file-path";
  * latest configuration and task results that are required to generate
  * the project files.
  *
- * @param cwd The working directory of the current coat project
+ * @param options.cwd The working directory of the current coat project
  */
-export async function sync(cwd: string): Promise<void> {
+export async function sync({
+  cwd,
+}: {
+  cwd: string;
+}): Promise<void> {
   // Run setup tasks that have not been run before
   //
   // TODO: See #36

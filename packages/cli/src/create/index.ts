@@ -255,7 +255,7 @@ export async function create({
     // @coat/cli version
     //
     // setup will be triggered implicitly via sync
-    await sync(targetCwd);
+    await sync({ cwd: targetCwd });
   }
 
   // Initialize a git repository and add an initial commit

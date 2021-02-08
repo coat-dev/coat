@@ -72,7 +72,8 @@ describe("coat cli", () => {
     await program.parseAsync(["sync"], { from: "user" });
 
     expect(sync).toHaveBeenCalledTimes(1);
-    expect(sync).toHaveBeenLastCalledWith("mock-cwd");
+    expect(sync).toHaveBeenLastCalledWith({ cwd: "mock-cwd" });
+
   });
 
   test("should call setup function with current working directory & force option", async () => {

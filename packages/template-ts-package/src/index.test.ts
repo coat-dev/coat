@@ -96,7 +96,7 @@ describe("@coat/template-ts-package", () => {
       ),
     ]);
 
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
 
     const allFiles = await fs.readdir(testCwd);
     allFiles.sort();
