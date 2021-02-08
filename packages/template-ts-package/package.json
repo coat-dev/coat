@@ -42,6 +42,7 @@
     "build": "coat run build:*",
     "build:babel": "babel src -d build --extensions \".ts\" --ignore \"**/*.test.ts\"",
     "build:typedefs": "tsc -p tsconfig.build.json",
+    "coat": "coat",
     "lint": "coat run lint:*",
     "lint:eslint": "eslint --ext .ts --max-warnings 0 src",
     "lint:prettier": "prettier --check src",
