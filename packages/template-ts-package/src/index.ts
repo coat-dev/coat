@@ -24,7 +24,7 @@ const filesDir = path.join(__dirname, "..", "files");
 
 function getTemplateFile(
   filePath: string,
-  type: CoatManifestFileType,
+  type: CoatManifestFileType.Json | CoatManifestFileType.Text,
   { once, destinationPath }: { once?: boolean; destinationPath: string }
 ): CoatManifestFile {
   return {
@@ -36,6 +36,13 @@ function getTemplateFile(
           return JSON.parse(fileRaw);
         case CoatManifestFileType.Text:
           return fileRaw;
+        // The default case is only required to let TypeScript throw
+        // compiler errors if a new file type is added
+        /* istanbul ignore next */
+        default: {
+          const unhandledType: never = type;
+          throw new Error(`Unhandled file type: ${unhandledType}`);
+        }
       }
     },
     type,
@@ -222,6 +229,13 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
         }
       );
       break;
+    // The default case is only required to let TypeScript throw
+    // compiler errors if a new compiler is added
+    /* istanbul ignore next */
+    default: {
+      const unhandledCompilerType: never = config.compiler;
+      throw new Error(`Unhandled compiler option: ${unhandledCompilerType}`);
+    }
   }
 
   return {
