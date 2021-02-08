@@ -96,7 +96,10 @@ describe("coat cli", () => {
     await program.parseAsync(["run", ...input], { from: "user" });
 
     expect(run).toHaveBeenCalledTimes(1);
-    expect(run).toHaveBeenCalledWith("mock-cwd", input);
+    expect(run).toHaveBeenCalledWith({
+      cwd: "mock-cwd",
+      scriptPatterns: input,
+    });
   });
 
   test("should exit from run function with correct error code thrown from script", async () => {
@@ -141,11 +144,17 @@ describe("coat cli", () => {
 
       await program.parseAsync(["build", "--watch"], { from: "user" });
       expect(run).toHaveBeenCalledTimes(1);
-      expect(run).toHaveBeenLastCalledWith("mock-cwd", ["build", "--watch"]);
+      expect(run).toHaveBeenLastCalledWith({
+        cwd: "mock-cwd",
+        scriptPatterns: ["build", "--watch"],
+      });
 
       await program.parseAsync(["test", "--watch"], { from: "user" });
       expect(run).toHaveBeenCalledTimes(2);
-      expect(run).toHaveBeenLastCalledWith("mock-cwd", ["test", "--watch"]);
+      expect(run).toHaveBeenLastCalledWith({
+        cwd: "mock-cwd",
+        scriptPatterns: ["test", "--watch"],
+      });
     });
 
     test("should exit immediately if script is run on unknown command and throws with exitCode", async () => {

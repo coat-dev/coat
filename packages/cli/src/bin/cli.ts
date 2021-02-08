@@ -57,7 +57,10 @@ export function createProgram(): InstanceType<CommandConstructor> {
     )
     .action(async (scriptPattern, otherScriptPatterns) => {
       try {
-        await run(process.cwd(), [scriptPattern, ...otherScriptPatterns]);
+        await run({
+          cwd: process.cwd(),
+          scriptPatterns: [scriptPattern, ...otherScriptPatterns],
+        });
       } catch (error) {
         // Exit immediately with the exitCode if a script has thrown an error
         if (error.exitCode) {
@@ -77,7 +80,10 @@ export function createProgram(): InstanceType<CommandConstructor> {
   // "coat run <script>" -> "coat <script>"
   program.on("command:*", async (commands, options) => {
     try {
-      await run(process.cwd(), [...commands, ...options]);
+      await run({
+        cwd: process.cwd(),
+        scriptPatterns: [...commands, ...options],
+      });
     } catch (error) {
       // If the error has an exitCode property, it has
       // been thrown from a script that has been run.

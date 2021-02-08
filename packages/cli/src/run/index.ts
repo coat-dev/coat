@@ -23,13 +23,16 @@ import { runMultipleScripts } from "./run-multiple-scripts";
  * Using "build:*" as a script pattern will run both the
  * build:tsc and build:babel scripts in parallel.
  *
- * @param cwd The working directory of the current project
- * @param scriptPatterns The script patterns that will be evaluated and run
+ * @param options.cwd The working directory of the current project
+ * @param options.scriptPatterns The script patterns that will be evaluated and run
  */
-export async function run(
-  cwd: string,
-  scriptPatterns: string[]
-): Promise<void> {
+export async function run({
+  cwd,
+  scriptPatterns,
+}: {
+  cwd: string;
+  scriptPatterns: string[];
+}): Promise<void> {
   // Split patterns by script names and arguments that
   // will be forwarded to each script.
   //

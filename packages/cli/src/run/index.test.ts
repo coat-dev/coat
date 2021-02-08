@@ -35,7 +35,10 @@ describe("run", () => {
   });
 
   test("should split script patterns and arguments correctly", async () => {
-    await run(testCwd, ["singleScript", "--arg1", "--arg2", "arg2value"]);
+    await run({
+      cwd: testCwd,
+      scriptPatterns: ["singleScript", "--arg1", "--arg2", "arg2value"],
+    });
 
     expect(runSingleScript).toBeCalledTimes(1);
     expect(runSingleScript).toHaveBeenLastCalledWith(testCwd, "singleScript", [
@@ -46,7 +49,7 @@ describe("run", () => {
   });
 
   test("should resolve scripts correctly from patterns", async () => {
-    await run(testCwd, ["singleScript*", "multi*"]);
+    await run({ cwd: testCwd, scriptPatterns: ["singleScript*", "multi*"] });
 
     expect(runMultipleScripts).toHaveBeenCalledTimes(1);
     expect(runMultipleScripts).toHaveBeenLastCalledWith(
@@ -60,7 +63,7 @@ describe("run", () => {
     await fs.unlink(path.join(testCwd, PACKAGE_JSON_FILENAME));
 
     await expect(() =>
-      run(testCwd, ["multi:*", "singleScript"])
+      run({ cwd: testCwd, scriptPatterns: ["multi:*", "singleScript"] })
     ).rejects.toHaveProperty(
       "message",
       expect.stringMatching(
@@ -71,13 +74,16 @@ describe("run", () => {
 
   test("should throw if no script pattern is provided but only arguments", async () => {
     await expect(() =>
-      run(testCwd, ["--arg1", "--arg2", "arg2Value"])
+      run({ cwd: testCwd, scriptPatterns: ["--arg1", "--arg2", "arg2Value"] })
     ).rejects.toHaveProperty("message", "No script pattern provided.");
   });
 
   test("should throw if no script can be found for a pattern", async () => {
     await expect(() =>
-      run(testCwd, ["unknown-pattern:*", "singleScript"])
+      run({
+        cwd: testCwd,
+        scriptPatterns: ["unknown-pattern:*", "singleScript"],
+      })
     ).rejects.toHaveProperty(
       "message",
       "No scripts found in package.json for pattern: unknown-pattern:*"
@@ -92,7 +98,9 @@ describe("run", () => {
       JSON.stringify({})
     );
 
-    await expect(() => run(testCwd, ["singleScript"])).rejects.toHaveProperty(
+    await expect(() =>
+      run({ cwd: testCwd, scriptPatterns: ["singleScript"] })
+    ).rejects.toHaveProperty(
       "message",
       'No script named "singleScript" found in package.json'
     );
@@ -107,7 +115,7 @@ describe("run", () => {
   `(
     "should run single script from $explanation",
     async ({ input, runParams }) => {
-      await run(testCwd, input);
+      await run({ cwd: testCwd, scriptPatterns: input });
 
       expect(runSingleScript).toHaveBeenCalledTimes(1);
       expect(runSingleScript).toHaveBeenLastCalledWith(testCwd, ...runParams);
@@ -123,7 +131,7 @@ describe("run", () => {
   `(
     "should run single script from $explanation",
     async ({ input, runParams }) => {
-      await run(testCwd, input);
+      await run({ cwd: testCwd, scriptPatterns: input });
 
       expect(runMultipleScripts).toHaveBeenCalledTimes(1);
       expect(runMultipleScripts).toHaveBeenLastCalledWith(
