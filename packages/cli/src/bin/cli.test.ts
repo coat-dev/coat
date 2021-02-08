@@ -66,14 +66,17 @@ describe("coat cli", () => {
     }
   );
 
-  test("should call sync function with current working directory", async () => {
+  test.each`
+    input                  | args                                 | explanation
+    ${["sync"]}            | ${{ cwd: "mock-cwd", check: false }} | ${"current working directory"}
+    ${["sync", "--check"]} | ${{ cwd: "mock-cwd", check: true }}  | ${"check flag"}
+  `("should call sync function with $explanation", async ({ input, args }) => {
     const program = createProgram();
 
-    await program.parseAsync(["sync"], { from: "user" });
+    await program.parseAsync(input, { from: "user" });
 
     expect(sync).toHaveBeenCalledTimes(1);
-    expect(sync).toHaveBeenLastCalledWith({ cwd: "mock-cwd" });
-
+    expect(sync).toHaveBeenLastCalledWith(args);
   });
 
   test("should call setup function with current working directory & force option", async () => {

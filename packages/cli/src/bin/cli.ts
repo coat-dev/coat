@@ -39,12 +39,16 @@ export function createProgram(): InstanceType<CommandConstructor> {
   program
     .command("sync")
     .description("Generates all files of the current coat project.")
+    .option(
+      "--check",
+      "Checks whether the coat project is in sync or whether there are any pending global file operations. Useful on CI systems to determine whether coat sync needs to be run."
+    )
     .helpOption(
       undefined,
       '\n\nGathers all files of the extended templates, merges them and places them in the project directory.\n\nGenerated files can be extended by placing a file next to it with the "-custom.js" suffix and exporting a function that returns the customized content.'
     )
-    .action(async () => {
-      await sync({ cwd: process.cwd() });
+    .action(async (options) => {
+      await sync({ cwd: process.cwd(), check: !!options.check });
     });
 
   program

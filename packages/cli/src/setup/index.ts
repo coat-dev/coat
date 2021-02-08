@@ -18,6 +18,7 @@ import {
 } from "../types/coat-lockfiles";
 import { isEqual } from "lodash";
 import produce from "immer";
+import chalk from "chalk";
 
 /**
  * Gathers and runs all tasks of a coat project.
@@ -26,15 +27,20 @@ import produce from "immer";
  * run regardless of whether they have been run before.
  *
  * @param options.cwd The working directory of the current coat project
+ * @param options.check Whether a dry-run should be performed that checks
+ * and exits if the coat project is out of sync and has pending global tasks that need to be run
  * @param options.force Whether to run tasks although they have been run before (e.g. when running the `coat setup` command directly)
  */
 export async function setup({
   cwd,
+  check,
   force,
 }: {
   cwd: string;
+  check?: boolean;
   force?: boolean;
 }): Promise<CoatContext> {
+  const checkFlag = !!check;
   const forceFlag = !!force;
   // Get context from cwd
   let context = await getContext(cwd);
@@ -47,55 +53,74 @@ export async function setup({
   // Let user interactively select which tasks should be run
   const tasksToRun = await getTasksToRun(allTasks, context, forceFlag);
 
-  // Run tasks sequentially to provide earlier task results
-  // to following tasks
-  for (const task of tasksToRun) {
-    const taskResult = await task.run({
-      context,
-      previousResults: {
-        global: context.coatGlobalLockfile.setup,
-        local: context.coatLocalLockfile.setup,
-      },
-    });
+  // --check flag
+  if (checkFlag) {
+    // If any global task has to be run, the coat project is out of sync
+    const globalTasksToRun = tasksToRun.filter(
+      (task) => task.type === CoatTaskType.Global
+    );
+    if (globalTasksToRun.length) {
+      const messages = [
+        "",
+        `The ${chalk.cyan("coat")} project is not in sync.`,
+        "There are global tasks pending that need to be run to setup this coat project.",
+        "",
+        `Run ${chalk.cyan("coat sync")} to bring the project back in sync.`,
+      ];
+      console.error(messages.join("\n"));
+      process.exit(1);
+    }
+  } else {
+    // Run tasks sequentially to provide earlier task results
+    // to following tasks
+    for (const task of tasksToRun) {
+      const taskResult = await task.run({
+        context,
+        previousResults: {
+          global: context.coatGlobalLockfile.setup,
+          local: context.coatLocalLockfile.setup,
+        },
+      });
 
-    const partialLockfileUpdate = {
-      setup: {
-        [task.id]: taskResult || {},
-      },
-    };
+      const partialLockfileUpdate = {
+        setup: {
+          [task.id]: taskResult || {},
+        },
+      };
 
-    // Update the lockfile in between task runs
-    // to save task results in case a following task
-    // throws an error
-    switch (task.type) {
-      case CoatTaskType.Global: {
-        const newGlobalLockfile = updateLockfile<
-          CoatGlobalLockfileStrict,
-          CoatGlobalLockfile
-        >(context.coatGlobalLockfile, partialLockfileUpdate);
-        context = produce(context, (draft) => {
-          draft.coatGlobalLockfile = newGlobalLockfile;
-        });
-        await writeGlobalLockfile(newGlobalLockfile, context);
-        break;
-      }
-      case CoatTaskType.Local: {
-        const newLocalLockfile = updateLockfile<
-          CoatLocalLockfileStrict,
-          CoatLocalLockfile
-        >(context.coatLocalLockfile, partialLockfileUpdate);
-        context = produce(context, (draft) => {
-          draft.coatLocalLockfile = newLocalLockfile;
-        });
-        await writeLocalLockfile(newLocalLockfile, context);
-        break;
-      }
-      // The default case is only required to let TypeScript throw
-      // compiler errors if a new task type is added
-      /* istanbul ignore next */
-      default: {
-        const unhandledTask: never = task;
-        throw new Error(`Unhandled task type for task: ${unhandledTask}`);
+      // Update the lockfile in between task runs
+      // to save task results in case a following task
+      // throws an error
+      switch (task.type) {
+        case CoatTaskType.Global: {
+          const newGlobalLockfile = updateLockfile<
+            CoatGlobalLockfileStrict,
+            CoatGlobalLockfile
+          >(context.coatGlobalLockfile, partialLockfileUpdate);
+          context = produce(context, (draft) => {
+            draft.coatGlobalLockfile = newGlobalLockfile;
+          });
+          await writeGlobalLockfile(newGlobalLockfile, context);
+          break;
+        }
+        case CoatTaskType.Local: {
+          const newLocalLockfile = updateLockfile<
+            CoatLocalLockfileStrict,
+            CoatLocalLockfile
+          >(context.coatLocalLockfile, partialLockfileUpdate);
+          context = produce(context, (draft) => {
+            draft.coatLocalLockfile = newLocalLockfile;
+          });
+          await writeLocalLockfile(newLocalLockfile, context);
+          break;
+        }
+        // The default case is only required to let TypeScript throw
+        // compiler errors if a new task type is added
+        /* istanbul ignore next */
+        default: {
+          const unhandledTask: never = task;
+          throw new Error(`Unhandled task type for task: ${unhandledTask}`);
+        }
       }
     }
   }
@@ -109,12 +134,32 @@ export async function setup({
     allTasks.filter((task) => task.type === CoatTaskType.Global)
   );
   if (!isEqual(context.coatGlobalLockfile, newGlobalLockfile)) {
+    //
+    // --check flag
+    if (checkFlag) {
+      // If the global lockfile needs to be updated,
+      // the coat project is out of sync
+      const messages = [
+        "",
+        `The ${chalk.cyan("coat")} project is not in sync.`,
+        `The global lockfile (${chalk.green(
+          "coat.lock"
+        )}) needs to be updated.`,
+        "",
+        `Run ${chalk.cyan("coat sync")} to bring the project back in sync.`,
+      ];
+      console.error(messages.join("\n"));
+      process.exit(1);
+    }
+
     context = produce(context, (draft) => {
       draft.coatGlobalLockfile = newGlobalLockfile;
     });
     await writeGlobalLockfile(newGlobalLockfile, context);
   }
 
+  // Local lockfile should only be updated if the setup method is not invoked with --check
+  if (!checkFlag) {
     // local lockfile
     const newLocalLockfile = removeUnmanagedTasksFromLockfile(
       context.coatLocalLockfile,
@@ -126,6 +171,7 @@ export async function setup({
       });
       await writeLocalLockfile(newLocalLockfile, context);
     }
+  }
 
   return context;
 }

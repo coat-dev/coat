@@ -21,6 +21,8 @@ export const COAT_LOCAL_LOCKFILE_PATH = path.join(
   COAT_GLOBAL_LOCKFILE_PATH
 );
 
+export const EVERYTHING_UP_TO_DATE_MESSAGE = "♻️ Everything up to date";
+
 export const COAT_LOGO_BOX_WIDTH = 58;
 // The logo in this string contains breaking empty
 // space characters, so that each line has the exact

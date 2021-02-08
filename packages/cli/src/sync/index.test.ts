@@ -35,6 +35,7 @@ import { getFileHash } from "../util/get-file-hash";
 import { promptForFileOperations } from "./prompt-for-file-operations";
 import { performFileOperations } from "./perform-file-operations";
 import { getStrictCoatLocalLockfile } from "../lockfiles/get-strict-coat-lockfiles";
+import stripAnsi from "strip-ansi";
 
 jest
   .mock("fs")
@@ -44,6 +45,18 @@ jest
   .mock("./get-file-operations")
   .mock("./prompt-for-file-operations")
   .mock("./perform-file-operations");
+
+const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {
+  // Empty function
+});
+
+const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {
+  // Empty function
+});
+
+const exitSpy = jest.spyOn(process, "exit").mockImplementation((): never => {
+  throw new Error("process.exit");
+});
 
 const platformRoot = path.parse(process.cwd()).root;
 const testCwd = path.join(platformRoot, "test");
@@ -636,6 +649,7 @@ describe("sync", () => {
     expect(setupSpy).toHaveBeenCalledTimes(1);
     expect(setupSpy).toHaveBeenLastCalledWith({
       cwd: testCwd,
+      check: false,
       force: false,
     });
   });
@@ -760,5 +774,240 @@ describe("sync", () => {
       }),
       expect.anything()
     );
+  });
+
+  test("should exit program if user aborts the prompt", async () => {
+    // Set return value from should continue prompt to false
+    promptForFileOperationsMock.mockResolvedValueOnce(false);
+
+    await expect(() => sync({ cwd: testCwd })).rejects.toHaveProperty(
+      "message",
+      "process.exit"
+    );
+
+    expect(promptForFileOperationsMock).toHaveBeenCalledTimes(1);
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy).toHaveBeenLastCalledWith(
+      "Aborting coat sync due to user request."
+    );
+
+    expect(exitSpy).toHaveBeenCalledTimes(1);
+    expect(exitSpy).toHaveBeenLastCalledWith(1);
+  });
+
+  describe("--check flag", () => {
+    test("should exit successfully if coat project is up to date", async () => {
+      gatherExtendedTemplatesMock.mockReturnValueOnce([]);
+      gatherExtendedTemplatesMock.mockReturnValueOnce([]);
+      // Place empty coat manifest
+      await fs.outputFile(
+        path.join(testCwd, COAT_MANIFEST_FILENAME),
+        JSON.stringify({
+          name: "my-project",
+          files: [
+            {
+              file: ".gitignore",
+              type: "TEXT",
+              content: null,
+            },
+          ],
+        })
+      );
+
+      await sync({ cwd: testCwd, check: true });
+
+      expect(consoleLogSpy).toHaveBeenCalledTimes(1);
+      expect(stripAnsi(consoleLogSpy.mock.calls[0][0])).toMatchInlineSnapshot(`
+        "
+        ♻️ Everything up to date
+        "
+      `);
+    });
+
+    test("should call setup with check = true if check flag is set", async () => {
+      gatherExtendedTemplatesMock.mockReturnValueOnce([]);
+      gatherExtendedTemplatesMock.mockReturnValueOnce([]);
+      // Place empty coat manifest
+      await fs.outputFile(
+        path.join(testCwd, COAT_MANIFEST_FILENAME),
+        JSON.stringify({
+          name: "my-project",
+          files: [
+            {
+              file: ".gitignore",
+              type: "TEXT",
+              content: null,
+            },
+          ],
+        })
+      );
+
+      await sync({ cwd: testCwd, check: true });
+
+      expect(setupSpy).toHaveBeenCalledTimes(1);
+      expect(setupSpy).toHaveBeenLastCalledWith({
+        cwd: testCwd,
+        force: false,
+        check: true,
+      });
+    });
+
+    test("should exit successfully even if there are local file operations pending", async () => {
+      gatherExtendedTemplatesMock.mockReturnValueOnce([]);
+      gatherExtendedTemplatesMock.mockReturnValueOnce([]);
+      // Place empty coat manifest
+      await fs.outputFile(
+        path.join(testCwd, COAT_MANIFEST_FILENAME),
+        JSON.stringify({
+          name: "my-project",
+          files: [
+            {
+              file: ".gitignore",
+              type: "TEXT",
+              content: null,
+            },
+          ],
+        })
+      );
+      const fileOperations: FileOperation[] = [
+        {
+          absolutePath: path.join(testCwd, "file-a.json"),
+          content: "{}",
+          relativePath: "file-a.json",
+          local: true,
+          type: FileOperationType.Place,
+        },
+      ];
+      getFileOperationsMock.mockReturnValueOnce(fileOperations);
+
+      await sync({ cwd: testCwd, check: true });
+
+      expect(performFileOperationsMock).not.toHaveBeenCalled();
+
+      await expect(
+        fs.readFile(path.join(testCwd, "file-a.json"))
+      ).rejects.toHaveProperty(
+        "message",
+        expect.stringContaining("ENOENT: no such file or directory")
+      );
+    });
+
+    test("should exit successfully even if there are local lockfile updates pending", async () => {
+      gatherExtendedTemplatesMock.mockReturnValueOnce([]);
+      gatherExtendedTemplatesMock.mockReturnValueOnce([]);
+      // Place empty coat manifest
+      await Promise.all([
+        fs.outputFile(
+          path.join(testCwd, COAT_MANIFEST_FILENAME),
+          JSON.stringify({
+            name: "my-project",
+            files: [
+              {
+                file: ".gitignore",
+                type: "TEXT",
+                content: null,
+              },
+            ],
+          })
+        ),
+        fs.outputFile(
+          path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH),
+          JSON.stringify(
+            getStrictCoatLocalLockfile({
+              version: COAT_LOCAL_LOCKFILE_VERSION,
+              files: [
+                {
+                  path: "file-a.json",
+                  hash: "",
+                },
+              ],
+            })
+          )
+        ),
+      ]);
+
+      await sync({ cwd: testCwd, check: true });
+
+      // Local lockfile should not be modified
+      const localLockfileOnDisk = await fs.readFile(
+        path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH),
+        "utf-8"
+      );
+      const localLockfile = yaml.load(localLockfileOnDisk);
+      expect(localLockfile).toEqual({
+        version: COAT_LOCAL_LOCKFILE_VERSION,
+        setup: {},
+        files: [
+          {
+            path: "file-a.json",
+            hash: "",
+            once: false,
+          },
+        ],
+      });
+    });
+
+    test("should exit with error and log pending global file operations", async () => {
+      const fileOperations: FileOperation[] = [
+        {
+          absolutePath: path.join(testCwd, "file-a.json"),
+          content: "{}",
+          relativePath: "file-a.json",
+          local: false,
+          type: FileOperationType.Place,
+        },
+        {
+          absolutePath: path.join(testCwd, "file-b.json"),
+          relativePath: "file-b.json",
+          local: false,
+          type: FileOperationType.Delete,
+        },
+        {
+          absolutePath: path.join(testCwd, "file-c.json"),
+          content: "{}",
+          relativePath: "file-c.json",
+          local: false,
+          type: FileOperationType.Update,
+        },
+      ];
+      getFileOperationsMock.mockReturnValueOnce(fileOperations);
+
+      await expect(sync({ cwd: testCwd, check: true })).rejects.toHaveProperty(
+        "message",
+        "process.exit"
+      );
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(stripAnsi(consoleErrorSpy.mock.calls[0][0]))
+        .toMatchInlineSnapshot(`
+        "
+        The coat project is not in sync.
+        There are pending file updates:
+
+          CREATE  file-a.json
+          DELETE  file-b.json
+          UPDATE  file-c.json
+
+        Run coat sync to bring the project back in sync."
+      `);
+    });
+
+    test("should exit with error if global lockfile has pending updates", async () => {
+      await expect(sync({ cwd: testCwd, check: true })).rejects.toHaveProperty(
+        "message",
+        "process.exit"
+      );
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(stripAnsi(consoleErrorSpy.mock.calls[0][0]))
+        .toMatchInlineSnapshot(`
+        "
+        The coat project is not in sync.
+        The global lockfile (coat.lock) needs to be updated.
+
+        Run coat sync to bring the project back in sync."
+      `);
+    });
   });
 });

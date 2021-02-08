@@ -10,7 +10,10 @@ import {
   CoatManifestGroupedFile,
   CoatManifestFileType,
 } from "../types/coat-manifest-file";
-import { PACKAGE_JSON_FILENAME } from "../constants";
+import {
+  EVERYTHING_UP_TO_DATE_MESSAGE,
+  PACKAGE_JSON_FILENAME,
+} from "../constants";
 import { JsonObject, PackageJson } from "type-fest";
 import { polishFiles } from "./polish-files";
 import isEqual from "lodash/isEqual";
@@ -33,6 +36,11 @@ import {
 } from "../lockfiles/write-lockfiles";
 import { promptForFileOperations } from "./prompt-for-file-operations";
 import { performFileOperations } from "./perform-file-operations";
+import chalk from "chalk";
+import {
+  createFileOperationLogMessage,
+  Tense,
+} from "./create-file-operation-log-message";
 
 /**
  * Generates all files from the current coat project.
@@ -46,17 +54,22 @@ import { performFileOperations } from "./perform-file-operations";
  * the project files.
  *
  * @param options.cwd The working directory of the current coat project
+ * @param options.check Whether a dry-run should be performed that checks
+ * and exits if the coat project is out of sync and has pending file updates
  */
 export async function sync({
   cwd,
+  check,
 }: {
   cwd: string;
+  check?: boolean;
 }): Promise<void> {
+  const checkFlag = !!check;
   // Run setup tasks that have not been run before
   //
   // TODO: See #36
   // Let user skip setup tasks if they should be run later
-  let context = await setup({ cwd, force: false });
+  let context = await setup({ cwd, check: checkFlag, force: false });
 
   // Gather all extended templates
   const allTemplates = getAllTemplates(context);
@@ -301,6 +314,40 @@ export async function sync({
     context
   );
 
+  // --check flag
+  if (checkFlag) {
+    // If there are any pending global file operations that
+    // are not skipped, the coat project is out of sync
+    const pendingGlobalFileOperations = fileOperations.filter(
+      (fileOperation) =>
+        // Only check global file operations, pending local file operations
+        // does not indicate that a coat project is out of sync
+        !fileOperation.local &&
+        //
+        // Ignore delete operations that are skipped and purely logged
+        // for information. This will however likely lead to the --check
+        // still failing, since the lockfile will require an update.
+        fileOperation.type !== FileOperationType.DeleteSkipped
+    );
+    if (pendingGlobalFileOperations.length) {
+      const pendingFileOperationMessages = pendingGlobalFileOperations.map(
+        (fileOperation) =>
+          createFileOperationLogMessage(fileOperation, Tense.Future)
+      );
+      const messages = [
+        "",
+        `The ${chalk.cyan("coat")} project is not in sync.`,
+        "There are pending file updates:",
+        "",
+        ...pendingFileOperationMessages,
+        "",
+        `Run ${chalk.cyan("coat sync")} to bring the project back in sync.`,
+      ];
+      console.error(messages.join("\n"));
+      process.exit(1);
+    }
+  }
+
   // Prompt the user if there are dangerous file operations that might have
   // unintended consequences. See getFileOperations for operations that
   // lead to prompts
@@ -336,50 +383,73 @@ export async function sync({
     scripts: newLockfileScripts,
   });
   if (!isEqual(context.coatGlobalLockfile, newGlobalLockfile)) {
+    //
+    // --check flag
+    if (checkFlag) {
+      // If the global lockfile needs to be updated,
+      // the coat project is out of sync
+      const messages = [
+        "",
+        `The ${chalk.cyan("coat")} project is not in sync.`,
+        `The global lockfile (${chalk.green(
+          "coat.lock"
+        )}) needs to be updated.`,
+        "",
+        `Run ${chalk.cyan("coat sync")} to bring the project back in sync.`,
+      ];
+      console.error(messages.join("\n"));
+      process.exit(1);
+    }
+
     context = produce(context, (draft) => {
       draft.coatGlobalLockfile = newGlobalLockfile;
     });
     await writeGlobalLockfile(newGlobalLockfile, context);
   }
 
-  // local lockfile
-  const newLocalLockfile = updateLockfile(context.coatLocalLockfile, {
-    files: newLocalLockFiles,
-  });
-  if (!isEqual(context.coatLocalLockfile, newLocalLockfile)) {
-    context = produce(context, (draft) => {
-      draft.coatLocalLockfile = newLocalLockfile;
+  if (checkFlag) {
+    // sync --check can end here, the coat project is in sync
+    console.log(`\n${EVERYTHING_UP_TO_DATE_MESSAGE}\n`);
+  } else {
+    // local lockfile
+    const newLocalLockfile = updateLockfile(context.coatLocalLockfile, {
+      files: newLocalLockFiles,
     });
-    await writeLocalLockfile(newLocalLockfile, context);
-  }
+    if (!isEqual(context.coatLocalLockfile, newLocalLockfile)) {
+      context = produce(context, (draft) => {
+        draft.coatLocalLockfile = newLocalLockfile;
+      });
+      await writeLocalLockfile(newLocalLockfile, context);
+    }
 
-  // Update files on disk
-  await performFileOperations(fileOperations);
+    // Update files on disk
+    await performFileOperations(fileOperations);
 
-  // Retrieve dependencies after merging to run npm install if they have changed
-  //
-  // If the package.json file still exists, it has to be a JsonObject,
-  // since an altered file type would throw an error during merging
-  const mergedPackageJson = mergedFiles.find(
-    (file) => file.relativePath === PACKAGE_JSON_FILENAME
-  )?.content as PackageJson | undefined;
+    // Retrieve dependencies after merging to run npm install if they have changed
+    //
+    // If the package.json file still exists, it has to be a JsonObject,
+    // since an altered file type would throw an error during merging
+    const mergedPackageJson = mergedFiles.find(
+      (file) => file.relativePath === PACKAGE_JSON_FILENAME
+    )?.content as PackageJson | undefined;
 
-  if (mergedPackageJson) {
-    const finalDependencies: CoatManifestStrict["dependencies"] = {
-      dependencies: mergedPackageJson.dependencies ?? {},
-      devDependencies: mergedPackageJson.devDependencies ?? {},
-      optionalDependencies: mergedPackageJson.optionalDependencies ?? {},
-      peerDependencies: mergedPackageJson.peerDependencies ?? {},
-    };
+    if (mergedPackageJson) {
+      const finalDependencies: CoatManifestStrict["dependencies"] = {
+        dependencies: mergedPackageJson.dependencies ?? {},
+        devDependencies: mergedPackageJson.devDependencies ?? {},
+        optionalDependencies: mergedPackageJson.optionalDependencies ?? {},
+        peerDependencies: mergedPackageJson.peerDependencies ?? {},
+      };
 
-    if (!isEqual(finalDependencies, currentDependencies)) {
-      const installSpinner = ora("Installing dependencies\n").start();
-      try {
-        await execa("npm", ["install"], { cwd: context.cwd });
-        installSpinner.succeed();
-      } catch (error) {
-        installSpinner.fail();
-        throw error;
+      if (!isEqual(finalDependencies, currentDependencies)) {
+        const installSpinner = ora("Installing dependencies\n").start();
+        try {
+          await execa("npm", ["install"], { cwd: context.cwd });
+          installSpinner.succeed();
+        } catch (error) {
+          installSpinner.fail();
+          throw error;
+        }
       }
     }
   }

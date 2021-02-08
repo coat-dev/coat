@@ -20,13 +20,25 @@ import { getStrictCoatManifest } from "../util/get-strict-coat-manifest";
 import * as getContextImport from "../util/get-context";
 import * as getAllTemplatesImport from "../util/get-all-templates";
 import * as getTasksToRunImport from "./get-tasks-to-run";
-import { CoatTaskRunOptions } from "../types/coat-manifest-tasks";
+import {
+  CoatManifestTaskStrict,
+  CoatTaskRunOptions,
+  CoatTaskType,
+} from "../types/coat-manifest-tasks";
+import stripAnsi from "strip-ansi";
 
 jest.mock("fs");
 
 const getContextSpy = jest.spyOn(getContextImport, "getContext");
 const getAllTemplatesSpy = jest.spyOn(getAllTemplatesImport, "getAllTemplates");
 const getTasksToRunSpy = jest.spyOn(getTasksToRunImport, "getTasksToRun");
+const exitSpy = jest.spyOn(process, "exit").mockImplementation((): never => {
+  throw new Error("process.exit");
+});
+const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {
+  // Empty function
+});
+
 const platformRoot = path.parse(process.cwd()).root;
 const testCwd = path.join(platformRoot, "test");
 
@@ -567,6 +579,139 @@ describe("setup", () => {
         },
         local: {},
       },
+    });
+  });
+
+  describe("--check flag", () => {
+    test("should exit successfully if coat project is up to date", async () => {
+      await setup({ cwd: testCwd, check: true });
+    });
+
+    test("should exit successfully even if there are local tasks that need to be run", async () => {
+      const tasks: CoatManifestTaskStrict[] = [
+        {
+          id: "test1",
+          type: CoatTaskType.Local,
+          run: jest.fn(),
+        },
+      ];
+
+      getTasksToRunSpy.mockReturnValueOnce(Promise.resolve(tasks));
+      await setup({ cwd: testCwd, check: true });
+    });
+
+    test("should exit successfully even if there are local lockfile updates pending", async () => {
+      const context: CoatContext = {
+        ...testContext,
+        coatLocalLockfile: {
+          ...testContext.coatLocalLockfile,
+          setup: {
+            previousTask: {},
+          },
+        },
+      };
+      getContextSpy.mockReturnValueOnce(Promise.resolve(context));
+
+      await setup({ cwd: testCwd, check: true });
+    });
+
+    test("should not run any tasks", async () => {
+      const run = jest.fn();
+      const tasks: CoatManifestTaskStrict[] = [
+        {
+          id: "test1",
+          type: CoatTaskType.Local,
+          run,
+        },
+      ];
+      getTasksToRunSpy.mockReturnValueOnce(Promise.resolve(tasks));
+
+      await setup({ cwd: testCwd, check: true });
+
+      expect(run).not.toHaveBeenCalled();
+    });
+
+    test("should not update local lockfile on disk", async () => {
+      const context: CoatContext = {
+        ...testContext,
+        coatLocalLockfile: {
+          ...testContext.coatLocalLockfile,
+          setup: {
+            previousLocalTask: {},
+          },
+        },
+      };
+      getContextSpy.mockReturnValueOnce(Promise.resolve(context));
+
+      await setup({ cwd: testCwd, check: true });
+
+      await expect(
+        fs.readFile(path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH))
+      ).rejects.toHaveProperty(
+        "message",
+        expect.stringContaining("ENOENT: no such file or directory")
+      );
+    });
+
+    test("should exit with error and log that there are pending global tasks", async () => {
+      const run = jest.fn();
+      const tasks: CoatManifestTaskStrict[] = [
+        {
+          id: "test1",
+          type: CoatTaskType.Global,
+          run,
+        },
+      ];
+      getTasksToRunSpy.mockReturnValueOnce(Promise.resolve(tasks));
+
+      await expect(setup({ cwd: testCwd, check: true })).rejects.toHaveProperty(
+        "message",
+        "process.exit"
+      );
+
+      expect(exitSpy).toHaveBeenCalledTimes(1);
+      expect(exitSpy).toHaveBeenLastCalledWith(1);
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(stripAnsi(consoleErrorSpy.mock.calls[0][0]))
+        .toMatchInlineSnapshot(`
+        "
+        The coat project is not in sync.
+        There are global tasks pending that need to be run to setup this coat project.
+
+        Run coat sync to bring the project back in sync."
+      `);
+    });
+
+    test("should exit with error if global lockfile has pending updates", async () => {
+      const context: CoatContext = {
+        ...testContext,
+        coatGlobalLockfile: {
+          ...testContext.coatGlobalLockfile,
+          setup: {
+            previousGlobalTask: {},
+          },
+        },
+      };
+      getContextSpy.mockReturnValueOnce(Promise.resolve(context));
+
+      await expect(setup({ cwd: testCwd, check: true })).rejects.toHaveProperty(
+        "message",
+        "process.exit"
+      );
+
+      expect(exitSpy).toHaveBeenCalledTimes(1);
+      expect(exitSpy).toHaveBeenLastCalledWith(1);
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(stripAnsi(consoleErrorSpy.mock.calls[0][0]))
+        .toMatchInlineSnapshot(`
+        "
+        The coat project is not in sync.
+        The global lockfile (coat.lock) needs to be updated.
+
+        Run coat sync to bring the project back in sync."
+      `);
     });
   });
 });
