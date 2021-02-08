@@ -26,15 +26,24 @@ import { CoatManifestStrict } from "../types/coat-manifest";
 import * as groupFilesImport from "./group-files";
 import { flatten } from "lodash";
 import { getDefaultFiles } from "./get-default-files";
-import { updateFilesOnDisk } from "./update-files-on-disk";
+import {
+  FileOperation,
+  FileOperationType,
+  getFileOperations,
+} from "./get-file-operations";
 import { getFileHash } from "../util/get-file-hash";
+import { promptForFileOperations } from "./prompt-for-file-operations";
+import { performFileOperations } from "./perform-file-operations";
+import { getStrictCoatLocalLockfile } from "../lockfiles/get-strict-coat-lockfiles";
 
 jest
   .mock("fs")
   .mock("execa")
   .mock("ora")
   .mock("../util/gather-extended-templates")
-  .mock("./update-files-on-disk.ts");
+  .mock("./get-file-operations")
+  .mock("./prompt-for-file-operations")
+  .mock("./perform-file-operations");
 
 const platformRoot = path.parse(process.cwd()).root;
 const testCwd = path.join(platformRoot, "test");
@@ -85,7 +94,13 @@ const templates: CoatManifestStrict[] = [
 const gatherExtendedTemplatesMock = (gatherExtendedTemplates as unknown) as jest.Mock;
 gatherExtendedTemplatesMock.mockImplementation(() => templates);
 
-const updateFilesOnDiskMock = (updateFilesOnDisk as unknown) as jest.Mock;
+const getFileOperationsMock = (getFileOperations as unknown) as jest.Mock;
+getFileOperationsMock.mockReturnValue([]);
+
+const promptForFileOperationsMock = (promptForFileOperations as unknown) as jest.Mock;
+promptForFileOperationsMock.mockResolvedValue(true);
+
+const performFileOperationsMock = (performFileOperations as unknown) as jest.Mock;
 
 const groupFilesSpy = jest.spyOn(groupFilesImport, "groupFiles");
 const { groupFiles } = groupFilesImport;
@@ -164,7 +179,7 @@ describe("sync", () => {
   });
 
   test("should call mergeScripts with extended templates and current coat manifest", async () => {
-    await sync(testCwd);
+    await sync({ cwd: testCwd });
     expect(mergeScriptsSpy).toBeCalledTimes(1);
 
     const templateScripts = templates.map((template) => template.scripts);
@@ -226,10 +241,11 @@ describe("sync", () => {
     );
   });
 
+  test("should call getFileOperations with the correct files", async () => {
     await sync({ cwd: testCwd });
 
-    expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(1);
-    expect(updateFilesOnDiskMock.mock.calls[0]).toEqual([
+    expect(getFileOperationsMock).toHaveBeenCalledTimes(1);
+    expect(getFileOperationsMock.mock.calls[0]).toEqual([
       // files to place
       [
         {
@@ -363,6 +379,40 @@ describe("sync", () => {
     ]);
   });
 
+  test("should call promptForFileOperations with the correct file operations", async () => {
+    // Testing with an empty array is sufficient, since the array is exactly the one that is
+    // returned from getFileOperations
+    const fileOperations: FileOperation[] = [];
+
+    getFileOperationsMock.mockReturnValueOnce(fileOperations);
+
+    await sync({ cwd: testCwd });
+
+    expect(promptForFileOperationsMock).toHaveBeenCalledTimes(1);
+    expect(promptForFileOperationsMock).toHaveBeenLastCalledWith(
+      fileOperations
+    );
+
+    // Array should be exactly the return value from getFileOperations
+    expect(promptForFileOperationsMock.mock.calls[0][0]).toBe(fileOperations);
+  });
+
+  test("should call performFileOperations with the correct file operations", async () => {
+    // Testing with an empty array is sufficient, since the array is exactly the one that is
+    // returned from getFileOperations
+    const fileOperations: FileOperation[] = [];
+
+    getFileOperationsMock.mockReturnValueOnce(fileOperations);
+
+    await sync({ cwd: testCwd });
+
+    expect(performFileOperationsMock).toHaveBeenCalledTimes(1);
+    expect(performFileOperationsMock).toHaveBeenLastCalledWith(fileOperations);
+
+    // Array should be exactly the return value from getFileOperations
+    expect(performFileOperationsMock.mock.calls[0][0]).toBe(fileOperations);
+  });
+
   test("should run npm install in project directory if dependencies are changed", async () => {
     await sync({ cwd: testCwd });
     expect(execa).toHaveBeenCalledTimes(1);
@@ -476,13 +526,14 @@ describe("sync", () => {
 
     await sync({ cwd: testCwd });
 
-    expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(1);
-    expect(updateFilesOnDiskMock.mock.calls[0][1]).toEqual([
+    expect(getFileOperationsMock).toHaveBeenCalledTimes(1);
+    expect(getFileOperationsMock.mock.calls[0][1]).toEqual([
       {
         hash:
           "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
         once: false,
         path: "unmanaged-path-1.json",
+        local: false,
       },
     ]);
   });
@@ -509,13 +560,14 @@ describe("sync", () => {
 
     await sync({ cwd: testCwd });
 
-    expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(1);
-    expect(updateFilesOnDiskMock.mock.calls[0][1]).toEqual([
+    expect(getFileOperationsMock).toHaveBeenCalledTimes(1);
+    expect(getFileOperationsMock.mock.calls[0][1]).toEqual([
       {
         hash:
           "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
         once: false,
         path: "unmanaged-path-1.json",
+        local: true,
       },
     ]);
   });
@@ -547,13 +599,13 @@ describe("sync", () => {
 
     await sync({ cwd: testCwd });
 
-    expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(1);
-    expect(updateFilesOnDiskMock.mock.calls[0][0]).toContainEqual(
+    expect(getFileOperationsMock).toHaveBeenCalledTimes(1);
+    expect(getFileOperationsMock.mock.calls[0][0]).toContainEqual(
       expect.objectContaining({
         relativePath: "once-a.json",
       })
     );
-    expect(updateFilesOnDiskMock.mock.calls[0][0]).toContainEqual(
+    expect(getFileOperationsMock.mock.calls[0][0]).toContainEqual(
       expect.objectContaining({
         relativePath: "once-b.json",
       })
@@ -564,14 +616,14 @@ describe("sync", () => {
 
     await sync({ cwd: testCwd });
 
-    expect(updateFilesOnDiskMock).toHaveBeenCalledTimes(2);
+    expect(getFileOperationsMock).toHaveBeenCalledTimes(2);
 
-    expect(updateFilesOnDiskMock.mock.calls[1][0]).not.toContainEqual(
+    expect(getFileOperationsMock.mock.calls[1][0]).not.toContainEqual(
       expect.objectContaining({
         relativePath: "once-a.json",
       })
     );
-    expect(updateFilesOnDiskMock.mock.calls[1][0]).not.toContainEqual(
+    expect(getFileOperationsMock.mock.calls[1][0]).not.toContainEqual(
       expect.objectContaining({
         relativePath: "once-b.json",
       })

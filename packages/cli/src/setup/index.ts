@@ -2,10 +2,22 @@ import { CoatContext } from "../types/coat-context";
 import { getContext } from "../util/get-context";
 import { getAllTemplates } from "../util/get-all-templates";
 import { gatherAllTasks } from "./gather-all-tasks";
-import { updateLockfiles } from "../lockfiles/update-lockfiles";
+import { updateLockfile } from "../lockfiles/update-lockfile";
 import { getTasksToRun } from "./get-tasks-to-run";
 import { CoatTaskType } from "../types/coat-manifest-tasks";
-import { removeUnmanagedTasksFromLockfiles } from "./remove-unmanaged-tasks-from-lockfile";
+import { removeUnmanagedTasksFromLockfile } from "./remove-unmanaged-tasks-from-lockfile";
+import {
+  writeGlobalLockfile,
+  writeLocalLockfile,
+} from "../lockfiles/write-lockfiles";
+import {
+  CoatGlobalLockfile,
+  CoatGlobalLockfileStrict,
+  CoatLocalLockfile,
+  CoatLocalLockfileStrict,
+} from "../types/coat-lockfiles";
+import { isEqual } from "lodash";
+import produce from "immer";
 
 /**
  * Gathers and runs all tasks of a coat project.
@@ -46,35 +58,74 @@ export async function setup({
       },
     });
 
-    const updateLockfileOptions: Parameters<typeof updateLockfiles>[0] = {
-      context,
-    };
     const partialLockfileUpdate = {
       setup: {
         [task.id]: taskResult || {},
       },
     };
-    switch (task.type) {
-      case CoatTaskType.Global:
-        updateLockfileOptions.updatedGlobalLockfile = partialLockfileUpdate;
-        break;
-      case CoatTaskType.Local:
-        updateLockfileOptions.updatedLocalLockfile = partialLockfileUpdate;
-        break;
-    }
+
     // Update the lockfile in between task runs
     // to save task results in case a following task
     // throws an error
-    context = await updateLockfiles(updateLockfileOptions);
+    switch (task.type) {
+      case CoatTaskType.Global: {
+        const newGlobalLockfile = updateLockfile<
+          CoatGlobalLockfileStrict,
+          CoatGlobalLockfile
+        >(context.coatGlobalLockfile, partialLockfileUpdate);
+        context = produce(context, (draft) => {
+          draft.coatGlobalLockfile = newGlobalLockfile;
+        });
+        await writeGlobalLockfile(newGlobalLockfile, context);
+        break;
+      }
+      case CoatTaskType.Local: {
+        const newLocalLockfile = updateLockfile<
+          CoatLocalLockfileStrict,
+          CoatLocalLockfile
+        >(context.coatLocalLockfile, partialLockfileUpdate);
+        context = produce(context, (draft) => {
+          draft.coatLocalLockfile = newLocalLockfile;
+        });
+        await writeLocalLockfile(newLocalLockfile, context);
+        break;
+      }
+      // The default case is only required to let TypeScript throw
+      // compiler errors if a new task type is added
+      /* istanbul ignore next */
+      default: {
+        const unhandledTask: never = task;
+        throw new Error(`Unhandled task type for task: ${unhandledTask}`);
+      }
+    }
   }
 
   // Remove task results that are from tasks that are
   // no longer managed by coat
-  context = await removeUnmanagedTasksFromLockfiles(
-    allTasks.filter((task) => task.type === CoatTaskType.Global),
-    allTasks.filter((task) => task.type === CoatTaskType.Local),
-    context
+  //
+  // global lockfile
+  const newGlobalLockfile = removeUnmanagedTasksFromLockfile(
+    context.coatGlobalLockfile,
+    allTasks.filter((task) => task.type === CoatTaskType.Global)
   );
+  if (!isEqual(context.coatGlobalLockfile, newGlobalLockfile)) {
+    context = produce(context, (draft) => {
+      draft.coatGlobalLockfile = newGlobalLockfile;
+    });
+    await writeGlobalLockfile(newGlobalLockfile, context);
+  }
+
+    // local lockfile
+    const newLocalLockfile = removeUnmanagedTasksFromLockfile(
+      context.coatLocalLockfile,
+      allTasks.filter((task) => task.type === CoatTaskType.Local)
+    );
+    if (!isEqual(context.coatLocalLockfile, newLocalLockfile)) {
+      context = produce(context, (draft) => {
+        draft.coatLocalLockfile = newLocalLockfile;
+      });
+      await writeLocalLockfile(newLocalLockfile, context);
+    }
 
   return context;
 }

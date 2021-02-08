@@ -18,15 +18,21 @@ import { CoatManifestStrict } from "../types/coat-manifest";
 import { generateLockfileFiles } from "../lockfiles/generate-lockfile-files";
 import { getUnmanagedFiles } from "./get-unmanaged-files";
 import { getAllTemplates } from "../util/get-all-templates";
-import { updateLockfiles } from "../lockfiles/update-lockfiles";
+import { updateLockfile } from "../lockfiles/update-lockfile";
 import { setup } from "../setup";
 import produce from "immer";
 import { groupFiles } from "./group-files";
 import { getDefaultFiles } from "./get-default-files";
 import { getCurrentFiles } from "./get-current-files";
-import { updateFilesOnDisk } from "./update-files-on-disk";
+import { FileOperationType, getFileOperations } from "./get-file-operations";
 import { removeUnmanagedDependencies } from "./remove-unmanaged-dependencies";
 import { getNormalizedFilePath } from "../util/get-normalized-file-path";
+import {
+  writeGlobalLockfile,
+  writeLocalLockfile,
+} from "../lockfiles/write-lockfiles";
+import { promptForFileOperations } from "./prompt-for-file-operations";
+import { performFileOperations } from "./perform-file-operations";
 
 /**
  * Generates all files from the current coat project.
@@ -272,12 +278,41 @@ export async function sync({
   const newGlobalLockFiles = generateLockfileFiles(globalLockFileEntries);
 
   const filesToRemove = [
-    ...getUnmanagedFiles(newLocalLockFiles, context.coatLocalLockfile),
-    ...getUnmanagedFiles(newGlobalLockFiles, context.coatGlobalLockfile),
+    ...getUnmanagedFiles(newLocalLockFiles, context.coatLocalLockfile).map(
+      (unmanagedFile) => ({
+        ...unmanagedFile,
+        local: true,
+      })
+    ),
+    ...getUnmanagedFiles(newGlobalLockFiles, context.coatGlobalLockfile).map(
+      (unmanagedFile) => ({
+        ...unmanagedFile,
+        local: false,
+      })
+    ),
   ];
 
-  // Place or update new polished files on the disk and remove unmanaged files
-  await updateFilesOnDisk(polishedFiles, filesToRemove, currentFiles, context);
+  // Determine necessary file operations:
+  // Place or update new polished files and remove unmanaged files
+  const fileOperations = getFileOperations(
+    polishedFiles,
+    filesToRemove,
+    currentFiles,
+    context
+  );
+
+  // Prompt the user if there are dangerous file operations that might have
+  // unintended consequences. See getFileOperations for operations that
+  // lead to prompts
+  const shouldPerformFileOperations = await promptForFileOperations(
+    fileOperations
+  );
+  if (!shouldPerformFileOperations) {
+    // If the prompt is declined, sync should be aborted and
+    // coat should exit immediately.
+    console.error("Aborting coat sync due to user request.");
+    process.exit(1);
+  }
 
   // Node.js 10 compatibility
   // Use Object.fromEntries once Node 10 is no longer supported
@@ -293,15 +328,33 @@ export async function sync({
   const newLockfileScripts = Object.keys(mergedScripts).sort();
 
   // Update the lockfiles with the new file entries
-  context = await updateLockfiles({
-    updatedGlobalLockfile: {
-      files: newGlobalLockFiles,
-      dependencies: newLockfileDependencies,
-      scripts: newLockfileScripts,
-    },
-    updatedLocalLockfile: { files: newLocalLockFiles },
-    context,
+  //
+  // global lockfile
+  const newGlobalLockfile = updateLockfile(context.coatGlobalLockfile, {
+    files: newGlobalLockFiles,
+    dependencies: newLockfileDependencies,
+    scripts: newLockfileScripts,
   });
+  if (!isEqual(context.coatGlobalLockfile, newGlobalLockfile)) {
+    context = produce(context, (draft) => {
+      draft.coatGlobalLockfile = newGlobalLockfile;
+    });
+    await writeGlobalLockfile(newGlobalLockfile, context);
+  }
+
+  // local lockfile
+  const newLocalLockfile = updateLockfile(context.coatLocalLockfile, {
+    files: newLocalLockFiles,
+  });
+  if (!isEqual(context.coatLocalLockfile, newLocalLockfile)) {
+    context = produce(context, (draft) => {
+      draft.coatLocalLockfile = newLocalLockfile;
+    });
+    await writeLocalLockfile(newLocalLockfile, context);
+  }
+
+  // Update files on disk
+  await performFileOperations(fileOperations);
 
   // Retrieve dependencies after merging to run npm install if they have changed
   //
