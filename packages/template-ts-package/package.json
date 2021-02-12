@@ -3,16 +3,16 @@
   "version": "0.0.19",
   "author": "Peter Juras <me@peterjuras.com>",
   "devDependencies": {
-    "@babel/cli": "7.12.13",
-    "@babel/core": "7.12.13",
-    "@babel/preset-env": "7.12.13",
-    "@babel/preset-typescript": "7.12.13",
+    "@babel/cli": "7.12.16",
+    "@babel/core": "7.12.16",
+    "@babel/preset-env": "7.12.16",
+    "@babel/preset-typescript": "7.12.16",
     "@coat/cli": "0.0.18",
-    "@types/fs-extra": "9.0.6",
+    "@types/fs-extra": "9.0.7",
     "@types/jest": "26.0.20",
     "@types/tmp": "0.2.0",
-    "@typescript-eslint/eslint-plugin": "4.14.2",
-    "@typescript-eslint/parser": "4.14.2",
+    "@typescript-eslint/eslint-plugin": "4.15.0",
+    "@typescript-eslint/parser": "4.15.0",
     "eslint": "7.19.0",
     "eslint-config-prettier": "7.2.0",
     "fs-extra": "9.1.0",
@@ -21,7 +21,7 @@
     "prettier": "2.2.1",
     "rimraf": "3.0.2",
     "tmp": "0.2.1",
-    "typescript": "4.1.3"
+    "typescript": "4.1.5"
   },
   "files": [
     "build/",
