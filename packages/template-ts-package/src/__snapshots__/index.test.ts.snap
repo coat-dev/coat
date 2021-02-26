@@ -30,8 +30,7 @@ exports[`@coat/template-ts-package template verification - babel compiler 2`] = 
   \\"extends\\": [
     \\"eslint:recommended\\",
     \\"plugin:@typescript-eslint/recommended\\",
-    \\"prettier\\",
-    \\"prettier/@typescript-eslint\\"
+    \\"prettier\\"
   ],
   \\"overrides\\": [
     {
@@ -216,7 +215,7 @@ files:
       hHs8Ro19pcVjDAWfZTsTCzYcMScqbit0swZQzIwdn1M1u6TbZxxw581Q+SM0LjyPaNKBRtkF05gDnxv3fAzWug==
     path: .babelrc
   - hash: >-
-      18VlJXZ5M6991m08/5HH27cJattIDvAmLFGUIabEP5WH+o53D67XmVrVo7cGQqGtJwvrnyGsZRp52lgiwAIMZw==
+      n1uS6ajZMpOfiWQhE24L1oIsASvT63ay5GkxYOiYFBgF2SiwUbHQVMxdtPq9a5KyBtaZkpUtk7A/9frYkb1nzw==
     path: .eslintrc
   - hash: >-
       fxSZnVg1JXiEGv1w/4+1LpWhyUWeFgVRnyX8grd7X6S0JOseqVFI+GZS4O8s7QGhF0D2c/RfzdmEEbCDjdrbcw==
@@ -277,7 +276,7 @@ exports[`@coat/template-ts-package template verification - babel compiler 8`] = 
     \\"@typescript-eslint/eslint-plugin\\": \\"^4.8.1\\",
     \\"@typescript-eslint/parser\\": \\"^4.8.1\\",
     \\"eslint\\": \\"^7.13.0\\",
-    \\"eslint-config-prettier\\": \\"^7.0.0\\",
+    \\"eslint-config-prettier\\": \\"^8.1.0\\",
     \\"jest\\": \\"^26.6.3\\",
     \\"jest-circus\\": \\"^26.6.3\\",
     \\"prettier\\": \\"^2.2.0\\",
@@ -375,8 +374,7 @@ exports[`@coat/template-ts-package template verification - default config 1`] = 
   \\"extends\\": [
     \\"eslint:recommended\\",
     \\"plugin:@typescript-eslint/recommended\\",
-    \\"prettier\\",
-    \\"prettier/@typescript-eslint\\"
+    \\"prettier\\"
   ],
   \\"overrides\\": [
     {
@@ -555,7 +553,7 @@ dependencies:
     - typescript
 files:
   - hash: >-
-      18VlJXZ5M6991m08/5HH27cJattIDvAmLFGUIabEP5WH+o53D67XmVrVo7cGQqGtJwvrnyGsZRp52lgiwAIMZw==
+      n1uS6ajZMpOfiWQhE24L1oIsASvT63ay5GkxYOiYFBgF2SiwUbHQVMxdtPq9a5KyBtaZkpUtk7A/9frYkb1nzw==
     path: .eslintrc
   - hash: >-
       fxSZnVg1JXiEGv1w/4+1LpWhyUWeFgVRnyX8grd7X6S0JOseqVFI+GZS4O8s7QGhF0D2c/RfzdmEEbCDjdrbcw==
@@ -611,7 +609,7 @@ exports[`@coat/template-ts-package template verification - default config 7`] = 
     \\"@typescript-eslint/eslint-plugin\\": \\"^4.8.1\\",
     \\"@typescript-eslint/parser\\": \\"^4.8.1\\",
     \\"eslint\\": \\"^7.13.0\\",
-    \\"eslint-config-prettier\\": \\"^7.0.0\\",
+    \\"eslint-config-prettier\\": \\"^8.1.0\\",
     \\"jest\\": \\"^26.6.3\\",
     \\"jest-circus\\": \\"^26.6.3\\",
     \\"prettier\\": \\"^2.2.0\\",
@@ -705,8 +703,7 @@ exports[`@coat/template-ts-package template verification - typescript compiler 1
   \\"extends\\": [
     \\"eslint:recommended\\",
     \\"plugin:@typescript-eslint/recommended\\",
-    \\"prettier\\",
-    \\"prettier/@typescript-eslint\\"
+    \\"prettier\\"
   ],
   \\"overrides\\": [
     {
@@ -885,7 +882,7 @@ dependencies:
     - typescript
 files:
   - hash: >-
-      18VlJXZ5M6991m08/5HH27cJattIDvAmLFGUIabEP5WH+o53D67XmVrVo7cGQqGtJwvrnyGsZRp52lgiwAIMZw==
+      n1uS6ajZMpOfiWQhE24L1oIsASvT63ay5GkxYOiYFBgF2SiwUbHQVMxdtPq9a5KyBtaZkpUtk7A/9frYkb1nzw==
     path: .eslintrc
   - hash: >-
       fxSZnVg1JXiEGv1w/4+1LpWhyUWeFgVRnyX8grd7X6S0JOseqVFI+GZS4O8s7QGhF0D2c/RfzdmEEbCDjdrbcw==
@@ -941,7 +938,7 @@ exports[`@coat/template-ts-package template verification - typescript compiler 7
     \\"@typescript-eslint/eslint-plugin\\": \\"^4.8.1\\",
     \\"@typescript-eslint/parser\\": \\"^4.8.1\\",
     \\"eslint\\": \\"^7.13.0\\",
-    \\"eslint-config-prettier\\": \\"^7.0.0\\",
+    \\"eslint-config-prettier\\": \\"^8.1.0\\",
     \\"jest\\": \\"^26.6.3\\",
     \\"jest-circus\\": \\"^26.6.3\\",
     \\"prettier\\": \\"^2.2.0\\",

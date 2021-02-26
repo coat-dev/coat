@@ -19,7 +19,7 @@ files:
       hHs8Ro19pcVjDAWfZTsTCzYcMScqbit0swZQzIwdn1M1u6TbZxxw581Q+SM0LjyPaNKBRtkF05gDnxv3fAzWug==
     path: .babelrc
   - hash: >-
-      18VlJXZ5M6991m08/5HH27cJattIDvAmLFGUIabEP5WH+o53D67XmVrVo7cGQqGtJwvrnyGsZRp52lgiwAIMZw==
+      n1uS6ajZMpOfiWQhE24L1oIsASvT63ay5GkxYOiYFBgF2SiwUbHQVMxdtPq9a5KyBtaZkpUtk7A/9frYkb1nzw==
     path: .eslintrc
   - hash: >-
       fxSZnVg1JXiEGv1w/4+1LpWhyUWeFgVRnyX8grd7X6S0JOseqVFI+GZS4O8s7QGhF0D2c/RfzdmEEbCDjdrbcw==
@@ -41,12 +41,12 @@ files:
     path: tsconfig.json
 scripts:
   - build
-  - "build:babel"
-  - "build:typedefs"
+  - build:babel
+  - build:typedefs
   - lint
-  - "lint:eslint"
-  - "lint:prettier"
-  - "lint:types"
+  - lint:eslint
+  - lint:prettier
+  - lint:types
   - prebuild
   - test
 version: 1
