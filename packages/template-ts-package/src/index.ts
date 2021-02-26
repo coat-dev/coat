@@ -116,7 +116,7 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
     "jest-circus": "^26.6.3",
 
     prettier: "^2.2.0",
-    typescript: "~4.1.2",
+    typescript: "~4.2.2",
     rimraf: "^3.0.2",
   };
 
