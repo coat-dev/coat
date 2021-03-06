@@ -3,7 +3,6 @@
   "bugs": {
     "url": "https://github.com/coat-dev/coat/issues"
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/prettier": "2.2.2",
     "@types/prompts": "2.0.9",
