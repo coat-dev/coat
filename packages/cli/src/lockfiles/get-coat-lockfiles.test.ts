@@ -11,12 +11,41 @@ import {
   COAT_LOCAL_LOCKFILE_PATH,
 } from "../constants";
 import { getFileHash } from "../util/get-file-hash";
+import {
+  getCoatGlobalLockfileValidator,
+  getCoatLocalLockfileValidator,
+} from "../util/get-validator";
+import stripAnsi from "strip-ansi";
 
-jest.mock("fs");
+jest.mock("fs").mock("../util/get-validator");
+
+const getCoatGlobalLockfileValidatorMock = (getCoatGlobalLockfileValidator as unknown) as jest.Mock<
+  ReturnType<typeof getCoatGlobalLockfileValidator>,
+  Parameters<typeof getCoatGlobalLockfileValidator>
+>;
+
+const getCoatLocalLockfileValidatorMock = (getCoatLocalLockfileValidator as unknown) as jest.Mock<
+  ReturnType<typeof getCoatLocalLockfileValidator>,
+  Parameters<typeof getCoatLocalLockfileValidator>
+>;
+
+const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
+  // Ignore console warn messages
+});
 
 describe("lockfiles/get-coat-lockfiles", () => {
+  beforeEach(() => {
+    getCoatGlobalLockfileValidatorMock.mockImplementation(async () => () =>
+      true
+    );
+    getCoatLocalLockfileValidatorMock.mockImplementation(async () => () =>
+      true
+    );
+  });
+
   afterEach(() => {
     vol.reset();
+    jest.clearAllMocks();
   });
   const testCwd = "/test";
 
@@ -98,6 +127,39 @@ describe("lockfiles/get-coat-lockfiles", () => {
         `[Error: EACCES: permission denied, open '/test/coat.lock']`
       );
     });
+
+    test("should log warning if lockfile is not valid", async () => {
+      getCoatGlobalLockfileValidatorMock.mockImplementation(async () => {
+        const validate = (): boolean => false;
+        validate.errors = [
+          {
+            keyword: "Error!",
+            dataPath: "dataPath",
+            schemaPath: "schemaPath",
+            params: "params",
+          },
+        ];
+        return validate;
+      });
+
+      await getCoatGlobalLockfile(testCwd);
+
+      expect(consoleWarnSpy).toHaveBeenCalledTimes(2);
+      expect(stripAnsi(consoleWarnSpy.mock.calls[0][0])).toMatchInlineSnapshot(`
+        "Warning! The global lockfile coat.lock does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.
+        The following issues have been found:"
+      `);
+      expect(stripAnsi(consoleWarnSpy.mock.calls[1][0])).toMatchInlineSnapshot(`
+        Array [
+          Object {
+            "dataPath": "dataPath",
+            "keyword": "Error!",
+            "params": "params",
+            "schemaPath": "schemaPath",
+          },
+        ]
+      `);
+    });
   });
 
   describe("local", () => {
@@ -161,6 +223,38 @@ describe("lockfiles/get-coat-lockfiles", () => {
       await expect(getCoatLocalLockfile(testCwd)).rejects.toMatchInlineSnapshot(
         `[Error: EACCES: permission denied, open '/test/.coat/coat.lock']`
       );
+    });
+
+    test("should log warning if lockfile is not valid", async () => {
+      getCoatLocalLockfileValidatorMock.mockImplementation(async () => {
+        const validate = (): boolean => false;
+        validate.errors = [
+          {
+            keyword: "Error!",
+            dataPath: "dataPath",
+            schemaPath: "schemaPath",
+            params: "params",
+          },
+        ];
+        return validate;
+      });
+
+      await getCoatLocalLockfile(testCwd);
+
+      expect(consoleWarnSpy).toHaveBeenCalledTimes(2);
+      expect(stripAnsi(consoleWarnSpy.mock.calls[0][0])).toEqual(
+        `Warning! The local lockfile ${COAT_LOCAL_LOCKFILE_PATH} does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.\nThe following issues have been found:`
+      );
+      expect(stripAnsi(consoleWarnSpy.mock.calls[1][0])).toMatchInlineSnapshot(`
+        Array [
+          Object {
+            "dataPath": "dataPath",
+            "keyword": "Error!",
+            "params": "params",
+            "schemaPath": "schemaPath",
+          },
+        ]
+      `);
     });
   });
 });

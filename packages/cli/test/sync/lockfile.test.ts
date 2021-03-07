@@ -6,6 +6,7 @@ import {
 } from "../../src/constants";
 import { runSyncTest } from "../utils/run-cli-test";
 import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
+import stripAnsi from "strip-ansi";
 
 describe("coat sync - lockfile", () => {
   describe("global", () => {
@@ -91,6 +92,30 @@ describe("coat sync - lockfile", () => {
         "
       `);
     });
+
+    test("should warn if lockfile does not match expected schema", async () => {
+      const { task } = await runSyncTest({
+        coatGlobalLockfile: {
+          // @ts-expect-error
+          version: "123",
+        },
+      });
+      const taskResult = await task;
+
+      expect(stripAnsi(taskResult.stderr)).toMatchInlineSnapshot(`
+        "Warning! The global lockfile coat.lock does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.
+        The following issues have been found:
+        [
+          {
+            keyword: 'type',
+            dataPath: '.version',
+            schemaPath: '#/properties/version/type',
+            params: { type: 'number' },
+            message: 'should be number'
+          }
+        ]"
+      `);
+    });
   });
 
   describe("local", () => {
@@ -158,6 +183,30 @@ describe("coat sync - lockfile", () => {
         version: 1
         "
       `);
+    });
+
+    test("should warn if lockfile does not match expected schema", async () => {
+      const { task } = await runSyncTest({
+        coatLocalLockfile: {
+          // @ts-expect-error
+          version: "123",
+        },
+      });
+      const taskResult = await task;
+
+      expect(stripAnsi(taskResult.stderr)).toEqual(
+        `Warning! The local lockfile ${COAT_LOCAL_LOCKFILE_PATH} does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.
+The following issues have been found:
+[
+  {
+    keyword: 'type',
+    dataPath: '.version',
+    schemaPath: '#/properties/version/type',
+    params: { type: 'number' },
+    message: 'should be number'
+  }
+]`
+      );
     });
   });
 });

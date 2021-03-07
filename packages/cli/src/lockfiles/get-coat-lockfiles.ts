@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import yaml from "js-yaml";
+import chalk from "chalk";
 import {
   COAT_GLOBAL_LOCKFILE_PATH,
   COAT_GLOBAL_LOCKFILE_VERSION,
@@ -17,6 +18,10 @@ import {
   getStrictCoatGlobalLockfile,
   getStrictCoatLocalLockfile,
 } from "./get-strict-coat-lockfiles";
+import {
+  getCoatGlobalLockfileValidator,
+  getCoatLocalLockfileValidator,
+} from "../util/get-validator";
 
 const initialCoatGlobalLockfile: CoatGlobalLockfile = {
   version: COAT_GLOBAL_LOCKFILE_VERSION,
@@ -50,8 +55,15 @@ export async function getCoatGlobalLockfile(
     }
   }
 
-  // TODO: See #32
-  // Lockfile validation
+  const validate = await getCoatGlobalLockfileValidator();
+  if (!validate(lockfile)) {
+    console.warn(
+      `${chalk.yellow("Warning!")} The global lockfile ${chalk.green(
+        COAT_GLOBAL_LOCKFILE_PATH
+      )} does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.\nThe following issues have been found:`
+    );
+    console.warn(validate.errors);
+  }
 
   return getStrictCoatGlobalLockfile(lockfile);
 }
@@ -81,8 +93,15 @@ export async function getCoatLocalLockfile(
     }
   }
 
-  // TODO: See #32
-  // Lockfile validation
+  const validate = await getCoatLocalLockfileValidator();
+  if (!validate(lockfile)) {
+    console.warn(
+      `${chalk.yellow("Warning!")} The local lockfile ${chalk.green(
+        COAT_LOCAL_LOCKFILE_PATH
+      )} does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.\nThe following issues have been found:`
+    );
+    console.warn(validate.errors);
+  }
 
   return getStrictCoatLocalLockfile(lockfile);
 }
