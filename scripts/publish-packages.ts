@@ -3,6 +3,7 @@ import path from "path";
 import execa from "execa";
 import prompts from "prompts";
 import prettier from "prettier";
+import rimraf from "rimraf";
 
 enum Package {
   Cli = "cli",
@@ -56,11 +57,14 @@ async function publishCli(): Promise<void> {
   });
 
   // Update the version of cli in template-ts-package
-  const templateTsPackagePackageJsonPath = path.join(
+  const templateTsPackageDir = path.join(
     __dirname,
     "..",
     "packages",
-    "template-ts-package",
+    "template-ts-package"
+  );
+  const templateTsPackagePackageJsonPath = path.join(
+    templateTsPackageDir,
     "package.json"
   );
   const templateTsPackagePackageJsonRaw = await fs.readFile(
@@ -85,6 +89,15 @@ async function publishCli(): Promise<void> {
     templateTsPackagePackageJsonPath,
     newTemplateTsPackagePackageJson
   );
+
+  // Run lerna bootstrap again to update package-lock.json
+  // file of template-ts-package
+  //
+  // Remove node_modules in template to ensure lerna bootstrap actually runs
+  rimraf.sync(path.join(templateTsPackageDir, "node_modules"));
+  await execa("npx", ["--no-install", "lerna", "bootstrap"], {
+    cwd: path.join(__dirname, ".."),
+  });
 
   // Create a git commit and tag
   await execa("git", ["add", "--all"], {
@@ -140,7 +153,7 @@ async function publishTemplateTsPackage(): Promise<void> {
     stdio: "inherit",
   });
 
-  // Retrieve the new version from cli/package.json
+  // Retrieve the new version from template-ts-package/package.json
   const templateTsPackageJsonRaw = await fs.readFile(
     path.join(templateTsPackageDir, "package.json"),
     "utf-8"
