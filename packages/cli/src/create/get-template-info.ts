@@ -46,7 +46,7 @@ export async function getTemplateInfo(
   };
 
   // Get the name of the new devDependency that has been installed
-  // to get the correct template name by comparing current devDepndencies
+  // to get the correct template name by comparing current devDependencies
   // to the previous devDependencies.
   // Since only a single dependency - the template itself - was installed,
   // it should be the only entry in the difference array
@@ -71,7 +71,7 @@ export async function getTemplateInfo(
   // eslint-disable-next-line no-param-reassign
   installSpinner.text = `${chalk.cyan(
     "coat"
-  )} was not able to determine the template name and peerDependencies directly by installing the template and has to do an extra round to retrieve information about the installed template.\nThis is likely due to the template already being installed in the project directory before. This might take a couple of minutes.\n`;
+  )} was not able to determine the template name directly by installing the template and has to do an extra round to retrieve information about the installed template.\nThis is likely due to the template already being installed in the project directory before. This might take a couple of minutes.\n`;
   //
   // Create a temporary directory
   const tmpDir = tmp.dirSync({ unsafeCleanup: true });
@@ -114,7 +114,7 @@ export async function getTemplateInfo(
     `${tmpTemplatePackageName}/${PACKAGE_JSON_FILENAME}`
   ) as PackageJson;
 
-  // Remove temporary directory
+  // Remove the temporary directory
   tmpDir.removeCallback();
 
   return templateInfo;

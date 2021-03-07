@@ -207,7 +207,7 @@ describe("create", () => {
     );
   });
 
-  test("should add the template and its peerDependencies as devDependencies in the target dir", async () => {
+  test("should add the template as a devDependency in the target dir", async () => {
     (getTemplateInfo as jest.Mock).mockImplementationOnce(() => ({
       name: "template",
       peerDependencies: {
@@ -217,17 +217,10 @@ describe("create", () => {
     }));
     await create({ template: "template", directory: "project-name" });
 
-    expect(execa).toHaveBeenCalledTimes(4);
+    expect(execa).toHaveBeenCalledTimes(3);
     expect(execa).toHaveBeenCalledWith(
       "npm",
       ["install", "--save-exact", "--save-dev", "template"],
-      {
-        cwd: path.join(process.cwd(), "project-name"),
-      }
-    );
-    expect(execa).toHaveBeenCalledWith(
-      "npm",
-      ["install", "--save-dev", "peer-a@^0.0.1", "peer-b@*"],
       {
         cwd: path.join(process.cwd(), "project-name"),
       }

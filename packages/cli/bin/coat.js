@@ -5,7 +5,7 @@
 //
 // While this code is not covered by unit tests
 // and code coverage, e2e tests
-// in /tests will run this code since they
+// in /tests will run this code since they run
 // node with this file as the main module
 //
 // TODO: See #14
