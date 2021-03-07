@@ -18,6 +18,7 @@
     "fs-extra": "9.1.0",
     "jest": "26.6.3",
     "jest-circus": "26.6.3",
+    "lint-staged": "10.5.4",
     "prettier": "2.2.1",
     "rimraf": "3.0.2",
     "tmp": "0.2.1",
@@ -34,6 +35,12 @@
     "typescript"
   ],
   "license": "MIT",
+  "lint-staged": {
+    "*.{ts,js}": [
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
+    ]
+  },
   "main": "build/index.js",
   "peerDependencies": {
     "@coat/cli": "^0.0.20"
@@ -44,6 +51,7 @@
     "build:typedefs": "tsc -p tsconfig.build.json",
     "coat": "coat",
     "lint": "coat run lint:*",
+    "lint-staged": "lint-staged",
     "lint:eslint": "eslint --ext .ts --max-warnings 0 src",
     "lint:prettier": "prettier --check src",
     "lint:types": "tsc",

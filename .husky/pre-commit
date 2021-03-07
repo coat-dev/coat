@@ -1,0 +1,5 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+npx --no-install lerna run --since HEAD --stream test -- -- --only-changed
+npx --no-install lerna run --since HEAD --stream lint-staged
