@@ -62,6 +62,8 @@ export async function getCoatGlobalLockfile(
         COAT_GLOBAL_LOCKFILE_PATH
       )} does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.\nThe following issues have been found:`
     );
+    // TODO: See #15
+    // Better warning message
     console.warn(validate.errors);
   }
 
@@ -100,6 +102,8 @@ export async function getCoatLocalLockfile(
         COAT_LOCAL_LOCKFILE_PATH
       )} does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.\nThe following issues have been found:`
     );
+    // TODO: See #15
+    // Better warning message
     console.warn(validate.errors);
   }
 
