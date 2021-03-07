@@ -175,16 +175,9 @@ export async function create({
       cwd: targetCwd,
     });
 
-    // Templates should have a peerDependency on @coat/cli which could
-    // differ from the version which is currently being run.
-    //
-    // In order to run setup and sync with the correct @coat/cli version
-    // peerDependencies of the template should be retrieved and installed
-    // as devDependencies in the project.
-    //
-    // In addition to the peerDependencies, the templateInfo is also required
-    // to get the resolves template name, since the template string that has
-    // been passed to coat could also be a local file path,
+    // We need to retrieve the correct template name,
+    // since the template string that has been passed
+    // to coat create could also be a local file path,
     // GitHub URL or npm tag
     const templateInfo = await getTemplateInfo(
       targetCwd,
@@ -192,20 +185,7 @@ export async function create({
       template,
       installSpinner
     );
-    const peerDependenciesEntries = Object.entries(
-      templateInfo.peerDependencies || {}
-    );
-    if (peerDependenciesEntries.length) {
-      const peerDependencyPackages = peerDependenciesEntries.map(
-        ([packageName, packageVersion]) => `${packageName}@${packageVersion}`
-      );
-      await execa("npm", ["install", "--save-dev", ...peerDependencyPackages], {
-        cwd: targetCwd,
-      });
-    } else {
-      // TODO: See #15
-      // Warn that templates should have a peerDependency on @coat/cli
-    }
+
     installSpinner.succeed();
 
     // Write the coat manifest file

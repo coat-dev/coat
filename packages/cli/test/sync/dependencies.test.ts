@@ -107,9 +107,9 @@ describe("coat sync - dependencies", () => {
     ${"dependencies"}         | ${true}
     ${"devDependencies"}      | ${true}
     ${"optionalDependencies"} | ${true}
-    ${"peerDependencies"}     | ${false}
+    ${"peerDependencies"}     | ${true}
   `(
-    "should add a new $dependencyType",
+    "should add new $dependencyType",
     async ({ dependencyType, expectNodeModules }) => {
       const projectName = "test-project";
 
@@ -206,7 +206,7 @@ describe("coat sync - dependencies", () => {
     expect(nodeModules).toContain("local-dependency");
     expect(nodeModules).toContain("local-dependency-dev");
     expect(nodeModules).toContain("local-dependency-optional");
-    expect(nodeModules).not.toContain("local-dependency-peer");
+    expect(nodeModules).toContain("local-dependency-peer");
   });
 
   test("should install dependencies when a dependency is removed", async () => {
@@ -422,7 +422,7 @@ describe("coat sync - dependencies", () => {
     expect(nodeModules).toContain("local-dependency");
     expect(nodeModules).toContain("local-dependency-dev");
     expect(nodeModules).toContain("local-dependency-optional");
-    expect(nodeModules).not.toContain("local-dependency-peer");
+    expect(nodeModules).toContain("local-dependency-peer");
 
     // Update coat manifest to remove all dependency entries again
     await fs.writeFile(

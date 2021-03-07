@@ -29,9 +29,6 @@ describe("coat create - project files", () => {
       expect(packageJson.devDependencies?.["@coat/e2e-test-template"]).toBe(
         "2.0.0"
       );
-
-      // should add peerDependencies as devDependencies
-      expect(packageJson.devDependencies?.["no-op"]).toBe("^1.0.3");
     });
 
     test("should add the template with GitHub url as devDependency", async () => {
@@ -50,7 +47,6 @@ describe("coat create - project files", () => {
       const packageJson = JSON.parse(packageJsonRaw);
       expect(packageJson.devDependencies).toEqual({
         "@coat/e2e-test-template": "github:coat-dev/cli-e2e-tests-template",
-        "no-op": "^1.0.3",
       });
     });
   });
