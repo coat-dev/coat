@@ -35,15 +35,15 @@
     "typescript"
   ],
   "license": "MIT",
-  "main": "build/index.js",
-  "peerDependencies": {
-    "@coat/cli": "^0.0.20"
-  },
   "lint-staged": {
     "*.{ts,js}": [
       "eslint --fix --max-warnings=0",
       "prettier --write"
     ]
+  },
+  "main": "build/index.js",
+  "peerDependencies": {
+    "@coat/cli": "^0.0.20"
   },
   "scripts": {
     "build": "coat run build:*",
@@ -51,10 +51,10 @@
     "build:typedefs": "tsc -p tsconfig.build.json",
     "coat": "coat",
     "lint": "coat run lint:*",
+    "lint-staged": "lint-staged",
     "lint:eslint": "eslint --ext .ts --max-warnings 0 src",
     "lint:prettier": "prettier --check src",
     "lint:types": "tsc",
-    "lint-staged": "lint-staged",
     "prebuild": "rimraf build",
     "prepack": "coat run build",
     "test": "jest",
