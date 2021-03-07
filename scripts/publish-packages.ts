@@ -15,6 +15,10 @@ enum VersionIncrement {
   Patch = "patch",
 }
 
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function publishCli(): Promise<void> {
   const { updateType } = await prompts([
     {
@@ -95,9 +99,21 @@ async function publishCli(): Promise<void> {
   //
   // Remove node_modules in template to ensure lerna bootstrap actually runs
   rimraf.sync(path.join(templateTsPackageDir, "node_modules"));
-  await execa("npx", ["--no-install", "lerna", "bootstrap"], {
-    cwd: path.join(__dirname, ".."),
-  });
+  let error = null;
+  do {
+    error = null;
+    try {
+      await execa("npx", ["--no-install", "lerna", "bootstrap"], {
+        cwd: path.join(__dirname, ".."),
+      });
+    } catch (innerError) {
+      error = innerError;
+      console.log(
+        "Waiting 10 seconds, since lerna bootstrap failed - likely since the new cli version is not yet available on npm"
+      );
+      await delay(10 * 1000);
+    }
+  } while (error);
 
   // Create a git commit and tag
   await execa("git", ["add", "--all"], {
