@@ -9,10 +9,13 @@ const schemaTypes = ["CoatLocalLockfile", "CoatGlobalLockfile"];
 async function main(): Promise<void> {
   const program = programFromConfig(path.join(cliRoot, "tsconfig.json"));
   const generator = buildGenerator(program);
+  if (!generator) {
+    throw new Error("Could not create schema generator");
+  }
 
   await Promise.all(
     schemaTypes.map(async (typeName) => {
-      const schema = generator?.getSchemaForSymbol(typeName);
+      const schema = generator.getSchemaForSymbol(typeName);
       await fs.outputFile(
         path.join(schemasDir, `${typeName}.json`),
         JSON.stringify(schema)

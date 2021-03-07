@@ -53,7 +53,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: ${{ matrix.node }}
       - name: Install latest npm version
         run: npm install --global npm
       - name: Install dependencies
@@ -71,11 +71,6 @@ jobs:
           echo "npm_config_fetch_retry_factor=2" >> $GITHUB_ENV
           echo "npm_config_fetch_retry_mintimeout=50" >> $GITHUB_ENV
           echo "npm_config_fetch_retry_maxtimeout=6000" >> $GITHUB_ENV
-      - uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node }}
-      - name: Install latest npm version
-        run: npm install --global npm
       - name: Run all tests
         run: npm run test:all -- --ci --no-cache --runInBand --verbose
         working-directory: ./packages/cli
