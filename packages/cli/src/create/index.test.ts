@@ -2,16 +2,10 @@ import fs from "fs-extra";
 import path from "path";
 import { vol } from "memfs";
 import execa from "execa";
-import chalk from "chalk";
 import { create } from ".";
 import { getProjectName } from "./get-project-name";
 import { getTemplateInfo } from "./get-template-info";
-import { sync } from "../sync";
-import {
-  COAT_CLI_VERSION,
-  COAT_MANIFEST_FILENAME,
-  PACKAGE_JSON_FILENAME,
-} from "../constants";
+import { COAT_MANIFEST_FILENAME, PACKAGE_JSON_FILENAME } from "../constants";
 import { addInitialCommit } from "./add-initial-commit";
 
 jest
@@ -22,8 +16,7 @@ jest
   .mock("./get-project-name")
   .mock("./add-initial-commit")
   .mock("./print-create-customization-help")
-  .mock("../bin/get-coat-header")
-  .mock("../sync");
+  .mock("../bin/get-coat-header");
 
 const execaMock = (execa as unknown) as jest.Mock;
 const execaMockImplementation = (): unknown => ({
@@ -38,7 +31,7 @@ execaMock.mockImplementation(execaMockImplementation);
   name: "my-template",
 }));
 
-const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {
+jest.spyOn(console, "log").mockImplementation(() => {
   // Ignore console log messages
 });
 
@@ -188,7 +181,7 @@ describe("create", () => {
   test("should add the template as a devDependency in the target dir", async () => {
     await create({ template: "template", directory: "project-name" });
 
-    expect(execa).toHaveBeenCalledTimes(3);
+    expect(execa).toHaveBeenCalledTimes(2);
     expect(execa).toHaveBeenCalledWith(
       "npm",
       ["install", "--save-exact", "--save-dev", "template"],
@@ -217,7 +210,7 @@ describe("create", () => {
     }));
     await create({ template: "template", directory: "project-name" });
 
-    expect(execa).toHaveBeenCalledTimes(3);
+    expect(execa).toHaveBeenCalledTimes(2);
     expect(execa).toHaveBeenCalledWith(
       "npm",
       ["install", "--save-exact", "--save-dev", "template"],
@@ -227,107 +220,17 @@ describe("create", () => {
     );
   });
 
-  describe("sync functions", () => {
-    afterEach(() => {
-      execaMock.mockImplementation(execaMockImplementation);
-    });
+  test("should spawn coat again to run sync in the newly created project", async () => {
+    await create({ template: "template", directory: "project-name" });
 
-    test("should log message if locally installed @coat/cli version differs from the currently running cli", async () => {
-      execaMock.mockImplementation((cmd, args) => {
-        if (
-          cmd === "npx" &&
-          args.includes("coat") &&
-          args.includes("--version")
-        ) {
-          return {
-            exitCode: 0,
-            stdout: "1.0.0-mocked.1",
-          };
-        }
-      });
-      consoleLogSpy.mockClear();
-
-      await create({ template: "template", directory: "project-name" });
-
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        "Running %s with @coat/cli version %s\n",
-        chalk.cyan("coat sync"),
-        "1.0.0-mocked.1"
-      );
-    });
-
-    test("should not log message if locally installed @coat/cli version is the same as the currently running cli", async () => {
-      execaMock.mockImplementation((cmd, args) => {
-        if (
-          cmd === "npx" &&
-          args.includes("coat") &&
-          args.includes("--version")
-        ) {
-          return {
-            exitCode: 0,
-            stdout: COAT_CLI_VERSION,
-          };
-        }
-      });
-      consoleLogSpy.mockClear();
-
-      await create({ template: "template", directory: "project-name" });
-
-      const hasLogMessage = consoleLogSpy.mock.calls.some((consoleLine) =>
-        consoleLine
-          .toString()
-          .startsWith("Running coat setup and coat sync with @coat/cli version")
-      );
-      expect(hasLogMessage).toBe(false);
-    });
-
-    test("should call the coat sync function from the local @coat/cli package", async () => {
-      execaMock.mockClear();
-      // Use an absolute path as the target dir to make the assertion below
-      // environment agnostic
-      const targetDir = "/opt/coat-cli/test/target-dir";
-      await create({
-        template: "template",
-        directory: targetDir,
-        projectName: "project-name",
-      });
-      expect(execaMock).toHaveBeenCalledWith(
-        "npx",
-        ["--no-install", "coat", "sync"],
-        {
-          cwd: targetDir,
-          stdio: "inherit",
-        }
-      );
-    });
-
-    test("should call the coat sync function directly if the local @coat/cli package doesn't exist", async () => {
-      (sync as jest.Mock).mockClear();
-      execaMock.mockImplementation((cmd, innerArgs) => {
-        if (
-          cmd === "npx" &&
-          innerArgs.includes("coat") &&
-          innerArgs.includes("--version")
-        ) {
-          return {
-            exitCode: 1,
-          };
-        }
-        return {
-          exitCode: 0,
-          stdout: 0,
-        };
-      });
-
-      await create({
-        template: "template",
-        directory: "/absolute/test/path/project-name",
-        projectName: "project-name",
-      });
-      expect(sync).toHaveBeenCalledTimes(1);
-      expect(sync).toHaveBeenCalledWith({
-        cwd: "/absolute/test/path/project-name",
-      });
-    });
+    expect(execa).toHaveBeenCalledTimes(2);
+    expect(execa).toHaveBeenCalledWith(
+      expect.stringContaining("node"),
+      [expect.any(String), "sync"],
+      {
+        cwd: path.join(process.cwd(), "project-name"),
+        stdio: "inherit",
+      }
+    );
   });
 });

@@ -4,14 +4,9 @@ import execa from "execa";
 import ora from "ora";
 import chalk from "chalk";
 import { PackageJson } from "type-fest";
-import { sync } from "../sync";
 import { getProjectName } from "./get-project-name";
 import { getTemplateInfo } from "./get-template-info";
-import {
-  COAT_CLI_VERSION,
-  PACKAGE_JSON_FILENAME,
-  COAT_MANIFEST_FILENAME,
-} from "../constants";
+import { PACKAGE_JSON_FILENAME, COAT_MANIFEST_FILENAME } from "../constants";
 import { polish as jsonPolish } from "../file-types/json";
 import { addInitialCommit } from "./add-initial-commit";
 import { printCreateCustomizationHelp } from "./print-create-customization-help";
@@ -206,37 +201,16 @@ export async function create({
 
   // Run setup and sync commands in the project directory
   //
-  // Check whether @coat/cli is installed locally in the project
-  const localCoatVersionTask = await execa(
-    "npx",
-    ["--no-install", "coat", "--version"],
-    { cwd: targetCwd, reject: false }
-  );
-  if (localCoatVersionTask.exitCode === 0) {
-    // Log a message if the locally installed coat version differs
-    // from the current version in case an error occurs to make
-    // potential troubleshooting more straightforward
-    const localCoatVersion = localCoatVersionTask.stdout;
-    if (localCoatVersion !== COAT_CLI_VERSION) {
-      console.log(
-        "Running %s with @coat/cli version %s\n",
-        chalk.cyan("coat sync"),
-        localCoatVersion
-      );
-    }
-
-    // setup will be triggered via sync
-    await execa("npx", ["--no-install", "coat", "sync"], {
-      cwd: targetCwd,
-      stdio: "inherit",
-    });
-  } else {
-    // Run setup and sync directly with the currently running
-    // @coat/cli version
-    //
-    // setup will be triggered implicitly via sync
-    await sync({ cwd: targetCwd });
-  }
+  // The current coat process is respawned to use a local
+  // @coat/cli in case it is available after installing
+  // the template, since templates should have a peerDependency
+  // on the cli.
+  //
+  // The setup step will be triggered automatically by running sync
+  await execa(process.argv[0], [process.argv[1], "sync"], {
+    cwd: targetCwd,
+    stdio: "inherit",
+  });
 
   // Initialize a git repository and add an initial commit
   // if the project was not created in an existing git repository
