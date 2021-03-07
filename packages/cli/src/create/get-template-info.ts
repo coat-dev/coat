@@ -46,7 +46,7 @@ export async function getTemplateInfo(
   };
 
   // Get the name of the new devDependency that has been installed
-  // to get the correct template name by comparing current devDepndencies
+  // to get the correct template name by comparing current devDependencies
   // to the previous devDependencies.
   // Since only a single dependency - the template itself - was installed,
   // it should be the only entry in the difference array
@@ -114,7 +114,7 @@ export async function getTemplateInfo(
     `${tmpTemplatePackageName}/${PACKAGE_JSON_FILENAME}`
   ) as PackageJson;
 
-  // Remove temporary directory
+  // Remove the temporary directory
   tmpDir.removeCallback();
 
   return templateInfo;
