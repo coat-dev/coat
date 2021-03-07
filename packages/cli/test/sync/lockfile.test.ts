@@ -102,19 +102,11 @@ describe("coat sync - lockfile", () => {
       });
       const taskResult = await task;
 
-      expect(stripAnsi(taskResult.stderr)).toMatchInlineSnapshot(`
-        "Warning! The global lockfile coat.lock does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.
-        The following issues have been found:
-        [
-          {
-            keyword: 'type',
-            dataPath: '.version',
-            schemaPath: '#/properties/version/type',
-            params: { type: 'number' },
-            message: 'should be number'
-          }
-        ]"
-      `);
+      const stderr = stripAnsi(taskResult.stderr);
+      expect(stderr).toContain(
+        "Warning! The global lockfile coat.lock does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.\nThe following issues have been found:"
+      );
+      expect(stderr).toContain("should be number");
     });
   });
 
@@ -194,19 +186,11 @@ describe("coat sync - lockfile", () => {
       });
       const taskResult = await task;
 
-      expect(stripAnsi(taskResult.stderr)).toEqual(
-        `Warning! The local lockfile ${COAT_LOCAL_LOCKFILE_PATH} does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.
-The following issues have been found:
-[
-  {
-    keyword: 'type',
-    dataPath: '.version',
-    schemaPath: '#/properties/version/type',
-    params: { type: 'number' },
-    message: 'should be number'
-  }
-]`
+      const stderr = stripAnsi(taskResult.stderr);
+      expect(stderr).toContain(
+        `Warning! The local lockfile ${COAT_LOCAL_LOCKFILE_PATH} does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.\nThe following issues have been found:`
       );
+      expect(stderr).toContain("should be number");
     });
   });
 });
