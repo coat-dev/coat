@@ -1,9 +1,9 @@
 {
   "name": "@coat/cli",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "author": "Peter Juras <me@peterjuras.com>",
   "bin": {
-    "coat": "./bin/coat.js"
+    "coat": "bin/coat.js"
   },
   "dependencies": {
     "boxen": "5.0.0",
