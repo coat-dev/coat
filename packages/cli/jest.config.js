@@ -33,7 +33,7 @@ process.env.npm_config_loglevel = "notice";
 module.exports = {
   projects: projectsToRun,
   collectCoverage: true,
-  collectCoverageFrom: ["src/**/*.ts", "!src/**/*.test.ts"],
+  collectCoverageFrom: ["src/**/*.ts", "!src/**/*.test.ts", "!src/**/*.d.ts"],
   coverageReporters: ["text"],
 
   // Workaround to test e2e tests

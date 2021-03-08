@@ -6,6 +6,7 @@
     "coat": "bin/coat.js"
   },
   "dependencies": {
+    "ajv": "7.2.1",
     "boxen": "5.0.0",
     "chalk": "4.1.0",
     "commander": "7.1.0",
@@ -58,6 +59,7 @@
     "strip-ansi": "6.0.0",
     "ts-node": "9.1.1",
     "typescript": "4.2.3",
+    "typescript-json-schema": "0.49.0",
     "which": "2.0.2"
   },
   "engines": {
@@ -76,8 +78,9 @@
   },
   "scripts": {
     "build": "concurrently npm:build:*",
-    "build:babel": "babel src -d build --extensions \".ts,.ts\" --ignore \"**/*.d.ts,**/*.test.ts\"",
+    "build:babel": "babel src -d build --extensions \".ts\" --ignore \"**/*.d.ts,**/*.test.ts\"",
     "build:typedefs": "tsc -p tsconfig.build.json",
+    "build:generate": "ts-node scripts/create-schemas.ts",
     "lint": "concurrently npm:lint:*",
     "lint:eslint": "eslint \"{src,test}/**/*{.ts,.js}\" --max-warnings 0",
     "lint:prettier": "prettier --check src test",

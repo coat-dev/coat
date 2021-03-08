@@ -36,6 +36,10 @@ import { promptForFileOperations } from "./prompt-for-file-operations";
 import { performFileOperations } from "./perform-file-operations";
 import { getStrictCoatLocalLockfile } from "../lockfiles/get-strict-coat-lockfiles";
 import stripAnsi from "strip-ansi";
+import {
+  validateCoatGlobalLockfile,
+  validateCoatLocalLockfile,
+} from "../generated/validators";
 
 jest
   .mock("fs")
@@ -44,7 +48,8 @@ jest
   .mock("../util/gather-extended-templates")
   .mock("./get-file-operations")
   .mock("./prompt-for-file-operations")
-  .mock("./perform-file-operations");
+  .mock("./perform-file-operations")
+  .mock("../generated/validators");
 
 const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {
   // Empty function
@@ -57,6 +62,11 @@ const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {
 const exitSpy = jest.spyOn(process, "exit").mockImplementation((): never => {
   throw new Error("process.exit");
 });
+
+const validateGlobalLockfileMock = (validateCoatGlobalLockfile as unknown) as jest.Mock;
+const validateLocalLockfileMock = (validateCoatLocalLockfile as unknown) as jest.Mock;
+validateGlobalLockfileMock.mockReturnValue(true);
+validateLocalLockfileMock.mockReturnValue(true);
 
 const platformRoot = path.parse(process.cwd()).root;
 const testCwd = path.join(platformRoot, "test");

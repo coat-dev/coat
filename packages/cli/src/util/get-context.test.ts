@@ -3,8 +3,17 @@ import path from "path";
 import { vol } from "memfs";
 import { getContext } from "./get-context";
 import { PACKAGE_JSON_FILENAME } from "../constants";
+import {
+  validateCoatGlobalLockfile,
+  validateCoatLocalLockfile,
+} from "../generated/validators";
 
-jest.mock("fs");
+jest.mock("fs").mock("../generated/validators");
+
+const validateGlobalLockfileMock = (validateCoatGlobalLockfile as unknown) as jest.Mock;
+const validateLocalLockfileMock = (validateCoatLocalLockfile as unknown) as jest.Mock;
+validateGlobalLockfileMock.mockReturnValue(true);
+validateLocalLockfileMock.mockReturnValue(true);
 
 describe("util/get-context", () => {
   afterEach(() => {
