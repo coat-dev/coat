@@ -37,9 +37,9 @@ import { performFileOperations } from "./perform-file-operations";
 import { getStrictCoatLocalLockfile } from "../lockfiles/get-strict-coat-lockfiles";
 import stripAnsi from "strip-ansi";
 import {
-  getCoatGlobalLockfileValidator,
-  getCoatLocalLockfileValidator,
-} from "../util/get-validator";
+  validateCoatGlobalLockfile,
+  validateCoatLocalLockfile,
+} from "../generated/validators";
 
 jest
   .mock("fs")
@@ -49,7 +49,7 @@ jest
   .mock("./get-file-operations")
   .mock("./prompt-for-file-operations")
   .mock("./perform-file-operations")
-  .mock("../util/get-validator");
+  .mock("../generated/validators");
 
 const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {
   // Empty function
@@ -63,17 +63,10 @@ const exitSpy = jest.spyOn(process, "exit").mockImplementation((): never => {
   throw new Error("process.exit");
 });
 
-const getCoatGlobalLockfileValidatorMock = (getCoatGlobalLockfileValidator as unknown) as jest.Mock<
-  ReturnType<typeof getCoatGlobalLockfileValidator>,
-  Parameters<typeof getCoatGlobalLockfileValidator>
->;
-getCoatGlobalLockfileValidatorMock.mockImplementation(async () => () => true);
-
-const getCoatLocalLockfileValidatorMock = (getCoatLocalLockfileValidator as unknown) as jest.Mock<
-  ReturnType<typeof getCoatLocalLockfileValidator>,
-  Parameters<typeof getCoatLocalLockfileValidator>
->;
-getCoatLocalLockfileValidatorMock.mockImplementation(async () => () => true);
+const validateGlobalLockfileMock = (validateCoatGlobalLockfile as unknown) as jest.Mock;
+const validateLocalLockfileMock = (validateCoatLocalLockfile as unknown) as jest.Mock;
+validateGlobalLockfileMock.mockReturnValue(true);
+validateLocalLockfileMock.mockReturnValue(true);
 
 const platformRoot = path.parse(process.cwd()).root;
 const testCwd = path.join(platformRoot, "test");

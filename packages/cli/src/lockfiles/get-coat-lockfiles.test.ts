@@ -11,36 +11,28 @@ import {
   COAT_LOCAL_LOCKFILE_PATH,
 } from "../constants";
 import { getFileHash } from "../util/get-file-hash";
-import {
-  getCoatGlobalLockfileValidator,
-  getCoatLocalLockfileValidator,
-} from "../util/get-validator";
 import stripAnsi from "strip-ansi";
+import {
+  validateCoatGlobalLockfile,
+  validateCoatLocalLockfile,
+} from "../generated/validators";
+import { ValidateFunction } from "ajv";
 
-jest.mock("fs").mock("../util/get-validator");
-
-const getCoatGlobalLockfileValidatorMock = (getCoatGlobalLockfileValidator as unknown) as jest.Mock<
-  ReturnType<typeof getCoatGlobalLockfileValidator>,
-  Parameters<typeof getCoatGlobalLockfileValidator>
->;
-
-const getCoatLocalLockfileValidatorMock = (getCoatLocalLockfileValidator as unknown) as jest.Mock<
-  ReturnType<typeof getCoatLocalLockfileValidator>,
-  Parameters<typeof getCoatLocalLockfileValidator>
->;
+jest.mock("fs").mock("../generated/validators");
 
 const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
   // Ignore console warn messages
 });
 
+type ValidatorMock = jest.Mock & ValidateFunction;
+
+const validateGlobalLockfileMock = (validateCoatGlobalLockfile as unknown) as ValidatorMock;
+const validateLocalLockfileMock = (validateCoatLocalLockfile as unknown) as ValidatorMock;
+
 describe("lockfiles/get-coat-lockfiles", () => {
   beforeEach(() => {
-    getCoatGlobalLockfileValidatorMock.mockImplementation(async () => () =>
-      true
-    );
-    getCoatLocalLockfileValidatorMock.mockImplementation(async () => () =>
-      true
-    );
+    validateGlobalLockfileMock.mockReturnValue(true);
+    validateLocalLockfileMock.mockReturnValue(true);
   });
 
   afterEach(() => {
@@ -129,18 +121,17 @@ describe("lockfiles/get-coat-lockfiles", () => {
     });
 
     test("should log warning if lockfile is not valid", async () => {
-      getCoatGlobalLockfileValidatorMock.mockImplementation(async () => {
-        const validate = (): boolean => false;
-        validate.errors = [
-          {
-            keyword: "Error!",
-            dataPath: "dataPath",
-            schemaPath: "schemaPath",
-            params: "params",
+      validateGlobalLockfileMock.errors = [
+        {
+          dataPath: "dataPath",
+          keyword: "Error!",
+          params: {
+            param1: "param",
           },
-        ];
-        return validate;
-      });
+          schemaPath: "schemaPath",
+        },
+      ];
+      validateGlobalLockfileMock.mockReturnValue(false);
 
       await getCoatGlobalLockfile(testCwd);
 
@@ -154,7 +145,9 @@ describe("lockfiles/get-coat-lockfiles", () => {
           Object {
             "dataPath": "dataPath",
             "keyword": "Error!",
-            "params": "params",
+            "params": Object {
+              "param1": "param",
+            },
             "schemaPath": "schemaPath",
           },
         ]
@@ -226,18 +219,17 @@ describe("lockfiles/get-coat-lockfiles", () => {
     });
 
     test("should log warning if lockfile is not valid", async () => {
-      getCoatLocalLockfileValidatorMock.mockImplementation(async () => {
-        const validate = (): boolean => false;
-        validate.errors = [
-          {
-            keyword: "Error!",
-            dataPath: "dataPath",
-            schemaPath: "schemaPath",
-            params: "params",
+      validateLocalLockfileMock.errors = [
+        {
+          dataPath: "dataPath",
+          keyword: "Error!",
+          params: {
+            param1: "param",
           },
-        ];
-        return validate;
-      });
+          schemaPath: "schemaPath",
+        },
+      ];
+      validateLocalLockfileMock.mockReturnValue(false);
 
       await getCoatLocalLockfile(testCwd);
 
@@ -250,7 +242,9 @@ describe("lockfiles/get-coat-lockfiles", () => {
           Object {
             "dataPath": "dataPath",
             "keyword": "Error!",
-            "params": "params",
+            "params": Object {
+              "param1": "param",
+            },
             "schemaPath": "schemaPath",
           },
         ]

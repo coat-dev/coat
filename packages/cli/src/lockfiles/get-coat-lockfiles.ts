@@ -19,9 +19,9 @@ import {
   getStrictCoatLocalLockfile,
 } from "./get-strict-coat-lockfiles";
 import {
-  getCoatGlobalLockfileValidator,
-  getCoatLocalLockfileValidator,
-} from "../util/get-validator";
+  validateCoatGlobalLockfile,
+  validateCoatLocalLockfile,
+} from "../generated/validators";
 
 const initialCoatGlobalLockfile: CoatGlobalLockfile = {
   version: COAT_GLOBAL_LOCKFILE_VERSION,
@@ -55,8 +55,7 @@ export async function getCoatGlobalLockfile(
     }
   }
 
-  const validate = await getCoatGlobalLockfileValidator();
-  if (!validate(lockfile)) {
+  if (!validateCoatGlobalLockfile(lockfile)) {
     console.warn(
       `${chalk.yellow("Warning!")} The global lockfile ${chalk.green(
         COAT_GLOBAL_LOCKFILE_PATH
@@ -64,7 +63,7 @@ export async function getCoatGlobalLockfile(
     );
     // TODO: See #15
     // Better warning message
-    console.warn(validate.errors);
+    console.warn(validateCoatGlobalLockfile.errors);
   }
 
   return getStrictCoatGlobalLockfile(lockfile);
@@ -95,8 +94,7 @@ export async function getCoatLocalLockfile(
     }
   }
 
-  const validate = await getCoatLocalLockfileValidator();
-  if (!validate(lockfile)) {
+  if (!validateCoatLocalLockfile(lockfile)) {
     console.warn(
       `${chalk.yellow("Warning!")} The local lockfile ${chalk.green(
         COAT_LOCAL_LOCKFILE_PATH
@@ -104,7 +102,7 @@ export async function getCoatLocalLockfile(
     );
     // TODO: See #15
     // Better warning message
-    console.warn(validate.errors);
+    console.warn(validateCoatLocalLockfile.errors);
   }
 
   return getStrictCoatLocalLockfile(lockfile);

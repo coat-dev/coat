@@ -4,23 +4,16 @@ import { vol } from "memfs";
 import { getContext } from "./get-context";
 import { PACKAGE_JSON_FILENAME } from "../constants";
 import {
-  getCoatGlobalLockfileValidator,
-  getCoatLocalLockfileValidator,
-} from "./get-validator";
+  validateCoatGlobalLockfile,
+  validateCoatLocalLockfile,
+} from "../generated/validators";
 
-jest.mock("fs").mock("./get-validator");
+jest.mock("fs").mock("../generated/validators");
 
-const getCoatGlobalLockfileValidatorMock = (getCoatGlobalLockfileValidator as unknown) as jest.Mock<
-  ReturnType<typeof getCoatGlobalLockfileValidator>,
-  Parameters<typeof getCoatGlobalLockfileValidator>
->;
-getCoatGlobalLockfileValidatorMock.mockImplementation(async () => () => true);
-
-const getCoatLocalLockfileValidatorMock = (getCoatLocalLockfileValidator as unknown) as jest.Mock<
-  ReturnType<typeof getCoatLocalLockfileValidator>,
-  Parameters<typeof getCoatLocalLockfileValidator>
->;
-getCoatLocalLockfileValidatorMock.mockImplementation(async () => () => true);
+const validateGlobalLockfileMock = (validateCoatGlobalLockfile as unknown) as jest.Mock;
+const validateLocalLockfileMock = (validateCoatLocalLockfile as unknown) as jest.Mock;
+validateGlobalLockfileMock.mockReturnValue(true);
+validateLocalLockfileMock.mockReturnValue(true);
 
 describe("util/get-context", () => {
   afterEach(() => {

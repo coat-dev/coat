@@ -27,23 +27,16 @@ import {
 } from "../types/coat-manifest-tasks";
 import stripAnsi from "strip-ansi";
 import {
-  getCoatGlobalLockfileValidator,
-  getCoatLocalLockfileValidator,
-} from "../util/get-validator";
+  validateCoatGlobalLockfile,
+  validateCoatLocalLockfile,
+} from "../generated/validators";
 
-jest.mock("fs").mock("../util/get-validator");
+jest.mock("fs").mock("../generated/validators");
 
-const getCoatGlobalLockfileValidatorMock = (getCoatGlobalLockfileValidator as unknown) as jest.Mock<
-  ReturnType<typeof getCoatGlobalLockfileValidator>,
-  Parameters<typeof getCoatGlobalLockfileValidator>
->;
-getCoatGlobalLockfileValidatorMock.mockImplementation(async () => () => true);
-
-const getCoatLocalLockfileValidatorMock = (getCoatLocalLockfileValidator as unknown) as jest.Mock<
-  ReturnType<typeof getCoatLocalLockfileValidator>,
-  Parameters<typeof getCoatLocalLockfileValidator>
->;
-getCoatLocalLockfileValidatorMock.mockImplementation(async () => () => true);
+const validateGlobalLockfileMock = (validateCoatGlobalLockfile as unknown) as jest.Mock;
+const validateLocalLockfileMock = (validateCoatLocalLockfile as unknown) as jest.Mock;
+validateGlobalLockfileMock.mockReturnValue(true);
+validateLocalLockfileMock.mockReturnValue(true);
 
 const getContextSpy = jest.spyOn(getContextImport, "getContext");
 const getAllTemplatesSpy = jest.spyOn(getAllTemplatesImport, "getAllTemplates");
