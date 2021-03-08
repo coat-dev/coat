@@ -32,14 +32,3 @@ export const COAT_ASCII_LOGO = `  ____ ___    _  _____\u00A0
 | |  | | | |/ _ \\ | |\u00A0\u00A0
 | |__| |_| / ___ \\| |\u00A0\u00A0
  \\____\\___/_/   \\_|_|\u00A0\u00A0`;
-
-// JSON Schemas
-export const SCHEMA_DIR = path.join(__dirname, "generated", "schemas");
-export const COAT_GLOBAL_LOCKFILE_SCHEMA = path.join(
-  SCHEMA_DIR,
-  "CoatGlobalLockfile.json"
-);
-export const COAT_LOCAL_LOCKFILE_SCHEMA = path.join(
-  SCHEMA_DIR,
-  "CoatLocalLockfile.json"
-);
