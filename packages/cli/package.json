@@ -27,13 +27,13 @@
     "sha3": "2.1.4",
     "single-trailing-newline": "1.0.0",
     "tmp": "0.2.1",
-    "type-fest": "0.21.2",
+    "type-fest": "0.21.3",
     "wrap-ansi": "7.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "7.13.0",
-    "@babel/core": "7.13.8",
-    "@babel/preset-env": "7.13.9",
+    "@babel/cli": "7.13.10",
+    "@babel/core": "7.13.10",
+    "@babel/preset-env": "7.13.10",
     "@babel/preset-typescript": "7.13.0",
     "@types/fs-extra": "9.0.8",
     "@types/inquirer": "7.3.1",
@@ -45,8 +45,8 @@
     "@types/single-trailing-newline": "1.0.0",
     "@types/tmp": "0.2.0",
     "@types/wrap-ansi": "3.0.0",
-    "@typescript-eslint/eslint-plugin": "4.16.1",
-    "@typescript-eslint/parser": "4.16.1",
+    "@typescript-eslint/eslint-plugin": "4.17.0",
+    "@typescript-eslint/parser": "4.17.0",
     "concurrently": "6.0.0",
     "cross-env": "7.0.3",
     "eslint": "7.21.0",
@@ -59,7 +59,7 @@
     "strip-ansi": "6.0.0",
     "ts-node": "9.1.1",
     "typescript": "4.2.3",
-    "typescript-json-schema": "0.49.0",
+    "typescript-json-schema": "0.50.0",
     "which": "2.0.2"
   },
   "engines": {
