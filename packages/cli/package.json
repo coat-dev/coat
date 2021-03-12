@@ -1,6 +1,6 @@
 {
   "name": "@coat/cli",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "author": "Peter Juras <me@peterjuras.com>",
   "bin": {
     "coat": "bin/coat.js"

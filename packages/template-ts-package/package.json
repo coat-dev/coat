@@ -7,7 +7,7 @@
     "@babel/core": "7.13.10",
     "@babel/preset-env": "7.13.10",
     "@babel/preset-typescript": "7.13.0",
-    "@coat/cli": "0.0.20",
+    "@coat/cli": "0.0.21",
     "@types/fs-extra": "9.0.8",
     "@types/jest": "26.0.20",
     "@types/tmp": "0.2.0",
@@ -43,7 +43,7 @@
   },
   "main": "build/index.js",
   "peerDependencies": {
-    "@coat/cli": "^0.0.20"
+    "@coat/cli": "^0.0.21"
   },
   "scripts": {
     "build": "coat run build:*",
