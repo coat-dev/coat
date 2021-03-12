@@ -148,17 +148,14 @@ export async function create({
   }
 
   console.log(
-    "\nCreating a new %s project in %s\n",
-    chalk.cyan("coat"),
-    chalk.green(targetCwd)
+    chalk`\nCreating a new {cyan coat} project in {green ${targetCwd}}\n`
   );
 
   // Print getting started guidance for customization
   printCreateCustomizationHelp();
 
   console.log(
-    "%s will install the project template and its dependencies into the project directory.\nThis might take a couple of minutes.\n",
-    chalk.cyan("coat")
+    chalk`{cyan coat} will install the project template and its dependencies into the project directory.\nThis might take a couple of minutes.\n`
   );
 
   const installSpinner = ora(
@@ -217,8 +214,7 @@ export async function create({
   await addInitialCommit(targetCwd);
 
   console.log(
-    "🎊 Your new %s project has been successfully created! 🎊\n",
-    chalk.cyan("coat")
+    chalk`🎊 Your new {cyan coat} project has been successfully created! 🎊\n`
   );
 
   const relativePath = path.relative(process.cwd(), targetCwd);
@@ -226,14 +222,12 @@ export async function create({
   // directory than the project target directory
   if (relativePath) {
     console.log(
-      "Get started by changing into your project folder: %s",
-      chalk.cyan(`cd ${relativePath}`)
+      chalk`Get started by changing into your project folder: {cyan cd ${relativePath}}`
     );
   }
 
   console.log(
-    "You can ensure your generated files are up to date by running: %s\n",
-    chalk.cyan("coat sync")
+    chalk`You can ensure your generated files are up to date by running: {cyan coat sync}\n`
   );
   console.log("⚡️ Happy hacking! ⚡️\n");
 }

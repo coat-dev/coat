@@ -15,7 +15,7 @@ export function getCoatHeader(): string {
   const usableTerminalSize = getUsableTerminalSize(process.stdout);
 
   if (usableTerminalSize.size === TerminalSize.Tiny) {
-    const tinyLogo = `🚀 ${chalk.cyan("coat")} 🚀`;
+    const tinyLogo = chalk`🚀 {cyan coat} 🚀`;
     return `\n${tinyLogo}\n`;
   } else {
     return createCoatLogo();

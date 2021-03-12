@@ -91,9 +91,9 @@ function buildFileUpdatePromptMessage(
       "", 
       secondPartFiles,
       "", 
-      `${secondPartPlural ? "These files were" : "This file was"} already managed by coat and will be overwritten each time ${chalk.cyan("coat sync")} is run.`,
+      chalk`${secondPartPlural ? "These files were" : "This file was"} already managed by coat and will be overwritten each time {cyan coat sync} is run.`,
       "", 
-      `You can customize files by placing a ${chalk.green("<filename>-custom.js")} file next to them.`,
+      chalk`You can customize files by placing a {green <filename>-custom.js} file next to them.`,
       "", 
     ];
 
@@ -117,7 +117,7 @@ function buildFileUpdatePromptMessage(
       "", 
       promptFiles,
       "", 
-      `${plural ? 'These files' : 'This file'} will be overwritten each time ${chalk.cyan('coat sync')} is run. You can customize ${plural ? "them" : "it"} by placing a ${chalk.green(customizeFileName)} file next to ${plural ? "them" : "it"}.`,
+      chalk`${plural ? 'These files' : 'This file'} will be overwritten each time {cyan coat sync} is run. You can customize ${plural ? "them" : "it"} by placing a {green ${customizeFileName}} file next to ${plural ? "them" : "it"}.`,
       "",
     ];
 
@@ -143,9 +143,9 @@ function buildFileUpdatePromptMessage(
     "", 
     promptFiles,
     "", 
-    `${plural ? "These files are" : "This file is"} managed by coat and will be overwritten each time ${chalk.cyan("coat sync")} is run.`,
+    chalk`${plural ? "These files are" : "This file is"} managed by coat and will be overwritten each time {cyan coat sync} is run.`,
     "", 
-    `You can customize ${plural ? "them" : "it"} by placing a ${chalk.green(customizeFileName)} file next to ${plural ? "them" : "it"}.`,
+    chalk`You can customize ${plural ? "them" : "it"} by placing a {green ${customizeFileName}} file next to ${plural ? "them" : "it"}.`,
     "", 
   ];
 

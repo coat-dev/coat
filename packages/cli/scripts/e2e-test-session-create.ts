@@ -16,9 +16,7 @@ async function main(): Promise<void> {
     `export COAT_CLI_E2E_SESSION_TARBALL_PATH=${tarballPath}`,
     `export COAT_CLI_E2E_SESSION_TMP_PATH=${tmpDirPath}`,
     "",
-    `You can run the following command to tear down the test environment again: ${chalk.green(
-      "npm run test:e2e-test-session-destroy"
-    )}`,
+    chalk`You can run the following command to tear down the test environment again: {green npm run test:e2e-test-session-destroy}`,
     "",
   ];
   console.log(logLines.join("\n"));

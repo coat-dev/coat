@@ -339,12 +339,12 @@ export async function sync({
       );
       const messages = [
         "",
-        `The ${chalk.cyan("coat")} project is not in sync.`,
+        chalk`The {cyan coat} project is not in sync.`,
         "There are pending file updates:",
         "",
         ...pendingFileOperationMessages,
         "",
-        `Run ${chalk.cyan("coat sync")} to bring the project back in sync.`,
+        chalk`Run {cyan coat sync} to bring the project back in sync.`,
       ];
       console.error(messages.join("\n"));
       process.exit(1);
@@ -393,12 +393,10 @@ export async function sync({
       // the coat project is out of sync
       const messages = [
         "",
-        `The ${chalk.cyan("coat")} project is not in sync.`,
-        `The global lockfile (${chalk.green(
-          "coat.lock"
-        )}) needs to be updated.`,
+        chalk`The {cyan coat} project is not in sync.`,
+        chalk`The global lockfile ({green coat.lock}) needs to be updated.`,
         "",
-        `Run ${chalk.cyan("coat sync")} to bring the project back in sync.`,
+        chalk`Run {cyan coat sync} to bring the project back in sync.`,
       ];
       console.error(messages.join("\n"));
       process.exit(1);

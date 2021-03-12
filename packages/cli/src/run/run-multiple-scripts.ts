@@ -51,7 +51,7 @@ function createStreamPrefixHandler(
           (index === 0 && lastChar === "\n")
         ) {
           // Color the prefix label using chalk
-          return `${chalk.dim(`${prefix} - `)}${line}`;
+          return chalk`{dim ${prefix} - }${line}`;
         }
 
         // If no prefix is added, the line is returned

@@ -59,10 +59,10 @@ export async function setup({
     if (globalTasksToRun.length) {
       const messages = [
         "",
-        `The ${chalk.cyan("coat")} project is not in sync.`,
+        chalk`The {cyan coat} project is not in sync.`,
         "There are global tasks pending that need to be run to setup this coat project.",
         "",
-        `Run ${chalk.cyan("coat sync")} to bring the project back in sync.`,
+        chalk`Run {cyan coat sync} to bring the project back in sync.`,
       ];
       console.error(messages.join("\n"));
       process.exit(1);
@@ -138,12 +138,10 @@ export async function setup({
       // the coat project is out of sync
       const messages = [
         "",
-        `The ${chalk.cyan("coat")} project is not in sync.`,
-        `The global lockfile (${chalk.green(
-          "coat.lock"
-        )}) needs to be updated.`,
+        chalk`The {cyan coat} project is not in sync.`,
+        chalk`The global lockfile ({green coat.lock}) needs to be updated.`,
         "",
-        `Run ${chalk.cyan("coat sync")} to bring the project back in sync.`,
+        chalk`Run {cyan coat sync} to bring the project back in sync.`,
       ];
       console.error(messages.join("\n"));
       process.exit(1);

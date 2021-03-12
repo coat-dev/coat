@@ -57,24 +57,14 @@ export async function getCoatGlobalLockfile(
 
   if (lockfile.version > COAT_GLOBAL_LOCKFILE_VERSION) {
     console.warn(
-      `Warning! The global lockfile ${chalk.green(
-        COAT_GLOBAL_LOCKFILE_PATH
-      )} version (${
-        lockfile.version
-      }) is higher than the expected version (${COAT_GLOBAL_LOCKFILE_VERSION}) by the currently running cli. Please ensure that you are running the newest version of the ${chalk.cyan(
-        "@coat/cli"
-      )} since the current project might not be backwards compatible with the current cli version.`
+      chalk`Warning! The global lockfile {green ${COAT_GLOBAL_LOCKFILE_PATH}} version (${lockfile.version}) is higher than the expected version (${COAT_GLOBAL_LOCKFILE_VERSION}) by the currently running cli. Please ensure that you are running the newest version of the {cyan @coat/cli} since the current project might not be backwards compatible with the current cli version.`
     );
     // The lockfile is only validated if the version equals the current lockfile version,
     // since the schema is highly likely to have changed if a lockfile version bump has happened
     // and validation therefore would be pointless.
   } else if (!validateCoatGlobalLockfile(lockfile)) {
     console.warn(
-      `${chalk.yellow("Warning!")} The global lockfile ${chalk.green(
-        COAT_GLOBAL_LOCKFILE_PATH
-      )} does not conform to the expected schema! Consider deleting and regenerating the lockfile by running ${chalk.cyan(
-        "coat sync"
-      )} in case you run into any issues.`
+      chalk`{yellow Warning!} The global lockfile {green ${COAT_GLOBAL_LOCKFILE_PATH}} does not conform to the expected schema! Consider deleting and regenerating the lockfile by running {cyan coat sync} in case you run into any issues.`
     );
   }
 
@@ -108,24 +98,14 @@ export async function getCoatLocalLockfile(
 
   if (lockfile.version > COAT_LOCAL_LOCKFILE_VERSION) {
     console.warn(
-      `Warning! The local lockfile ${chalk.green(
-        COAT_LOCAL_LOCKFILE_PATH
-      )} version (${
-        lockfile.version
-      }) is higher than the expected version (${COAT_LOCAL_LOCKFILE_VERSION}) by the currently running cli. Please ensure that you are running the newest version of the ${chalk.cyan(
-        "@coat/cli"
-      )} since the current project might not be backwards compatible with the current cli version.`
+      chalk`Warning! The local lockfile {green ${COAT_LOCAL_LOCKFILE_PATH}} version (${lockfile.version}) is higher than the expected version (${COAT_LOCAL_LOCKFILE_VERSION}) by the currently running cli. Please ensure that you are running the newest version of the {cyan @coat/cli} since the current project might not be backwards compatible with the current cli version.`
     );
     // The lockfile is only validated if the version equals the current lockfile version,
     // since the schema is highly likely to have changed if a lockfile version bump has happened
     // and validation therefore would be pointless.
   } else if (!validateCoatLocalLockfile(lockfile)) {
     console.warn(
-      `${chalk.yellow("Warning!")} The local lockfile ${chalk.green(
-        COAT_LOCAL_LOCKFILE_PATH
-      )} does not conform to the expected schema! Consider deleting and regenerating the lockfile by running ${chalk.cyan(
-        "coat sync"
-      )} in case you run into any issues.`
+      chalk`{yellow Warning!} The local lockfile {green ${COAT_LOCAL_LOCKFILE_PATH}} does not conform to the expected schema! Consider deleting and regenerating the lockfile by running {cyan coat sync} in case you run into any issues.`
     );
   }
 
