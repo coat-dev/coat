@@ -2,7 +2,10 @@ import { CoatContext } from "../types/coat-context";
 import { getContext } from "../util/get-context";
 import { getAllTemplates } from "../util/get-all-templates";
 import { gatherAllTasks } from "./gather-all-tasks";
-import { updateLockfile } from "../lockfiles/update-lockfile";
+import {
+  updateGlobalLockfile,
+  updateLocalLockfile,
+} from "../lockfiles/update-lockfile";
 import { getTasksToRun } from "./get-tasks-to-run";
 import { CoatTaskType } from "../types/coat-manifest-tasks";
 import { removeUnmanagedTasksFromLockfile } from "./remove-unmanaged-tasks-from-lockfile";
@@ -10,12 +13,6 @@ import {
   writeGlobalLockfile,
   writeLocalLockfile,
 } from "../lockfiles/write-lockfiles";
-import {
-  CoatGlobalLockfile,
-  CoatGlobalLockfileStrict,
-  CoatLocalLockfile,
-  CoatLocalLockfileStrict,
-} from "../types/coat-lockfiles";
 import { isEqual } from "lodash";
 import produce from "immer";
 import chalk from "chalk";
@@ -93,10 +90,10 @@ export async function setup({
       // throws an error
       switch (task.type) {
         case CoatTaskType.Global: {
-          const newGlobalLockfile = updateLockfile<
-            CoatGlobalLockfileStrict,
-            CoatGlobalLockfile
-          >(context.coatGlobalLockfile, partialLockfileUpdate);
+          const newGlobalLockfile = updateGlobalLockfile(
+            context.coatGlobalLockfile,
+            partialLockfileUpdate
+          );
           context = produce(context, (draft) => {
             draft.coatGlobalLockfile = newGlobalLockfile;
           });
@@ -104,10 +101,10 @@ export async function setup({
           break;
         }
         case CoatTaskType.Local: {
-          const newLocalLockfile = updateLockfile<
-            CoatLocalLockfileStrict,
-            CoatLocalLockfile
-          >(context.coatLocalLockfile, partialLockfileUpdate);
+          const newLocalLockfile = updateLocalLockfile(
+            context.coatLocalLockfile,
+            partialLockfileUpdate
+          );
           context = produce(context, (draft) => {
             draft.coatLocalLockfile = newLocalLockfile;
           });

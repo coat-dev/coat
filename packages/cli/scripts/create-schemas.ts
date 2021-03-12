@@ -2,22 +2,24 @@ import path from "path";
 import fs from "fs-extra";
 import Ajv from "ajv";
 import standaloneCode from "ajv/dist/standalone";
-import { buildGenerator, programFromConfig } from "typescript-json-schema";
+import { createGenerator, Config } from "ts-json-schema-generator";
 
 async function main(): Promise<void> {
   const cliRoot = path.join(__dirname, "..");
 
-  const program = programFromConfig(path.join(cliRoot, "tsconfig.json"));
-
   const schemaId = "coat-validators";
-  const generator = buildGenerator(program, { id: schemaId });
 
-  if (!generator) {
-    throw new Error("Could not create schema generator");
-  }
+  const config: Config = {
+    path: path.join(__dirname, "..", "src", "types", "coat-lockfiles.ts"),
+    tsconfig: path.join(__dirname, "..", "tsconfig.json"),
+    type: "*",
+    additionalProperties: false,
+    skipTypeCheck: true,
+    schemaId,
+  };
+  const schema = createGenerator(config).createSchema(config.type);
 
   const schemaTypes = ["CoatLocalLockfile", "CoatGlobalLockfile"];
-  const schema = generator.getSchemaForSymbols(schemaTypes);
 
   const ajv = new Ajv({ code: { source: true } });
   ajv.addSchema(schema);

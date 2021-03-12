@@ -21,7 +21,10 @@ import { CoatManifestStrict } from "../types/coat-manifest";
 import { generateLockfileFiles } from "../lockfiles/generate-lockfile-files";
 import { getUnmanagedFiles } from "./get-unmanaged-files";
 import { getAllTemplates } from "../util/get-all-templates";
-import { updateLockfile } from "../lockfiles/update-lockfile";
+import {
+  updateGlobalLockfile,
+  updateLocalLockfile,
+} from "../lockfiles/update-lockfile";
 import { setup } from "../setup";
 import produce from "immer";
 import { groupFiles } from "./group-files";
@@ -377,7 +380,7 @@ export async function sync({
   // Update the lockfiles with the new file entries
   //
   // global lockfile
-  const newGlobalLockfile = updateLockfile(context.coatGlobalLockfile, {
+  const newGlobalLockfile = updateGlobalLockfile(context.coatGlobalLockfile, {
     files: newGlobalLockFiles,
     dependencies: newLockfileDependencies,
     scripts: newLockfileScripts,
@@ -412,7 +415,7 @@ export async function sync({
     console.log(`\n${EVERYTHING_UP_TO_DATE_MESSAGE}\n`);
   } else {
     // local lockfile
-    const newLocalLockfile = updateLockfile(context.coatLocalLockfile, {
+    const newLocalLockfile = updateLocalLockfile(context.coatLocalLockfile, {
       files: newLocalLockFiles,
     });
     if (!isEqual(context.coatLocalLockfile, newLocalLockfile)) {

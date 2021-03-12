@@ -6,7 +6,7 @@ import {
   getStrictCoatGlobalLockfile,
   getStrictCoatLocalLockfile,
 } from "./get-strict-coat-lockfiles";
-import { updateLockfile } from "./update-lockfile";
+import { updateGlobalLockfile, updateLocalLockfile } from "./update-lockfile";
 
 describe("lockfiles/update-lockfile", () => {
   const baseGlobalLockfile = getStrictCoatGlobalLockfile({
@@ -18,14 +18,15 @@ describe("lockfiles/update-lockfile", () => {
 
   describe("global", () => {
     test("should replace version property", () => {
-      const newGlobalLockfile = getStrictCoatGlobalLockfile({
-        version: 42,
-      });
-      const updatedLockfile = updateLockfile(
-        baseGlobalLockfile,
+      const newGlobalLockfile = {};
+      const updatedLockfile = updateGlobalLockfile(
+        {
+          ...baseGlobalLockfile,
+          version: 42,
+        },
         newGlobalLockfile
       );
-      expect(updatedLockfile).toHaveProperty("version", 42);
+      expect(updatedLockfile).toHaveProperty("version", 1);
     });
 
     test("should merge setup task results", () => {
@@ -46,7 +47,7 @@ describe("lockfiles/update-lockfile", () => {
         },
       });
 
-      const updatedLockfile = updateLockfile(
+      const updatedLockfile = updateGlobalLockfile(
         currentLockfile,
         newGlobalLockfile
       );
@@ -83,7 +84,7 @@ describe("lockfiles/update-lockfile", () => {
           },
         ],
       });
-      const updatedLockfile = updateLockfile(
+      const updatedLockfile = updateGlobalLockfile(
         currentLockfile,
         newGlobalLockfile
       );
@@ -111,7 +112,7 @@ describe("lockfiles/update-lockfile", () => {
         JSON.stringify(newGlobalLockfile)
       );
 
-      updateLockfile(baseGlobalLockfile, newGlobalLockfile);
+      updateGlobalLockfile(baseGlobalLockfile, newGlobalLockfile);
 
       expect(baseGlobalLockfile).toEqual(oldGlobalLockfileCopy);
       expect(newGlobalLockfile).toEqual(newGlobalLockfileCopy);
@@ -120,14 +121,12 @@ describe("lockfiles/update-lockfile", () => {
 
   describe("local", () => {
     test("should replace version property", () => {
-      const newLocalLockfile = getStrictCoatLocalLockfile({
-        version: 42,
-      });
-      const updatedLockfile = updateLockfile(
-        baseLocalLockfile,
+      const newLocalLockfile = {};
+      const updatedLockfile = updateLocalLockfile(
+        { ...baseLocalLockfile, version: 42 },
         newLocalLockfile
       );
-      expect(updatedLockfile).toHaveProperty("version", 42);
+      expect(updatedLockfile).toHaveProperty("version", 1);
     });
 
     test("should merge setup task results", () => {
@@ -149,7 +148,10 @@ describe("lockfiles/update-lockfile", () => {
         },
       });
 
-      const updatedLockfile = updateLockfile(currentLockfile, newLocalLockfile);
+      const updatedLockfile = updateLocalLockfile(
+        currentLockfile,
+        newLocalLockfile
+      );
 
       expect(updatedLockfile).toHaveProperty("setup", {
         oldTask1: {
@@ -186,7 +188,10 @@ describe("lockfiles/update-lockfile", () => {
         ],
       });
 
-      const updatedLockfile = updateLockfile(currentLockfile, newLocalLockfile);
+      const updatedLockfile = updateLocalLockfile(
+        currentLockfile,
+        newLocalLockfile
+      );
 
       expect(updatedLockfile).toHaveProperty("files", [
         {
@@ -210,7 +215,7 @@ describe("lockfiles/update-lockfile", () => {
       );
       const newLocalLockfileCopy = JSON.parse(JSON.stringify(newLocalLockfile));
 
-      updateLockfile(baseLocalLockfile, newLocalLockfile);
+      updateLocalLockfile(baseLocalLockfile, newLocalLockfile);
 
       expect(baseLocalLockfile).toEqual(oldLocalLockfileCopy);
       expect(newLocalLockfile).toEqual(newLocalLockfileCopy);

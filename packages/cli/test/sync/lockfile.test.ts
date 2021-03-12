@@ -1,12 +1,15 @@
 import { promises as fs } from "fs";
 import path from "path";
+import stripAnsi from "strip-ansi";
+import yaml from "js-yaml";
 import {
   COAT_GLOBAL_LOCKFILE_PATH,
+  COAT_GLOBAL_LOCKFILE_VERSION,
   COAT_LOCAL_LOCKFILE_PATH,
+  COAT_LOCAL_LOCKFILE_VERSION,
 } from "../../src/constants";
 import { runSyncTest } from "../utils/run-cli-test";
 import { CoatManifestFileType } from "../../src/types/coat-manifest-file";
-import stripAnsi from "strip-ansi";
 
 describe("coat sync - lockfile", () => {
   describe("global", () => {
@@ -103,10 +106,26 @@ describe("coat sync - lockfile", () => {
       const taskResult = await task;
 
       const stderr = stripAnsi(taskResult.stderr);
-      expect(stderr).toContain(
-        "Warning! The global lockfile coat.lock does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.\nThe following issues have been found:"
+      expect(stderr).toMatchInlineSnapshot(
+        `"Warning! The global lockfile coat.lock does not conform to the expected schema! Consider deleting and regenerating the lockfile by running coat sync in case you run into any issues."`
       );
-      expect(stderr).toContain("should be number");
+    });
+
+    test("should update the lockfile version even if no other lockfile update is needed", async () => {
+      const { task, cwd } = await runSyncTest({
+        coatGlobalLockfile: {
+          version: COAT_GLOBAL_LOCKFILE_VERSION + 1,
+        },
+      });
+      await task;
+
+      const lockfileRaw = await fs.readFile(
+        path.join(cwd, COAT_GLOBAL_LOCKFILE_PATH),
+        "utf-8"
+      );
+      const lockfile = yaml.load(lockfileRaw);
+
+      expect(lockfile).toHaveProperty("version", COAT_GLOBAL_LOCKFILE_VERSION);
     });
   });
 
@@ -188,9 +207,25 @@ describe("coat sync - lockfile", () => {
 
       const stderr = stripAnsi(taskResult.stderr);
       expect(stderr).toContain(
-        `Warning! The local lockfile ${COAT_LOCAL_LOCKFILE_PATH} does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.\nThe following issues have been found:`
+        `Warning! The local lockfile ${COAT_LOCAL_LOCKFILE_PATH} does not conform to the expected schema! Consider deleting and regenerating the lockfile by running coat sync in case you run into any issues.`
       );
-      expect(stderr).toContain("should be number");
+    });
+
+    test("should update the lockfile version even if no other lockfile update is needed", async () => {
+      const { task, cwd } = await runSyncTest({
+        coatLocalLockfile: {
+          version: COAT_LOCAL_LOCKFILE_VERSION + 1,
+        },
+      });
+      await task;
+
+      const lockfileRaw = await fs.readFile(
+        path.join(cwd, COAT_LOCAL_LOCKFILE_PATH),
+        "utf-8"
+      );
+      const lockfile = yaml.load(lockfileRaw);
+
+      expect(lockfile).toHaveProperty("version", COAT_LOCAL_LOCKFILE_VERSION);
     });
   });
 });

@@ -59,11 +59,10 @@ export async function getCoatGlobalLockfile(
     console.warn(
       `${chalk.yellow("Warning!")} The global lockfile ${chalk.green(
         COAT_GLOBAL_LOCKFILE_PATH
-      )} does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.\nThe following issues have been found:`
+      )} does not conform to the expected schema! Consider deleting and regenerating the lockfile by running ${chalk.cyan(
+        "coat sync"
+      )} in case you run into any issues.`
     );
-    // TODO: See #15
-    // Better warning message
-    console.warn(validateCoatGlobalLockfile.errors);
   }
 
   return getStrictCoatGlobalLockfile(lockfile);
@@ -98,11 +97,10 @@ export async function getCoatLocalLockfile(
     console.warn(
       `${chalk.yellow("Warning!")} The local lockfile ${chalk.green(
         COAT_LOCAL_LOCKFILE_PATH
-      )} does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.\nThe following issues have been found:`
+      )} does not conform to the expected schema! Consider deleting and regenerating the lockfile by running ${chalk.cyan(
+        "coat sync"
+      )} in case you run into any issues.`
     );
-    // TODO: See #15
-    // Better warning message
-    console.warn(validateCoatLocalLockfile.errors);
   }
 
   return getStrictCoatLocalLockfile(lockfile);

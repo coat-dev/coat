@@ -135,23 +135,10 @@ describe("lockfiles/get-coat-lockfiles", () => {
 
       await getCoatGlobalLockfile(testCwd);
 
-      expect(consoleWarnSpy).toHaveBeenCalledTimes(2);
-      expect(stripAnsi(consoleWarnSpy.mock.calls[0][0])).toMatchInlineSnapshot(`
-        "Warning! The global lockfile coat.lock does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.
-        The following issues have been found:"
-      `);
-      expect(stripAnsi(consoleWarnSpy.mock.calls[1][0])).toMatchInlineSnapshot(`
-        Array [
-          Object {
-            "dataPath": "dataPath",
-            "keyword": "Error!",
-            "params": Object {
-              "param1": "param",
-            },
-            "schemaPath": "schemaPath",
-          },
-        ]
-      `);
+      expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
+      expect(stripAnsi(consoleWarnSpy.mock.calls[0][0])).toMatchInlineSnapshot(
+        `"Warning! The global lockfile coat.lock does not conform to the expected schema! Consider deleting and regenerating the lockfile by running coat sync in case you run into any issues."`
+      );
     });
   });
 
@@ -233,22 +220,10 @@ describe("lockfiles/get-coat-lockfiles", () => {
 
       await getCoatLocalLockfile(testCwd);
 
-      expect(consoleWarnSpy).toHaveBeenCalledTimes(2);
+      expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
       expect(stripAnsi(consoleWarnSpy.mock.calls[0][0])).toEqual(
-        `Warning! The local lockfile ${COAT_LOCAL_LOCKFILE_PATH} does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.\nThe following issues have been found:`
+        `Warning! The local lockfile ${COAT_LOCAL_LOCKFILE_PATH} does not conform to the expected schema! Consider deleting and regenerating the lockfile by running coat sync in case you run into any issues.`
       );
-      expect(stripAnsi(consoleWarnSpy.mock.calls[1][0])).toMatchInlineSnapshot(`
-        Array [
-          Object {
-            "dataPath": "dataPath",
-            "keyword": "Error!",
-            "params": Object {
-              "param1": "param",
-            },
-            "schemaPath": "schemaPath",
-          },
-        ]
-      `);
     });
   });
 });
