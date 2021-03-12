@@ -207,7 +207,7 @@ describe("coat sync - --check option", () => {
       version: COAT_GLOBAL_LOCKFILE_VERSION,
       files: [
         {
-          hash: "",
+          hash: "test-hash",
           path: "file-a.json",
         },
       ],

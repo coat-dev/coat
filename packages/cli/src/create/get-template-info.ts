@@ -69,9 +69,7 @@ export async function getTemplateInfo(
   // Install the template again in a temporary directory to
   // retrieve the difference.
   // eslint-disable-next-line no-param-reassign
-  installSpinner.text = `${chalk.cyan(
-    "coat"
-  )} was not able to determine the template name directly by installing the template and has to do an extra round to retrieve information about the installed template.\nThis is likely due to the template already being installed in the project directory before. This might take a couple of minutes.\n`;
+  installSpinner.text = chalk`{cyan coat} was not able to determine the template name directly by installing the template and has to do an extra round to retrieve information about the installed template.\nThis is likely due to the template already being installed in the project directory before. This might take a couple of minutes.\n`;
   //
   // Create a temporary directory
   const tmpDir = tmp.dirSync({ unsafeCleanup: true });

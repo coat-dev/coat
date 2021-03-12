@@ -8,7 +8,9 @@ import {
 } from "./get-coat-lockfiles";
 import {
   COAT_GLOBAL_LOCKFILE_PATH,
+  COAT_GLOBAL_LOCKFILE_VERSION,
   COAT_LOCAL_LOCKFILE_PATH,
+  COAT_LOCAL_LOCKFILE_VERSION,
 } from "../constants";
 import { getFileHash } from "../util/get-file-hash";
 import stripAnsi from "strip-ansi";
@@ -121,37 +123,32 @@ describe("lockfiles/get-coat-lockfiles", () => {
     });
 
     test("should log warning if lockfile is not valid", async () => {
-      validateGlobalLockfileMock.errors = [
-        {
-          dataPath: "dataPath",
-          keyword: "Error!",
-          params: {
-            param1: "param",
-          },
-          schemaPath: "schemaPath",
-        },
-      ];
       validateGlobalLockfileMock.mockReturnValue(false);
 
       await getCoatGlobalLockfile(testCwd);
 
-      expect(consoleWarnSpy).toHaveBeenCalledTimes(2);
-      expect(stripAnsi(consoleWarnSpy.mock.calls[0][0])).toMatchInlineSnapshot(`
-        "Warning! The global lockfile coat.lock does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.
-        The following issues have been found:"
-      `);
-      expect(stripAnsi(consoleWarnSpy.mock.calls[1][0])).toMatchInlineSnapshot(`
-        Array [
-          Object {
-            "dataPath": "dataPath",
-            "keyword": "Error!",
-            "params": Object {
-              "param1": "param",
-            },
-            "schemaPath": "schemaPath",
-          },
-        ]
-      `);
+      expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
+      expect(stripAnsi(consoleWarnSpy.mock.calls[0][0])).toMatchInlineSnapshot(
+        `"Warning! The global lockfile coat.lock does not conform to the expected schema! Consider deleting and regenerating the lockfile by running coat sync in case you run into any issues."`
+      );
+    });
+
+    test("should log warning if lockfile version is higher than the currently supported version", async () => {
+      const lockfile = {
+        version: COAT_GLOBAL_LOCKFILE_VERSION + 1,
+      };
+      const lockfileYaml = yaml.dump(lockfile);
+      await fs.outputFile(
+        path.join(testCwd, COAT_GLOBAL_LOCKFILE_PATH),
+        lockfileYaml
+      );
+
+      await getCoatGlobalLockfile(testCwd);
+
+      expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
+      expect(stripAnsi(consoleWarnSpy.mock.calls[0][0])).toMatchInlineSnapshot(
+        `"Warning! The global lockfile coat.lock version (2) is higher than the expected version (1) by the currently running cli. Please ensure that you are running the newest version of the @coat/cli since the current project might not be backwards compatible with the current cli version."`
+      );
     });
   });
 
@@ -219,36 +216,32 @@ describe("lockfiles/get-coat-lockfiles", () => {
     });
 
     test("should log warning if lockfile is not valid", async () => {
-      validateLocalLockfileMock.errors = [
-        {
-          dataPath: "dataPath",
-          keyword: "Error!",
-          params: {
-            param1: "param",
-          },
-          schemaPath: "schemaPath",
-        },
-      ];
       validateLocalLockfileMock.mockReturnValue(false);
 
       await getCoatLocalLockfile(testCwd);
 
-      expect(consoleWarnSpy).toHaveBeenCalledTimes(2);
+      expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
       expect(stripAnsi(consoleWarnSpy.mock.calls[0][0])).toEqual(
-        `Warning! The local lockfile ${COAT_LOCAL_LOCKFILE_PATH} does not conform to the expected schema! Consider deleting and regenerating the lockfile in case you run into any issues.\nThe following issues have been found:`
+        `Warning! The local lockfile ${COAT_LOCAL_LOCKFILE_PATH} does not conform to the expected schema! Consider deleting and regenerating the lockfile by running coat sync in case you run into any issues.`
       );
-      expect(stripAnsi(consoleWarnSpy.mock.calls[1][0])).toMatchInlineSnapshot(`
-        Array [
-          Object {
-            "dataPath": "dataPath",
-            "keyword": "Error!",
-            "params": Object {
-              "param1": "param",
-            },
-            "schemaPath": "schemaPath",
-          },
-        ]
-      `);
+    });
+
+    test("should log warning if lockfile version is higher than the currently supported version", async () => {
+      const lockfile = {
+        version: COAT_LOCAL_LOCKFILE_VERSION + 1,
+      };
+      const lockfileYaml = yaml.dump(lockfile);
+      await fs.outputFile(
+        path.join(testCwd, COAT_LOCAL_LOCKFILE_PATH),
+        lockfileYaml
+      );
+
+      await getCoatLocalLockfile(testCwd);
+
+      expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
+      expect(stripAnsi(consoleWarnSpy.mock.calls[0][0])).toContain(
+        `Warning! The local lockfile ${COAT_LOCAL_LOCKFILE_PATH} version (2) is higher than the expected version (1) by the currently running cli. Please ensure that you are running the newest version of the @coat/cli since the current project might not be backwards compatible with the current cli version.`
+      );
     });
   });
 });

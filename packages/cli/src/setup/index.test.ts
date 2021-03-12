@@ -26,17 +26,8 @@ import {
   CoatTaskType,
 } from "../types/coat-manifest-tasks";
 import stripAnsi from "strip-ansi";
-import {
-  validateCoatGlobalLockfile,
-  validateCoatLocalLockfile,
-} from "../generated/validators";
 
-jest.mock("fs").mock("../generated/validators");
-
-const validateGlobalLockfileMock = (validateCoatGlobalLockfile as unknown) as jest.Mock;
-const validateLocalLockfileMock = (validateCoatLocalLockfile as unknown) as jest.Mock;
-validateGlobalLockfileMock.mockReturnValue(true);
-validateLocalLockfileMock.mockReturnValue(true);
+jest.mock("fs");
 
 const getContextSpy = jest.spyOn(getContextImport, "getContext");
 const getAllTemplatesSpy = jest.spyOn(getAllTemplatesImport, "getAllTemplates");

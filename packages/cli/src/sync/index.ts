@@ -21,7 +21,10 @@ import { CoatManifestStrict } from "../types/coat-manifest";
 import { generateLockfileFiles } from "../lockfiles/generate-lockfile-files";
 import { getUnmanagedFiles } from "./get-unmanaged-files";
 import { getAllTemplates } from "../util/get-all-templates";
-import { updateLockfile } from "../lockfiles/update-lockfile";
+import {
+  updateGlobalLockfile,
+  updateLocalLockfile,
+} from "../lockfiles/update-lockfile";
 import { setup } from "../setup";
 import produce from "immer";
 import { groupFiles } from "./group-files";
@@ -336,12 +339,12 @@ export async function sync({
       );
       const messages = [
         "",
-        `The ${chalk.cyan("coat")} project is not in sync.`,
+        chalk`The {cyan coat} project is not in sync.`,
         "There are pending file updates:",
         "",
         ...pendingFileOperationMessages,
         "",
-        `Run ${chalk.cyan("coat sync")} to bring the project back in sync.`,
+        chalk`Run {cyan coat sync} to bring the project back in sync.`,
       ];
       console.error(messages.join("\n"));
       process.exit(1);
@@ -377,7 +380,7 @@ export async function sync({
   // Update the lockfiles with the new file entries
   //
   // global lockfile
-  const newGlobalLockfile = updateLockfile(context.coatGlobalLockfile, {
+  const newGlobalLockfile = updateGlobalLockfile(context.coatGlobalLockfile, {
     files: newGlobalLockFiles,
     dependencies: newLockfileDependencies,
     scripts: newLockfileScripts,
@@ -390,12 +393,10 @@ export async function sync({
       // the coat project is out of sync
       const messages = [
         "",
-        `The ${chalk.cyan("coat")} project is not in sync.`,
-        `The global lockfile (${chalk.green(
-          "coat.lock"
-        )}) needs to be updated.`,
+        chalk`The {cyan coat} project is not in sync.`,
+        chalk`The global lockfile ({green coat.lock}) needs to be updated.`,
         "",
-        `Run ${chalk.cyan("coat sync")} to bring the project back in sync.`,
+        chalk`Run {cyan coat sync} to bring the project back in sync.`,
       ];
       console.error(messages.join("\n"));
       process.exit(1);
@@ -412,7 +413,7 @@ export async function sync({
     console.log(`\n${EVERYTHING_UP_TO_DATE_MESSAGE}\n`);
   } else {
     // local lockfile
-    const newLocalLockfile = updateLockfile(context.coatLocalLockfile, {
+    const newLocalLockfile = updateLocalLockfile(context.coatLocalLockfile, {
       files: newLocalLockFiles,
     });
     if (!isEqual(context.coatLocalLockfile, newLocalLockfile)) {

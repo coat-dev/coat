@@ -22,9 +22,7 @@ describe("sync/create-file-operation-log-message", () => {
         },
         Tense.Past
       );
-      const expectedResult = ` ${chalk.inverse.red.bold(" DELETED ")} ${
-        testOperation.relativePath
-      }`;
+      const expectedResult = chalk` {inverse.red.bold  DELETED } ${testOperation.relativePath}`;
       expect(result).toBe(expectedResult);
     });
 
@@ -37,9 +35,7 @@ describe("sync/create-file-operation-log-message", () => {
         Tense.Past
       );
       const expectedResult = chalk.dim(
-        ` ${chalk.inverse.red.bold(" DELETED ")} (skipped - ${
-          testOperation.relativePath
-        })`
+        chalk` {inverse.red.bold  DELETED } (skipped - ${testOperation.relativePath})`
       );
       expect(result).toBe(expectedResult);
     });
@@ -52,9 +48,7 @@ describe("sync/create-file-operation-log-message", () => {
         },
         Tense.Past
       );
-      const expectedResult = ` ${chalk.inverse.green.bold(" CREATED ")} ${
-        testOperation.relativePath
-      }`;
+      const expectedResult = chalk` {inverse.green.bold  CREATED } ${testOperation.relativePath}`;
       expect(result).toBe(expectedResult);
     });
 
@@ -66,9 +60,7 @@ describe("sync/create-file-operation-log-message", () => {
         },
         Tense.Past
       );
-      const expectedResult = ` ${chalk.inverse.blueBright.bold(" UPDATED ")} ${
-        testOperation.relativePath
-      }`;
+      const expectedResult = chalk` {inverse.blueBright.bold  UPDATED } ${testOperation.relativePath}`;
       expect(result).toBe(expectedResult);
     });
   });
@@ -82,9 +74,7 @@ describe("sync/create-file-operation-log-message", () => {
         },
         Tense.Future
       );
-      const expectedResult = ` ${chalk.inverse.red.bold(" DELETE ")} ${
-        testOperation.relativePath
-      }`;
+      const expectedResult = chalk` {inverse.red.bold  DELETE } ${testOperation.relativePath}`;
       expect(result).toBe(expectedResult);
     });
 
@@ -97,9 +87,7 @@ describe("sync/create-file-operation-log-message", () => {
         Tense.Future
       );
       const expectedResult = chalk.dim(
-        ` ${chalk.inverse.red.bold(" DELETE ")} (skipped - ${
-          testOperation.relativePath
-        })`
+        chalk` {inverse.red.bold  DELETE } (skipped - ${testOperation.relativePath})`
       );
       expect(result).toBe(expectedResult);
     });
@@ -112,9 +100,7 @@ describe("sync/create-file-operation-log-message", () => {
         },
         Tense.Future
       );
-      const expectedResult = ` ${chalk.inverse.green.bold(" CREATE ")} ${
-        testOperation.relativePath
-      }`;
+      const expectedResult = chalk` {inverse.green.bold  CREATE } ${testOperation.relativePath}`;
       expect(result).toBe(expectedResult);
     });
 
@@ -126,9 +112,7 @@ describe("sync/create-file-operation-log-message", () => {
         },
         Tense.Future
       );
-      const expectedResult = ` ${chalk.inverse.blueBright.bold(" UPDATE ")} ${
-        testOperation.relativePath
-      }`;
+      const expectedResult = chalk` {inverse.blueBright.bold  UPDATE } ${testOperation.relativePath}`;
       expect(result).toBe(expectedResult);
     });
   });

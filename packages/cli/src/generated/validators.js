@@ -8,8 +8,10 @@
 //
 export function validateCoatGlobalLockfile() {
   // Dummy function
+  return true;
 }
 
 export function validateCoatLocalLockfile() {
   // Dummy function
+  return true;
 }

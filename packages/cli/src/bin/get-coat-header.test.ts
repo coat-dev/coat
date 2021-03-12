@@ -24,7 +24,7 @@ describe("create/print-create-customization-help", () => {
       });
 
       const header = getCoatHeader();
-      expect(header).toBe(`\n🚀 ${chalk.cyan("coat")} 🚀\n`);
+      expect(header).toBe(chalk`\n🚀 {cyan coat} 🚀\n`);
     });
 
     test("should return full logo box when terminal is small", () => {
@@ -37,7 +37,7 @@ describe("create/print-create-customization-help", () => {
       // Only assert that console has been called
       // and that it has not been called with the small logo
       // since the logo box is too complex
-      expect(header).not.toBe(`\n🚀 ${chalk.cyan("coat")} 🚀\n`);
+      expect(header).not.toBe(chalk`\n🚀 {cyan coat} 🚀\n`);
     });
   });
 });

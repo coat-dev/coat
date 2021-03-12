@@ -2,7 +2,10 @@ import { CoatContext } from "../types/coat-context";
 import { getContext } from "../util/get-context";
 import { getAllTemplates } from "../util/get-all-templates";
 import { gatherAllTasks } from "./gather-all-tasks";
-import { updateLockfile } from "../lockfiles/update-lockfile";
+import {
+  updateGlobalLockfile,
+  updateLocalLockfile,
+} from "../lockfiles/update-lockfile";
 import { getTasksToRun } from "./get-tasks-to-run";
 import { CoatTaskType } from "../types/coat-manifest-tasks";
 import { removeUnmanagedTasksFromLockfile } from "./remove-unmanaged-tasks-from-lockfile";
@@ -10,12 +13,6 @@ import {
   writeGlobalLockfile,
   writeLocalLockfile,
 } from "../lockfiles/write-lockfiles";
-import {
-  CoatGlobalLockfile,
-  CoatGlobalLockfileStrict,
-  CoatLocalLockfile,
-  CoatLocalLockfileStrict,
-} from "../types/coat-lockfiles";
 import { isEqual } from "lodash";
 import produce from "immer";
 import chalk from "chalk";
@@ -62,10 +59,10 @@ export async function setup({
     if (globalTasksToRun.length) {
       const messages = [
         "",
-        `The ${chalk.cyan("coat")} project is not in sync.`,
+        chalk`The {cyan coat} project is not in sync.`,
         "There are global tasks pending that need to be run to setup this coat project.",
         "",
-        `Run ${chalk.cyan("coat sync")} to bring the project back in sync.`,
+        chalk`Run {cyan coat sync} to bring the project back in sync.`,
       ];
       console.error(messages.join("\n"));
       process.exit(1);
@@ -93,10 +90,10 @@ export async function setup({
       // throws an error
       switch (task.type) {
         case CoatTaskType.Global: {
-          const newGlobalLockfile = updateLockfile<
-            CoatGlobalLockfileStrict,
-            CoatGlobalLockfile
-          >(context.coatGlobalLockfile, partialLockfileUpdate);
+          const newGlobalLockfile = updateGlobalLockfile(
+            context.coatGlobalLockfile,
+            partialLockfileUpdate
+          );
           context = produce(context, (draft) => {
             draft.coatGlobalLockfile = newGlobalLockfile;
           });
@@ -104,10 +101,10 @@ export async function setup({
           break;
         }
         case CoatTaskType.Local: {
-          const newLocalLockfile = updateLockfile<
-            CoatLocalLockfileStrict,
-            CoatLocalLockfile
-          >(context.coatLocalLockfile, partialLockfileUpdate);
+          const newLocalLockfile = updateLocalLockfile(
+            context.coatLocalLockfile,
+            partialLockfileUpdate
+          );
           context = produce(context, (draft) => {
             draft.coatLocalLockfile = newLocalLockfile;
           });
@@ -141,12 +138,10 @@ export async function setup({
       // the coat project is out of sync
       const messages = [
         "",
-        `The ${chalk.cyan("coat")} project is not in sync.`,
-        `The global lockfile (${chalk.green(
-          "coat.lock"
-        )}) needs to be updated.`,
+        chalk`The {cyan coat} project is not in sync.`,
+        chalk`The global lockfile ({green coat.lock}) needs to be updated.`,
         "",
-        `Run ${chalk.cyan("coat sync")} to bring the project back in sync.`,
+        chalk`Run {cyan coat sync} to bring the project back in sync.`,
       ];
       console.error(messages.join("\n"));
       process.exit(1);
