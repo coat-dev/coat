@@ -99,8 +99,8 @@ describe("coat sync - lockfile", () => {
     test("should warn if lockfile does not match expected schema", async () => {
       const { task } = await runSyncTest({
         coatGlobalLockfile: {
-          // @ts-expect-error
-          version: "123",
+          version: COAT_GLOBAL_LOCKFILE_VERSION,
+          files: [{ path: "test-path", hash: "" }],
         },
       });
       const taskResult = await task;
@@ -108,6 +108,20 @@ describe("coat sync - lockfile", () => {
       const stderr = stripAnsi(taskResult.stderr);
       expect(stderr).toMatchInlineSnapshot(
         `"Warning! The global lockfile coat.lock does not conform to the expected schema! Consider deleting and regenerating the lockfile by running coat sync in case you run into any issues."`
+      );
+    });
+
+    test("should warn if the lockfile version is higher than the currently supported version", async () => {
+      const { task } = await runSyncTest({
+        coatGlobalLockfile: {
+          version: COAT_GLOBAL_LOCKFILE_VERSION + 1,
+        },
+      });
+      const taskResult = await task;
+
+      const stderr = stripAnsi(taskResult.stderr);
+      expect(stderr).toMatchInlineSnapshot(
+        `"Warning! The global lockfile coat.lock version (2) is higher than the expected version (1) by the currently running cli. Please ensure that you are running the newest version of the @coat/cli since the current project might not be backwards compatible with the current cli version."`
       );
     });
 
@@ -199,8 +213,8 @@ describe("coat sync - lockfile", () => {
     test("should warn if lockfile does not match expected schema", async () => {
       const { task } = await runSyncTest({
         coatLocalLockfile: {
-          // @ts-expect-error
-          version: "123",
+          version: COAT_LOCAL_LOCKFILE_VERSION,
+          files: [{ path: "test-path", hash: "" }],
         },
       });
       const taskResult = await task;
@@ -208,6 +222,22 @@ describe("coat sync - lockfile", () => {
       const stderr = stripAnsi(taskResult.stderr);
       expect(stderr).toContain(
         `Warning! The local lockfile ${COAT_LOCAL_LOCKFILE_PATH} does not conform to the expected schema! Consider deleting and regenerating the lockfile by running coat sync in case you run into any issues.`
+      );
+    });
+
+    test("should warn if the lockfile version is higher than the currently supported version", async () => {
+      const { task } = await runSyncTest({
+        coatLocalLockfile: {
+          version: COAT_LOCAL_LOCKFILE_VERSION + 1,
+        },
+      });
+      const taskResult = await task;
+
+      const stderr = stripAnsi(taskResult.stderr);
+      expect(stderr).toContain(
+        `Warning! The local lockfile ${COAT_LOCAL_LOCKFILE_PATH} version (${
+          COAT_LOCAL_LOCKFILE_VERSION + 1
+        }) is higher than the expected version (${COAT_GLOBAL_LOCKFILE_VERSION}) by the currently running cli. Please ensure that you are running the newest version of the @coat/cli since the current project might not be backwards compatible with the current cli version.`
       );
     });
 
