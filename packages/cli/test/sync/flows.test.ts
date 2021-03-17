@@ -56,7 +56,6 @@ describe("sync/flows", () => {
         CREATED  global.json
         CREATED  local-once.json
         CREATED  local.json
-        UPDATED  package.json
       "
     `);
 

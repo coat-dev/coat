@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import stripAnsi from "strip-ansi";
 import { prepareCliTest, runSyncTest } from "../utils/run-cli-test";
 import {
   COAT_MANIFEST_FILENAME,
@@ -65,11 +66,60 @@ describe("coat sync - errors", () => {
       await task;
       throw new Error("This error should not be reached. Task should throw");
     } catch (error) {
-      expect(
-        error.stderr.includes(
-          "Error: Cannot merge unknown file type: UNSUPPORTED_FILE_TYPE"
-        )
-      ).toBe(true);
+      // Error is already thrown at validation time
+      //
+      // Only use first 13 lines to exclude stack trace with platform specific paths
+      // in temporary directories
+      const errorMessage = error.stderr.split("\n").slice(0, 13).join("\n");
+      expect(stripAnsi(errorMessage)).toMatchInlineSnapshot(`
+        "The coat manifest file (coat.json) has the following issue:
+
+         ERROR  - files[0].type: must be either \\"JSON\\", \\"YAML\\" or \\"TEXT\\".
+
+           7 |       },
+           8 |       \\"file\\": \\"file.json\\",
+        >  9 |       \\"type\\": \\"UNSUPPORTED_FILE_TYPE\\"
+             |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ must be either \\"JSON\\", \\"YAML\\" or \\"TEXT\\".
+          10 |     }
+          11 |   ]
+          12 | }
+
+        Error: Validation of coat manifest threw an error."
+      `);
+    }
+  });
+
+  test("should throw if a template function returns a promise", async () => {
+    const testPackagesPath = path.join(
+      __dirname,
+      "..",
+      "utils",
+      "test-packages"
+    );
+    const localTemplateWithAsyncFunction = path.join(
+      testPackagesPath,
+      "local-template-async-fn-error-1"
+    );
+
+    const { task } = await runSyncTest({
+      coatManifest: {
+        name: "project",
+        extends: localTemplateWithAsyncFunction,
+      },
+    });
+
+    try {
+      await task;
+      throw new Error("This error should not be reached. Task should throw");
+    } catch (error) {
+      // Error is already thrown at validation time
+      const errorMessage = stripAnsi(error.stderr);
+      expect(errorMessage).toContain(
+        `The extended template "${localTemplateWithAsyncFunction}" has the following issue:`
+      );
+      expect(errorMessage).toContain(
+        "ERROR  - The coat template resolved to a promise. Template functions must return the template synchronously."
+      );
     }
   });
 
