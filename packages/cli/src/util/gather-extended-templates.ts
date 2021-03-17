@@ -2,10 +2,18 @@ import path from "path";
 import flattenDeep from "lodash/flattenDeep";
 import resolveFrom from "resolve-from";
 import importFrom from "import-from";
-import { CoatManifestStrict } from "../types/coat-manifest";
+import chalk from "chalk";
+import groupBy from "lodash/groupBy";
+import { CoatManifest, CoatManifestStrict } from "../types/coat-manifest";
 import { CoatTemplate } from "../types/coat-template";
 import { CoatContext } from "../types/coat-context";
 import { getStrictCoatManifest } from "../util/get-strict-coat-manifest";
+import { validateCoatManifest } from "../validation/coat-manifest";
+import {
+  ValidationIssueError,
+  ValidationIssueType,
+  ValidationIssueWarning,
+} from "../validation/validation-issue";
 
 type NestedManifests = Array<NestedManifests | CoatManifestStrict>;
 
@@ -58,20 +66,66 @@ function getTemplates(
     templateManifestRaw = templateManifestRawModule as CoatTemplate;
   }
 
-  let resolvedTemplate: CoatManifestStrict;
+  let resolvedTemplate: CoatManifest;
   if (typeof templateManifestRaw === "function") {
-    resolvedTemplate = getStrictCoatManifest(
-      templateManifestRaw({ coatContext: context, config: templateConfig })
-    );
+    resolvedTemplate = templateManifestRaw({
+      coatContext: context,
+      config: templateConfig,
+    });
   } else {
-    resolvedTemplate = getStrictCoatManifest(templateManifestRaw);
+    resolvedTemplate = templateManifestRaw;
   }
 
+  // Validate template
+  const issues = [
+    ...validateCoatManifest(resolvedTemplate, { isTemplate: true }),
+  ];
+  if (issues.length) {
+    const {
+      [ValidationIssueType.Error]: errors = [],
+      [ValidationIssueType.Warning]: warnings = [],
+    } = groupBy(issues, "type") as {
+      [ValidationIssueType.Error]: ValidationIssueError[];
+      [ValidationIssueType.Warning]: ValidationIssueWarning[];
+    };
+    const validationMessages = [
+      chalk`The extended template "{green ${template}}" has the following issue${
+        issues.length > 1 ? "s" : ""
+      }:`,
+      "",
+    ];
+
+    validationMessages.push(
+      ...warnings.map(
+        (warning) => chalk`{inverse.yellow.bold  WARNING } - ${warning.message}`
+      )
+    );
+
+    validationMessages.push(
+      ...errors.map(
+        (error) => chalk`{inverse.red.bold  ERROR } - ${error.message}`
+      )
+    );
+
+    validationMessages.push("");
+    console.error(validationMessages.join("\n"));
+
+    if (errors.length) {
+      throw new Error(
+        `Validation of template "${template}" threw ${
+          errors.length > 1 ? "errors" : "an error"
+        }.`
+      );
+    }
+  }
+
+  const resolvedTemplateStrict = getStrictCoatManifest(resolvedTemplate);
+
   return [
-    ...resolvedTemplate.extends.map((childTemplate) =>
+    ...resolvedTemplateStrict.extends.map((childTemplate) =>
       getTemplates(templateDir, context, childTemplate)
     ),
-    resolvedTemplate,
+    resolvedTemplateStrict,
   ];
 }
 

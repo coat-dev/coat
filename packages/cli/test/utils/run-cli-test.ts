@@ -85,11 +85,11 @@ export async function prepareCliTest(
   const filePromises = [
     fs.writeFile(
       path.join(tmpDir, PACKAGE_JSON_FILENAME),
-      JSON.stringify(packageJson)
+      JSON.stringify(packageJson, null, 2)
     ),
     fs.writeFile(
       path.join(tmpDir, COAT_MANIFEST_FILENAME),
-      JSON.stringify(coatManifest)
+      JSON.stringify(coatManifest, null, 2)
     ),
   ];
 

@@ -6,7 +6,7 @@ export interface CoatManifest {
   /**
    * The name of the coat project or template
    */
-  name: string;
+  name?: string;
   /**
    * The names of the coat templates that are extended.
    *
@@ -50,7 +50,9 @@ export interface CoatManifest {
    */
 }
 
-export interface CoatManifestStrict extends Required<CoatManifest> {
+export interface CoatManifestStrict
+  extends Pick<CoatManifest, "name">,
+    Required<Omit<CoatManifest, "name">> {
   extends: Exclude<Required<CoatManifest>["extends"], string>;
   dependencies: Exclude<Required<CoatManifest["dependencies"]>, undefined>;
 }
