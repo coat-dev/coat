@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import json5 from "json5";
 import { CoatManifest } from "../types/coat-manifest";
 import { COAT_MANIFEST_FILENAME } from "../constants";
 import { getStrictCoatManifest } from "./get-strict-coat-manifest";
@@ -32,7 +33,7 @@ export async function getContext(cwd: string): Promise<CoatContext> {
     getPackageJson(cwd),
   ]);
 
-  const coatManifest: CoatManifest = JSON.parse(coatManifestRaw);
+  const coatManifest: CoatManifest = json5.parse(coatManifestRaw);
   const coatManifestStrict = getStrictCoatManifest(coatManifest);
 
   return {
