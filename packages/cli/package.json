@@ -32,7 +32,7 @@
     "sha3": "2.1.4",
     "single-trailing-newline": "1.0.0",
     "tmp": "0.2.1",
-    "type-fest": "0.21.3",
+    "type-fest": "1.0.1",
     "unquoted-property-validator": "1.1.0",
     "wrap-ansi": "7.0.0"
   },
