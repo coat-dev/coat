@@ -3,8 +3,8 @@
   "version": "0.0.25",
   "author": "Peter Juras <me@peterjuras.com>",
   "devDependencies": {
-    "@babel/cli": "7.13.14",
-    "@babel/core": "7.13.15",
+    "@babel/cli": "7.13.16",
+    "@babel/core": "7.13.16",
     "@babel/preset-env": "7.13.15",
     "@babel/preset-typescript": "7.13.0",
     "@coat/cli": "0.0.22",
