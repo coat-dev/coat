@@ -162,9 +162,7 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
         },
         {
           file: "tsconfig.json",
-          // Node.js 10 compatibility
-          // Update target once Node 10 is no longer supported
-          content: { compilerOptions: { target: "ES2018" } },
+          content: { compilerOptions: { target: "ES2019" } },
           type: CoatManifestFileType.Json,
         }
       );
