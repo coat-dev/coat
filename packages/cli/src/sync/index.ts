@@ -1,7 +1,5 @@
 import execa from "execa";
 import ora from "ora";
-import flatten from "lodash/flatten";
-import fromPairs from "lodash/fromPairs";
 import { mergeFiles } from "./merge-files";
 import { mergeScripts } from "./merge-scripts";
 import { mergeDependencies } from "./merge-dependencies";
@@ -85,9 +83,7 @@ export async function sync({
   // Get all current scripts from the project's package.json file
   //
   const previouslyManagedScripts = new Set(context.coatGlobalLockfile.scripts);
-  // Node.js 10 compatibility
-  // Use Object.fromEntries once Node 10 is no longer supported
-  const currentScripts = fromPairs(
+  const currentScripts = Object.fromEntries(
     Object.entries(context.packageJson?.scripts || {}).filter(
       ([scriptName]) =>
         // Filter out scripts that have been added / managed by coat.
@@ -182,11 +178,7 @@ export async function sync({
   allFiles.push(...defaultFiles);
 
   // Add files from all templates
-  allFiles.push(
-    // Node.js 10 compatibility
-    // Use Array.flatMap once Node 10 is no longer supported
-    ...flatten(allTemplates.map((template) => template.files))
-  );
+  allFiles.push(...allTemplates.flatMap((template) => template.files));
 
   // Group files by file path
   const groupedFiles = groupFiles(allFiles, context);
@@ -364,9 +356,7 @@ export async function sync({
     process.exit(1);
   }
 
-  // Node.js 10 compatibility
-  // Use Object.fromEntries once Node 10 is no longer supported
-  const newLockfileDependencies = fromPairs(
+  const newLockfileDependencies = Object.fromEntries(
     Object.entries(
       templateDependencies
     ).map(([dependencyKey, dependencyEntries]) => [

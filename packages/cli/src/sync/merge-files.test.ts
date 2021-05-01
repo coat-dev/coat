@@ -24,10 +24,6 @@ jest.mock("fs").mock("import-from");
 const statMock = jest.spyOn(fs.promises, "stat");
 const importFromMock = (importFrom as unknown) as jest.Mock;
 
-// Node.js 10 compatibility
-// Use Array.flatMap instead of flatten from lodash
-// once Node 10 is no longer supported
-
 describe("sync/merge-files", () => {
   afterEach(() => {
     vol.reset();

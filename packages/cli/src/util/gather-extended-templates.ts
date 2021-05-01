@@ -1,5 +1,4 @@
 import path from "path";
-import flattenDeep from "lodash/flattenDeep";
 import resolveFrom from "resolve-from";
 import importFrom from "import-from";
 import chalk from "chalk";
@@ -145,7 +144,5 @@ export function gatherExtendedTemplates(
     getTemplates(context.cwd, context, template)
   );
 
-  // Node.js 10 compatibility
-  // Use results.flat(Infinity) once Node 10 is no longer supported
-  return flattenDeep(results);
+  return results.flat(Infinity);
 }

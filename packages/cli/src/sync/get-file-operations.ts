@@ -1,4 +1,3 @@
-import fromPairs from "lodash/fromPairs";
 import { CoatContext } from "../types/coat-context";
 import { CoatLockfileContinuousFileEntryStrict } from "../types/coat-lockfiles";
 import { getFileHash } from "../util/get-file-hash";
@@ -132,10 +131,7 @@ export function getFileOperations(
 
   // Retrieve the hashes of all files that have already been managed
   // and are included in the current lockfiles
-  //
-  // Node.js 10 compatibility
-  // Use Object.fromEntries once Node 10 is no longer supported
-  const lockfileHashes = fromPairs(
+  const lockfileHashes = Object.fromEntries(
     // Use files from both lockfiles
     [...context.coatGlobalLockfile.files, ...context.coatLocalLockfile.files]
       // Filter out once files, since they don't require updating or deletion

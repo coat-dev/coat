@@ -10,7 +10,7 @@ exports[`@coat/template-ts-package template verification - babel compiler 1`] = 
       \\"@babel/preset-env\\",
       {
         \\"targets\\": {
-          \\"node\\": \\"10.13\\"
+          \\"node\\": \\"12.13\\"
         }
       }
     ]
@@ -212,7 +212,7 @@ dependencies:
     - typescript
 files:
   - hash: >-
-      hHs8Ro19pcVjDAWfZTsTCzYcMScqbit0swZQzIwdn1M1u6TbZxxw581Q+SM0LjyPaNKBRtkF05gDnxv3fAzWug==
+      VKrM58CBcZN83c8DJkLlK1LycSDfyQiL6rPU2DMubB58OAQV4xR61GEB2Xxm9YW1gZvuc/Kse0GYmCqSzi4I1w==
     path: .babelrc
   - hash: >-
       n1uS6ajZMpOfiWQhE24L1oIsASvT63ay5GkxYOiYFBgF2SiwUbHQVMxdtPq9a5KyBtaZkpUtk7A/9frYkb1nzw==
@@ -571,7 +571,7 @@ files:
       zN51ATJNBuF7EqPvKtnvN8DjhfuWBsojjSkOl2y67qI9j8LmkNmsh0DBkLk3qDJm8dQ025+bGUNNfZBmxx81Gg==
     path: tsconfig.build.json
   - hash: >-
-      baIFGU4pqXu749Y7zvK1NP/VzP27ZlZ0TrsD86m3alSj0LHNsrZp+On4Rod2U299a2NkQykBpjpKbBBJTtvQqA==
+      /ZZOw3mK3MdFX4A+sub907oSJhFoe3BQmYyari7fhovY79lln8Oz8oeumwU4+ORYjtmpe1RCltqltkeENPrq+w==
     path: tsconfig.json
 scripts:
   - build
@@ -686,7 +686,7 @@ exports[`@coat/template-ts-package template verification - default config 11`] =
     \\"noEmit\\": true,
     \\"outDir\\": \\"build\\",
     \\"strict\\": true,
-    \\"target\\": \\"ES2018\\"
+    \\"target\\": \\"ES2019\\"
   }
 }
 "
@@ -900,7 +900,7 @@ files:
       zN51ATJNBuF7EqPvKtnvN8DjhfuWBsojjSkOl2y67qI9j8LmkNmsh0DBkLk3qDJm8dQ025+bGUNNfZBmxx81Gg==
     path: tsconfig.build.json
   - hash: >-
-      baIFGU4pqXu749Y7zvK1NP/VzP27ZlZ0TrsD86m3alSj0LHNsrZp+On4Rod2U299a2NkQykBpjpKbBBJTtvQqA==
+      /ZZOw3mK3MdFX4A+sub907oSJhFoe3BQmYyari7fhovY79lln8Oz8oeumwU4+ORYjtmpe1RCltqltkeENPrq+w==
     path: tsconfig.json
 scripts:
   - build
@@ -1015,7 +1015,7 @@ exports[`@coat/template-ts-package template verification - typescript compiler 1
     \\"noEmit\\": true,
     \\"outDir\\": \\"build\\",
     \\"strict\\": true,
-    \\"target\\": \\"ES2018\\"
+    \\"target\\": \\"ES2019\\"
   }
 }
 "

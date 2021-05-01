@@ -1,5 +1,4 @@
 import { promises as fs } from "fs";
-import fromPairs from "lodash/fromPairs";
 
 /**
  * Returns the disk content for the given file paths if they exist.
@@ -32,7 +31,5 @@ export async function getCurrentFiles(
     })
   );
 
-  // Node.js 10 compatibility
-  // Use Object.fromEntries once Node 10 is no longer supported
-  return fromPairs(currentFiles);
+  return Object.fromEntries(currentFiles);
 }
