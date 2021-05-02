@@ -94,22 +94,18 @@ async function publishCli(): Promise<void> {
     newTemplateTsPackagePackageJson
   );
 
-  // Run lerna bootstrap again to update package-lock.json
-  // file of template-ts-package
-  //
-  // Remove node_modules in template to ensure lerna bootstrap actually runs
-  rimraf.sync(path.join(templateTsPackageDir, "node_modules"));
+  // Run npm install again to update package-lock.json
   let error = null;
   do {
     error = null;
     try {
-      await execa("npx", ["--no-install", "lerna", "bootstrap"], {
+      await execa("npm", ["install"], {
         cwd: path.join(__dirname, ".."),
       });
     } catch (innerError) {
       error = innerError;
       console.log(
-        "Waiting 10 seconds, since lerna bootstrap failed - likely since the new cli version is not yet available on npm"
+        "Waiting 10 seconds, since npm install failed - likely since the new cli version is not yet available on npm"
       );
       await delay(10 * 1000);
     }

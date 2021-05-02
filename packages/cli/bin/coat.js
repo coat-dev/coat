@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 //
 // The bin file for the @coat/cli package is not transpiled,
-// since lerna does not correctly symlink the bin file
+// since npm does not correctly symlink the bin file
 // if it is transpiled during the bootstrapping process
 //
 // While this code is not covered by unit tests
