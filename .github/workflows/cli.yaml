@@ -38,7 +38,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: coat
-          path: packages/*/*.tgz
+          path: "*.tgz"
   e2e-tests:
     name: E2E tests
     strategy:
