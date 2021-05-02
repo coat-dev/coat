@@ -5,8 +5,7 @@
   },
   "commitlint": {
     "extends": [
-      "@commitlint/config-conventional",
-      "@commitlint/config-lerna-scopes"
+      "@commitlint/config-conventional"
     ],
     "rules": {
       "body-max-line-length": [
@@ -19,7 +18,6 @@
   "devDependencies": {
     "@commitlint/cli": "12.1.1",
     "@commitlint/config-conventional": "12.1.1",
-    "@commitlint/config-lerna-scopes": "12.1.1",
     "@commitlint/prompt-cli": "12.1.1",
     "@types/prettier": "2.2.3",
     "@types/prompts": "2.0.10",
@@ -27,7 +25,6 @@
     "execa": "5.0.0",
     "husky": "6.0.0",
     "is-ci": "3.0.0",
-    "lerna": "4.0.0",
     "prettier": "2.2.1",
     "prompts": "2.4.1",
     "rimraf": "3.0.2",
@@ -45,5 +42,8 @@
   "version": "0.0.1",
   "scripts": {
     "prepare": "is-ci || husky install"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

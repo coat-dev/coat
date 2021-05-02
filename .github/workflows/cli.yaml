@@ -13,19 +13,16 @@ jobs:
           node-version: 14
       - name: Install latest npm version
         run: npm install --global npm
-      - name: Install dependencies
-        run: |
-          npm ci
-          npx --no-install lerna bootstrap
+      - uses: bahmutov/npm-install@v1
       - name: Build
-        run: npx --no-install lerna run build --stream
+        run: npm run --ws build
       - name: Lint
-        run: npx --no-install lerna run lint --stream
+        run: npm run --ws lint
       - name: Ensure coat projects are in sync
-        run: npx --no-install lerna run coat -- sync -- --check
+        run: npm run --ws --if-present coat -- sync --check
       - name: Test
         run: |
-          npx --no-install lerna run test --stream -- -- \
+          npm run --ws test -- \
             --ci \
             --no-cache \
             --runInBand \
@@ -37,7 +34,7 @@ jobs:
       - name: Upload test coverage information
         run: bash <(curl -s https://codecov.io/bash)
       - name: Build package artifacts
-        run: npx --no-install lerna exec npm pack
+        run: npm pack --ws
       - uses: actions/upload-artifact@v2
         with:
           name: coat
@@ -56,10 +53,7 @@ jobs:
           node-version: ${{ matrix.node }}
       - name: Install latest npm version
         run: npm install --global npm
-      - name: Install dependencies
-        run: |
-          npm ci
-          npx --no-install lerna bootstrap
+      - uses: bahmutov/npm-install@v1
       - name: Setup git config for e2e tests
         run: |
           git config --global user.name "GitHub Actions Bot"
