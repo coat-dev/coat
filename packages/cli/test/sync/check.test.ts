@@ -283,11 +283,9 @@ describe("coat sync - --check option", () => {
     const cwd = await prepareCliTest({
       coatManifest: {
         name: "project",
-        extends: [
-          "local-files-1",
-          "local-files-2",
-          "local-files-3",
-        ].map((templateName) => path.join(testPackagesPath, templateName)),
+        extends: ["local-files-1", "local-files-2", "local-files-3"].map(
+          (templateName) => path.join(testPackagesPath, templateName)
+        ),
       },
     });
 

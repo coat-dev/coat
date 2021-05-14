@@ -18,7 +18,7 @@ jest
   .mock("./print-create-customization-help")
   .mock("../bin/get-coat-header");
 
-const execaMock = (execa as unknown) as jest.Mock;
+const execaMock = execa as unknown as jest.Mock;
 const execaMockImplementation = (): unknown => ({
   exitCode: 0,
   stdout: "",

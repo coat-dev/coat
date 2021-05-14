@@ -7,7 +7,7 @@ import { prompt } from "inquirer";
 
 jest.mock("inquirer");
 
-const promptMock = (prompt as unknown) as jest.Mock;
+const promptMock = prompt as unknown as jest.Mock;
 promptMock.mockImplementation(() => ({
   projectName: "prompted-name",
 }));

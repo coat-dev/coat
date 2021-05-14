@@ -18,7 +18,7 @@ jest.mock("import-from");
 const platformRoot = path.parse(process.cwd()).root;
 const testCwd = path.join(platformRoot, "test");
 
-const importFromMock = (importFrom.silent as unknown) as jest.Mock;
+const importFromMock = importFrom.silent as unknown as jest.Mock;
 
 describe("util/get-prettier", () => {
   const testContext: CoatContext = {

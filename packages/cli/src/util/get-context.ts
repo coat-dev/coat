@@ -32,17 +32,13 @@ export async function getContext(cwd: string): Promise<CoatContext> {
   // Read package.json & coat.json files
   // TODO: See #15
   // More friendly error messages if files are missing
-  const [
-    coatManifestRaw,
-    coatGlobalLockfile,
-    coatLocalLockfile,
-    packageJson,
-  ] = await Promise.all([
-    fs.readFile(path.join(cwd, COAT_MANIFEST_FILENAME), "utf8"),
-    getCoatGlobalLockfile(cwd),
-    getCoatLocalLockfile(cwd),
-    getPackageJson(cwd),
-  ]);
+  const [coatManifestRaw, coatGlobalLockfile, coatLocalLockfile, packageJson] =
+    await Promise.all([
+      fs.readFile(path.join(cwd, COAT_MANIFEST_FILENAME), "utf8"),
+      getCoatGlobalLockfile(cwd),
+      getCoatLocalLockfile(cwd),
+      getPackageJson(cwd),
+    ]);
 
   const coatManifest: CoatManifest = json5.parse(coatManifestRaw);
 

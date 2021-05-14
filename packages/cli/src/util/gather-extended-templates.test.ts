@@ -26,8 +26,8 @@ jest
 
 const testCwd = "test";
 
-const resolveFromMock = (resolveFrom as unknown) as jest.Mock;
-const importFromMock = (importFrom as unknown) as jest.Mock;
+const resolveFromMock = resolveFrom as unknown as jest.Mock;
+const importFromMock = importFrom as unknown as jest.Mock;
 
 type CoatStrictTemplate = CoatManifestStrict | (() => CoatManifestStrict);
 
@@ -37,7 +37,7 @@ let testExtendedTemplates: {
     | { default: CoatStrictTemplate; __esModule: { value: true } };
 };
 
-const validateCoatManifestMock = (validateCoatManifest as unknown) as jest.Mock;
+const validateCoatManifestMock = validateCoatManifest as unknown as jest.Mock;
 const consoleErrorSpy = jest.spyOn(console, "error");
 
 describe("sync/gather-extended-templates", () => {
@@ -131,16 +131,14 @@ describe("sync/gather-extended-templates", () => {
             `${testCwd}/nested/nested-2/nested-2-A-result`
           ] as CoatManifestStrict
       ),
-      [`${testCwd}/nested/nested-2/nested-2-A/nested-2-A-1`]: getStrictCoatManifest(
-        {
+      [`${testCwd}/nested/nested-2/nested-2-A/nested-2-A-1`]:
+        getStrictCoatManifest({
           name: "nested-2-A-1",
-        }
-      ),
-      [`${testCwd}/nested/nested-2/nested-2-A/nested-2-A-2-result`]: getStrictCoatManifest(
-        {
+        }),
+      [`${testCwd}/nested/nested-2/nested-2-A/nested-2-A-2-result`]:
+        getStrictCoatManifest({
           name: "nested-2-A-2",
-        }
-      ),
+        }),
       [`${testCwd}/nested/nested-2/nested-2-A/nested-2-A-2`]: jest.fn<
         CoatManifestStrict,
         []
@@ -154,26 +152,24 @@ describe("sync/gather-extended-templates", () => {
         name: "nested-2-B",
         extends: ["nested-common-template"],
       }),
-      [`${testCwd}/nested/nested-2/nested-2-B/nested-common-template`]: getStrictCoatManifest(
-        {
+      [`${testCwd}/nested/nested-2/nested-2-B/nested-common-template`]:
+        getStrictCoatManifest({
           name: "nested-common-template",
           dependencies: {
             dependencies: {
               "from-2-B": "^1.0.0",
             },
           },
-        }
-      ),
-      [`${testCwd}/nested/nested-2/nested-common-template`]: getStrictCoatManifest(
-        {
+        }),
+      [`${testCwd}/nested/nested-2/nested-common-template`]:
+        getStrictCoatManifest({
           name: "nested-common-template",
           dependencies: {
             dependencies: {
               "from-2": "^1.0.0",
             },
           },
-        }
-      ),
+        }),
       [`${testCwd}/nested/nested-3`]: getStrictCoatManifest({
         name: "nested-3",
       }),

@@ -118,17 +118,13 @@ describe("coat create - target directories", () => {
       defaultProjectName,
     ]);
     await task;
-    const [
-      firstLevelFolder,
-      entries,
-      packageJson,
-      coatManifest,
-    ] = await Promise.all([
-      fs.readdir(path.join(cwd, "first-dir")),
-      fs.readdir(path.join(cwd, targetDir)),
-      fs.readFile(path.join(cwd, targetDir, packageJsonFileName), "utf8"),
-      fs.readFile(path.join(cwd, targetDir, coatManifestFileName), "utf8"),
-    ]);
+    const [firstLevelFolder, entries, packageJson, coatManifest] =
+      await Promise.all([
+        fs.readdir(path.join(cwd, "first-dir")),
+        fs.readdir(path.join(cwd, targetDir)),
+        fs.readFile(path.join(cwd, targetDir, packageJsonFileName), "utf8"),
+        fs.readFile(path.join(cwd, targetDir, coatManifestFileName), "utf8"),
+      ]);
     entries.sort();
 
     expect(firstLevelFolder).toEqual(["second-dir"]);

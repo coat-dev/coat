@@ -9,7 +9,7 @@ jest.mock("execa");
 const platformRoot = path.parse(process.cwd()).root;
 const testCwd = path.join(platformRoot, "test");
 
-const execaMock = (execa as unknown) as jest.Mock;
+const execaMock = execa as unknown as jest.Mock;
 execaMock.mockReturnValue({});
 
 describe("run/run-multiple-scripts", () => {

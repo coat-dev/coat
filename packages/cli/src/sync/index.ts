@@ -264,23 +264,21 @@ export async function sync({
   ];
 
   // Split lockfile candidates by local and global file entries
-  const {
-    localLockFileEntries,
-    globalLockFileEntries,
-  } = lockFileCanditates.reduce<{
-    localLockFileEntries: typeof lockFileCanditates;
-    globalLockFileEntries: typeof lockFileCanditates;
-  }>(
-    (accumulator, file) => {
-      if (file.local) {
-        accumulator.localLockFileEntries.push(file);
-      } else {
-        accumulator.globalLockFileEntries.push(file);
-      }
-      return accumulator;
-    },
-    { localLockFileEntries: [], globalLockFileEntries: [] }
-  );
+  const { localLockFileEntries, globalLockFileEntries } =
+    lockFileCanditates.reduce<{
+      localLockFileEntries: typeof lockFileCanditates;
+      globalLockFileEntries: typeof lockFileCanditates;
+    }>(
+      (accumulator, file) => {
+        if (file.local) {
+          accumulator.localLockFileEntries.push(file);
+        } else {
+          accumulator.globalLockFileEntries.push(file);
+        }
+        return accumulator;
+      },
+      { localLockFileEntries: [], globalLockFileEntries: [] }
+    );
 
   const newLocalLockFiles = generateLockfileFiles(localLockFileEntries);
   const newGlobalLockFiles = generateLockfileFiles(globalLockFileEntries);
@@ -357,12 +355,12 @@ export async function sync({
   }
 
   const newLockfileDependencies = Object.fromEntries(
-    Object.entries(
-      templateDependencies
-    ).map(([dependencyKey, dependencyEntries]) => [
-      dependencyKey,
-      Object.keys(dependencyEntries).sort(),
-    ])
+    Object.entries(templateDependencies).map(
+      ([dependencyKey, dependencyEntries]) => [
+        dependencyKey,
+        Object.keys(dependencyEntries).sort(),
+      ]
+    )
   );
 
   const newLockfileScripts = Object.keys(mergedScripts).sort();

@@ -25,7 +25,7 @@ const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {
   // Empty function
 });
 
-const promptsMock = (prompt as unknown) as jest.Mock;
+const promptsMock = prompt as unknown as jest.Mock;
 // Default return value for prompts
 promptsMock.mockReturnValue({
   filesToPlacePrompted: false,

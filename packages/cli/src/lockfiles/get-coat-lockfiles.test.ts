@@ -28,8 +28,10 @@ const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
 
 type ValidatorMock = jest.Mock & ValidateFunction;
 
-const validateGlobalLockfileMock = (validateCoatGlobalLockfile as unknown) as ValidatorMock;
-const validateLocalLockfileMock = (validateCoatLocalLockfile as unknown) as ValidatorMock;
+const validateGlobalLockfileMock =
+  validateCoatGlobalLockfile as unknown as ValidatorMock;
+const validateLocalLockfileMock =
+  validateCoatLocalLockfile as unknown as ValidatorMock;
 
 describe("lockfiles/get-coat-lockfiles", () => {
   beforeEach(() => {

@@ -43,12 +43,9 @@ describe("coat sync - lockfile", () => {
       const { cwd, task } = await runSyncTest({
         coatManifest: {
           name: "project",
-          extends: [
-            "local-files-1",
-            "local-files-2",
-            "local-files-3",
-          ].map((templateName) =>
-            path.join(__dirname, "..", "utils", "test-packages", templateName)
+          extends: ["local-files-1", "local-files-2", "local-files-3"].map(
+            (templateName) =>
+              path.join(__dirname, "..", "utils", "test-packages", templateName)
           ),
           files: [
             {

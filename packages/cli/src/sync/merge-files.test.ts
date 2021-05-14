@@ -22,7 +22,7 @@ import { JsonObject } from "type-fest";
 jest.mock("fs").mock("import-from");
 
 const statMock = jest.spyOn(fs.promises, "stat");
-const importFromMock = (importFrom as unknown) as jest.Mock;
+const importFromMock = importFrom as unknown as jest.Mock;
 
 describe("sync/merge-files", () => {
   afterEach(() => {
