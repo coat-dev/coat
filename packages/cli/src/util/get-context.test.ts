@@ -12,7 +12,7 @@ import {
 
 jest.mock("fs").mock("../validation/coat-manifest");
 
-const validateCoatManifestMock = (validateCoatManifest as unknown) as jest.Mock;
+const validateCoatManifestMock = validateCoatManifest as unknown as jest.Mock;
 
 const consoleErrorSpy = jest.spyOn(console, "error");
 

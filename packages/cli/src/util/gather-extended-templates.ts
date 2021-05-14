@@ -58,9 +58,11 @@ function getTemplates(
     "__esModule" in templateManifestRawModule &&
     "default" in templateManifestRawModule
   ) {
-    templateManifestRaw = (templateManifestRawModule as {
-      default: CoatTemplate;
-    }).default;
+    templateManifestRaw = (
+      templateManifestRawModule as {
+        default: CoatTemplate;
+      }
+    ).default;
   } else {
     templateManifestRaw = templateManifestRawModule as CoatTemplate;
   }

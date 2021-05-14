@@ -14,9 +14,7 @@ import { CoatManifestStrict } from "../types/coat-manifest";
  *
  * @param scripts All scripts that should be merged
  */
-export function mergeScripts(
-  scripts: CoatManifestStrict["scripts"][]
-): {
+export function mergeScripts(scripts: CoatManifestStrict["scripts"][]): {
   scripts: Record<string, string>;
   parallelScriptPrefixes: string[];
 } {

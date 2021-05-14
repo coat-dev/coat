@@ -29,9 +29,11 @@ export async function getTasksToRun(
   // Determine which tasks should be run
   const allTasksUnfiltered = await Promise.all(
     allTasks.map(async (task) => {
-      const previousTaskResults = (task.type === CoatTaskType.Global
-        ? context.coatGlobalLockfile.setup
-        : context.coatLocalLockfile.setup)[task.id];
+      const previousTaskResults = (
+        task.type === CoatTaskType.Global
+          ? context.coatGlobalLockfile.setup
+          : context.coatLocalLockfile.setup
+      )[task.id];
 
       let shouldRun: boolean;
       if (task.shouldRun) {

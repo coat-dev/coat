@@ -154,8 +154,7 @@ describe("lockfiles/generate-lockfile-files", () => {
     expect(result).toEqual([
       {
         path: "file3.json",
-        hash:
-          "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
+        hash: "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
         once: false,
       },
     ]);

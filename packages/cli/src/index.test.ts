@@ -9,7 +9,7 @@ describe("@coat/cli - index", () => {
     ${"sync"}
   `("should export $functionName from index", ({ functionName }) => {
     expect(
-      ((cli as unknown) as Record<string, unknown>)[functionName]
+      (cli as unknown as Record<string, unknown>)[functionName]
     ).toBeDefined();
   });
 

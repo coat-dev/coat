@@ -41,7 +41,8 @@ type CoatLockfileFileEntry =
 
 type CoatLockfileOnceFileEntryStrict = CoatLockfileOnceFileEntry;
 
-export type CoatLockfileContinuousFileEntryStrict = Required<CoatLockfileContinuousFileEntry>;
+export type CoatLockfileContinuousFileEntryStrict =
+  Required<CoatLockfileContinuousFileEntry>;
 
 export type CoatLockfileFileEntryStrict =
   | CoatLockfileOnceFileEntryStrict

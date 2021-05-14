@@ -17,7 +17,7 @@ const templatePackageJson = {
   },
 };
 
-const importFromMock = (importFrom as unknown) as jest.Mock;
+const importFromMock = importFrom as unknown as jest.Mock;
 importFromMock.mockImplementation(() => templatePackageJson);
 
 jest.spyOn(tmp, "dirSync").mockImplementation(() => ({
@@ -25,7 +25,7 @@ jest.spyOn(tmp, "dirSync").mockImplementation(() => ({
   removeCallback: jest.fn(),
 }));
 
-const execaMock = (execa as unknown) as jest.Mock;
+const execaMock = execa as unknown as jest.Mock;
 
 describe("create/get-template-info", () => {
   afterEach(() => {

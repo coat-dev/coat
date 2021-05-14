@@ -26,7 +26,7 @@ const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {
   // Empty function
 });
 
-((createFileOperationLogMessage as unknown) as jest.Mock).mockImplementation(
+(createFileOperationLogMessage as unknown as jest.Mock).mockImplementation(
   (file: FileOperation) => `${file.type} - ${file.relativePath}`
 );
 

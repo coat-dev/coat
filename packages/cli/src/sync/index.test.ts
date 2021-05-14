@@ -104,16 +104,18 @@ const templates: CoatManifestStrict[] = [
   },
 ].map((template) => getStrictCoatManifest(template));
 
-const gatherExtendedTemplatesMock = (gatherExtendedTemplates as unknown) as jest.Mock;
+const gatherExtendedTemplatesMock =
+  gatherExtendedTemplates as unknown as jest.Mock;
 gatherExtendedTemplatesMock.mockImplementation(() => templates);
 
-const getFileOperationsMock = (getFileOperations as unknown) as jest.Mock;
+const getFileOperationsMock = getFileOperations as unknown as jest.Mock;
 getFileOperationsMock.mockReturnValue([]);
 
-const promptForFileOperationsMock = (promptForFileOperations as unknown) as jest.Mock;
+const promptForFileOperationsMock =
+  promptForFileOperations as unknown as jest.Mock;
 promptForFileOperationsMock.mockResolvedValue(true);
 
-const performFileOperationsMock = (performFileOperations as unknown) as jest.Mock;
+const performFileOperationsMock = performFileOperations as unknown as jest.Mock;
 
 const groupFilesSpy = jest.spyOn(groupFilesImport, "groupFiles");
 const { groupFiles } = groupFilesImport;
@@ -165,7 +167,7 @@ const packageJson = {
   ...currentDependencies,
 };
 
-const execaMock = (execa as unknown) as jest.Mock;
+const execaMock = execa as unknown as jest.Mock;
 
 describe("sync", () => {
   afterEach(() => {
@@ -318,12 +320,8 @@ describe("sync", () => {
         [path.join(testCwd, ".gitignore")]: undefined,
         [path.join(testCwd, "local-file.json")]: undefined,
         [path.join(testCwd, "manifestA.json")]: undefined,
-        [path.join(
-          testCwd,
-          "some-folder",
-          "deep-folder",
-          "template2x.json"
-        )]: undefined,
+        [path.join(testCwd, "some-folder", "deep-folder", "template2x.json")]:
+          undefined,
         [path.join(testCwd, "package.json")]: expect.any(String),
       },
       // coat context
@@ -542,8 +540,7 @@ describe("sync", () => {
     expect(getFileOperationsMock).toHaveBeenCalledTimes(1);
     expect(getFileOperationsMock.mock.calls[0][1]).toEqual([
       {
-        hash:
-          "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
+        hash: "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
         once: false,
         path: "unmanaged-path-1.json",
         local: false,
@@ -576,8 +573,7 @@ describe("sync", () => {
     expect(getFileOperationsMock).toHaveBeenCalledTimes(1);
     expect(getFileOperationsMock.mock.calls[0][1]).toEqual([
       {
-        hash:
-          "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
+        hash: "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
         once: false,
         path: "unmanaged-path-1.json",
         local: true,

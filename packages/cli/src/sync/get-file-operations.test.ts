@@ -458,10 +458,8 @@ describe("sync/get-file-operations", () => {
   test("should not prompt if package.json is updated", () => {
     // Put modified package.json in currentFiles
     const currentFiles = {
-      [getNormalizedFilePath(
-        PACKAGE_JSON_FILENAME,
-        testContext
-      )]: JSON.stringify({ a: "modified" }),
+      [getNormalizedFilePath(PACKAGE_JSON_FILENAME, testContext)]:
+        JSON.stringify({ a: "modified" }),
     };
 
     const filesToPlace: PolishedFile[] = [

@@ -31,38 +31,36 @@ function buildFileUpdatePromptMessage(
 
   // Split files into files that have not been managed before
   // and files that were already managed by coat
-  const {
-    filesToUpdatePromptFirst,
-    filesToUpdatePrompt,
-  } = sortedFilesToPrompt.reduce<{
-    filesToUpdatePromptFirst: FileOperationWithPrompt[];
-    filesToUpdatePrompt: FileOperationWithPrompt[];
-  }>(
-    (accumulator, file) => {
-      switch (file.prompt) {
-        case UpdatePrompt.Update:
-          accumulator.filesToUpdatePrompt.push(file);
-          break;
-        case UpdatePrompt.FirstUpdate:
-          accumulator.filesToUpdatePromptFirst.push(file);
-          break;
-        // The default case is only required to let TypeScript throw
-        // compiler errors if a new UpdatePrompt type is added
-        /* istanbul ignore next */
-        default: {
-          const unhandledPromptType: never = file.prompt;
-          throw new Error(
-            `Unhandled UpdatePrompt type for file: ${unhandledPromptType}`
-          );
+  const { filesToUpdatePromptFirst, filesToUpdatePrompt } =
+    sortedFilesToPrompt.reduce<{
+      filesToUpdatePromptFirst: FileOperationWithPrompt[];
+      filesToUpdatePrompt: FileOperationWithPrompt[];
+    }>(
+      (accumulator, file) => {
+        switch (file.prompt) {
+          case UpdatePrompt.Update:
+            accumulator.filesToUpdatePrompt.push(file);
+            break;
+          case UpdatePrompt.FirstUpdate:
+            accumulator.filesToUpdatePromptFirst.push(file);
+            break;
+          // The default case is only required to let TypeScript throw
+          // compiler errors if a new UpdatePrompt type is added
+          /* istanbul ignore next */
+          default: {
+            const unhandledPromptType: never = file.prompt;
+            throw new Error(
+              `Unhandled UpdatePrompt type for file: ${unhandledPromptType}`
+            );
+          }
         }
+        return accumulator;
+      },
+      {
+        filesToUpdatePromptFirst: [],
+        filesToUpdatePrompt: [],
       }
-      return accumulator;
-    },
-    {
-      filesToUpdatePromptFirst: [],
-      filesToUpdatePrompt: [],
-    }
-  );
+    );
 
   // TODO: See #52
   // Add link to customization help once it exists
