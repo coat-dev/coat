@@ -3,7 +3,6 @@ import path from "path";
 import execa from "execa";
 import prompts from "prompts";
 import prettier from "prettier";
-import rimraf from "rimraf";
 
 enum Package {
   Cli = "cli",
