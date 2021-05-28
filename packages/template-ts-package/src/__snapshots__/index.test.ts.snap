@@ -281,7 +281,7 @@ exports[`@coat/template-ts-package template verification - babel compiler 8`] = 
     \\"jest-circus\\": \\"^26.6.3\\",
     \\"prettier\\": \\"^2.2.0\\",
     \\"rimraf\\": \\"^3.0.2\\",
-    \\"typescript\\": \\"~4.2.2\\"
+    \\"typescript\\": \\"~4.3.2\\"
   },
   \\"files\\": [
     \\"build/\\"
@@ -615,7 +615,7 @@ exports[`@coat/template-ts-package template verification - default config 7`] = 
     \\"prettier\\": \\"^2.2.0\\",
     \\"rimraf\\": \\"^3.0.2\\",
     \\"ts-jest\\": \\"^26.4.4\\",
-    \\"typescript\\": \\"~4.2.2\\"
+    \\"typescript\\": \\"~4.3.2\\"
   },
   \\"files\\": [
     \\"build/\\"
@@ -944,7 +944,7 @@ exports[`@coat/template-ts-package template verification - typescript compiler 7
     \\"prettier\\": \\"^2.2.0\\",
     \\"rimraf\\": \\"^3.0.2\\",
     \\"ts-jest\\": \\"^26.4.4\\",
-    \\"typescript\\": \\"~4.2.2\\"
+    \\"typescript\\": \\"~4.3.2\\"
   },
   \\"files\\": [
     \\"build/\\"

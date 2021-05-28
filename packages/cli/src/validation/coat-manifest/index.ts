@@ -43,7 +43,10 @@ export function* validateCoatManifest(
 
   // Ensure that coat templates are not returning
   // promises and run synchronously
-  if ("then" in coatManifest && typeof coatManifest["then"] === "function") {
+  if (
+    "then" in coatManifest &&
+    typeof (coatManifest as Promise<CoatManifest>).then === "function"
+  ) {
     // isTemplate === true is implied,
     // since the coat manifest is a JSON file and can't be a promise.
     const message =
