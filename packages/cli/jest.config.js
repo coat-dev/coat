@@ -1,16 +1,9 @@
-const sharedConfig = {
-  testEnvironment: "node",
-  testRunner: "jest-circus/runner",
-};
-
 const unitTestsProject = {
-  ...sharedConfig,
   displayName: "Unit tests",
   testPathIgnorePatterns: ["/node_modules/", "<rootDir>/test/"],
 };
 
 const e2eTestsProject = {
-  ...sharedConfig,
   displayName: "E2E tests",
   testPathIgnorePatterns: ["/node_modules/", "<rootDir>/src/"],
   globalSetup: "./test/utils/e2e-setup.ts",

@@ -10,7 +10,6 @@ dependencies:
     - eslint
     - eslint-config-prettier
     - jest
-    - jest-circus
     - prettier
     - rimraf
     - typescript
@@ -25,7 +24,7 @@ files:
       fxSZnVg1JXiEGv1w/4+1LpWhyUWeFgVRnyX8grd7X6S0JOseqVFI+GZS4O8s7QGhF0D2c/RfzdmEEbCDjdrbcw==
     path: .gitignore
   - hash: >-
-      My194NNHkJfUbK2noROeqy0WWRf02X52rbcepOM9IcDa99Ien9Rywh3fL9+nvliUPbLGp+tNzfsdStScIcOSCQ==
+      EOdt5MupU/WW3SdIsJCdICDzZoC/n56ZcBx1qykA0GrlxTOjCE3GAc89C6CtEv9WxfuBMK2Y5d7aFyV1jLDPfQ==
     path: jest.config.json
   - once: true
     path: README.md
