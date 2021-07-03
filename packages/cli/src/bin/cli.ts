@@ -1,4 +1,4 @@
-import { Command, CommandConstructor } from "commander";
+import { Command } from "commander";
 import { COAT_CLI_VERSION } from "../constants";
 import { create } from "../create";
 import { run } from "../run";
@@ -10,7 +10,7 @@ import { getCoatHeader } from "./get-coat-header";
  * Creates a command CLI program to run coat commands
  * from the cli or programmatically in tests
  */
-export function createProgram(): InstanceType<CommandConstructor> {
+export function createProgram(): Command {
   const program = new Command("coat");
   program.version(COAT_CLI_VERSION).allowUnknownOption();
 
