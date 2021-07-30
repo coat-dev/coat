@@ -16,9 +16,9 @@
     }
   },
   "devDependencies": {
-    "@commitlint/cli": "12.1.4",
-    "@commitlint/config-conventional": "12.1.4",
-    "@commitlint/prompt-cli": "12.1.4",
+    "@commitlint/cli": "13.1.0",
+    "@commitlint/config-conventional": "13.1.0",
+    "@commitlint/prompt-cli": "13.1.0",
     "@types/prettier": "2.3.2",
     "@types/prompts": "2.0.14",
     "@types/rimraf": "3.0.1",
