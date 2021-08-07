@@ -169,7 +169,7 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
       // Dependencies
       //
       // Jest
-      devDependencies["ts-jest"] = "^26.4.4";
+      devDependencies["ts-jest"] = "^27.0.4";
 
       // Scripts
       scripts.push({
