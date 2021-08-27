@@ -3,6 +3,7 @@ import fs from "fs-extra";
 import path from "path";
 import { getTmpDir } from "../utils/get-tmp-dir";
 import { COAT_MANIFEST_FILENAME } from "../../src/constants";
+import { ExecaError } from "execa";
 
 describe("coat create - errors", () => {
   test("should throw error if no template is specified", async () => {
@@ -14,7 +15,7 @@ describe("coat create - errors", () => {
       // task throws an error
       throw new Error("Error! Task should have thrown an error");
     } catch (error) {
-      expect(error.stderr).toMatchInlineSnapshot(
+      expect((error as ExecaError).stderr).toMatchInlineSnapshot(
         `"error: missing required argument 'template'"`
       );
     }
@@ -33,7 +34,7 @@ describe("coat create - errors", () => {
       // task throws an error
       throw new Error("Error! Task should have thrown an error");
     } catch (error) {
-      expect(error.stderr).toEqual(
+      expect((error as ExecaError).stderr).toEqual(
         expect.stringContaining(
           "npm ERR! 404 Not Found - GET https://registry.npmjs.org/@coat%2fnon-existent-package - Not found"
         )
@@ -57,7 +58,7 @@ describe("coat create - errors", () => {
       // task throws an error
       throw new Error("Error! Task should have thrown an error");
     } catch (error) {
-      expect(error.stderr).toContain(
+      expect((error as ExecaError).stderr).toContain(
         "A coat manifest file already exists in the target directory.\n\nPlease install the template manually via npm and add the name of the template to the existing coat manifest file."
       );
 

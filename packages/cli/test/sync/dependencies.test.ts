@@ -151,7 +151,9 @@ describe("coat sync - dependencies", () => {
           );
         } catch (error) {
           expect(
-            error.message.includes("ENOENT: no such file or directory,")
+            (error as Error).message.includes(
+              "ENOENT: no such file or directory,"
+            )
           ).toBe(true);
         }
       }
@@ -266,9 +268,9 @@ describe("coat sync - dependencies", () => {
       await fs.stat(path.join(cwd, "node_modules", "local-dependency-before"));
       throw new Error("Error! Old dependency directory should no longer exist");
     } catch (error) {
-      expect(error.message.includes("ENOENT: no such file or directory,")).toBe(
-        true
-      );
+      expect(
+        (error as Error).message.includes("ENOENT: no such file or directory,")
+      ).toBe(true);
     }
     const afterStatResult = await fs.stat(
       path.join(cwd, "node_modules", "local-dependency-after")

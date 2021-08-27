@@ -289,7 +289,7 @@ describe("sync/merge-files", () => {
     try {
       await mergeFiles(files, testContext);
     } catch (error) {
-      expect(error.message).toMatchInlineSnapshot(
+      expect((error as Error).message).toMatchInlineSnapshot(
         `"Cannot merge unknown file type: unknown"`
       );
     }
@@ -317,7 +317,9 @@ describe("sync/merge-files", () => {
     try {
       await mergeFiles(files, testContext);
     } catch (error) {
-      expect(error.message).toMatchInlineSnapshot(`"Something went wrong"`);
+      expect((error as Error).message).toMatchInlineSnapshot(
+        `"Something went wrong"`
+      );
     }
   });
 
@@ -503,7 +505,9 @@ describe("sync/merge-files", () => {
       try {
         await mergeFiles(files, testContext);
       } catch (error) {
-        expect(error.message).toMatchInlineSnapshot(`"Parsing issue"`);
+        expect((error as Error).message).toMatchInlineSnapshot(
+          `"Parsing issue"`
+        );
       }
     });
   });

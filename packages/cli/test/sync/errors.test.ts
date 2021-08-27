@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import stripAnsi from "strip-ansi";
+import { ExecaError } from "execa";
 import { prepareCliTest, runSyncTest } from "../utils/run-cli-test";
 import {
   COAT_MANIFEST_FILENAME,
@@ -22,9 +23,11 @@ describe("coat sync - errors", () => {
       throw new Error("This error should not be reached. Task should throw");
     } catch (error) {
       expect(
-        error.stderr.includes("Error: ENOENT: no such file or directory,")
+        (error as ExecaError).stderr.includes(
+          "Error: ENOENT: no such file or directory,"
+        )
       ).toBe(true);
-      expect(error.stderr.includes("coat.json")).toBe(true);
+      expect((error as ExecaError).stderr.includes("coat.json")).toBe(true);
     }
   });
 
@@ -41,9 +44,11 @@ describe("coat sync - errors", () => {
       await task;
       throw new Error("This error should not be reached. Task should throw");
     } catch (error) {
-      expect(error.stderr.includes("Cannot find module 'test-template'")).toBe(
-        true
-      );
+      expect(
+        (error as ExecaError).stderr.includes(
+          "Cannot find module 'test-template'"
+        )
+      ).toBe(true);
     }
   });
 
@@ -70,7 +75,10 @@ describe("coat sync - errors", () => {
       //
       // Only use first 13 lines to exclude stack trace with platform specific paths
       // in temporary directories
-      const errorMessage = error.stderr.split("\n").slice(0, 13).join("\n");
+      const errorMessage = (error as ExecaError).stderr
+        .split("\n")
+        .slice(0, 13)
+        .join("\n");
       expect(stripAnsi(errorMessage)).toMatchInlineSnapshot(`
         "The coat manifest file (coat.json) has the following issue:
 
@@ -113,7 +121,7 @@ describe("coat sync - errors", () => {
       throw new Error("This error should not be reached. Task should throw");
     } catch (error) {
       // Error is already thrown at validation time
-      const errorMessage = stripAnsi(error.stderr);
+      const errorMessage = stripAnsi((error as ExecaError).stderr);
       expect(errorMessage).toContain(
         `The extended template "${localTemplateWithAsyncFunction}" has the following issue:`
       );
@@ -135,10 +143,12 @@ describe("coat sync - errors", () => {
         await task;
         throw new Error("This error should not be reached. Task should throw");
       } catch (error) {
-        expect(error.stderr.includes("Error: EACCES: permission denied,")).toBe(
-          true
-        );
-        expect(error.stderr.includes("coat.json")).toBe(true);
+        expect(
+          (error as ExecaError).stderr.includes(
+            "Error: EACCES: permission denied,"
+          )
+        ).toBe(true);
+        expect((error as ExecaError).stderr.includes("coat.json")).toBe(true);
       }
     }
   );
@@ -155,10 +165,14 @@ describe("coat sync - errors", () => {
         await task;
         throw new Error("This error should not be reached. Task should throw");
       } catch (error) {
-        expect(error.stderr.includes("Error: EACCES: permission denied,")).toBe(
+        expect(
+          (error as ExecaError).stderr.includes(
+            "Error: EACCES: permission denied,"
+          )
+        ).toBe(true);
+        expect((error as ExecaError).stderr.includes("package.json")).toBe(
           true
         );
-        expect(error.stderr.includes("package.json")).toBe(true);
       }
     }
   );
@@ -191,11 +205,15 @@ describe("coat sync - errors", () => {
         await task;
         throw new Error("This error should not be reached. Task should throw");
       } catch (error) {
-        expect(error.stderr.includes("Error: EACCES: permission denied,")).toBe(
-          true
-        );
         expect(
-          error.stderr.includes(path.join("some-folder", "file.json"))
+          (error as ExecaError).stderr.includes(
+            "Error: EACCES: permission denied,"
+          )
+        ).toBe(true);
+        expect(
+          (error as ExecaError).stderr.includes(
+            path.join("some-folder", "file.json")
+          )
         ).toBe(true);
       }
     }

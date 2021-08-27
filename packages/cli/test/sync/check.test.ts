@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import path from "path";
 import stripAnsi from "strip-ansi";
 import yaml from "js-yaml";
+import { ExecaError } from "execa";
 import {
   COAT_GLOBAL_LOCKFILE_PATH,
   COAT_GLOBAL_LOCKFILE_VERSION,
@@ -136,8 +137,8 @@ describe("coat sync - --check option", () => {
       await checkTask;
       throw new Error("checkTask should fail");
     } catch (error) {
-      expect(error.exitCode).toBe(1);
-      expect(stripAnsi(error.stderr)).toMatchInlineSnapshot(`
+      expect((error as ExecaError).exitCode).toBe(1);
+      expect(stripAnsi((error as ExecaError).stderr)).toMatchInlineSnapshot(`
         "
         The coat project is not in sync.
         There are global tasks pending that need to be run to setup this coat project.
@@ -179,8 +180,8 @@ describe("coat sync - --check option", () => {
       await checkTask;
       throw new Error("checkTask should fail");
     } catch (error) {
-      expect(error.exitCode).toBe(1);
-      expect(stripAnsi(error.stderr)).toMatchInlineSnapshot(`
+      expect((error as ExecaError).exitCode).toBe(1);
+      expect(stripAnsi((error as ExecaError).stderr)).toMatchInlineSnapshot(`
         "
         The coat project is not in sync.
         The global lockfile (coat.lock) needs to be updated.
@@ -223,8 +224,8 @@ describe("coat sync - --check option", () => {
       await checkTask;
       throw new Error("checkTask should fail");
     } catch (error) {
-      expect(error.exitCode).toBe(1);
-      expect(stripAnsi(error.stderr)).toMatchInlineSnapshot(`
+      expect((error as ExecaError).exitCode).toBe(1);
+      expect(stripAnsi((error as ExecaError).stderr)).toMatchInlineSnapshot(`
         "
         The coat project is not in sync.
         The global lockfile (coat.lock) needs to be updated.
@@ -294,8 +295,8 @@ describe("coat sync - --check option", () => {
       await checkTask;
       throw new Error("checkTask should fail");
     } catch (error) {
-      expect(error.exitCode).toBe(1);
-      expect(stripAnsi(error.stderr)).toMatchInlineSnapshot(`
+      expect((error as ExecaError).exitCode).toBe(1);
+      expect(stripAnsi((error as ExecaError).stderr)).toMatchInlineSnapshot(`
         "
         The coat project is not in sync.
         There are pending file updates:

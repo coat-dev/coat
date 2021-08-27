@@ -19,7 +19,7 @@ export async function getCurrentFiles(
         // to match them back together later in an object
         return [filePath, content];
       } catch (error) {
-        if (error.code === "ENOENT") {
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") {
           // File doesn't exist, return the key with an undefined content
           return [filePath];
         }

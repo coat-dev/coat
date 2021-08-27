@@ -18,7 +18,7 @@ export async function deleteFile(filePath: string): Promise<void> {
     // test in test/sync/delete-unmanaged-files.test.ts:
     // "should throw errors if unmanaged files cannot be accessed"
     /* istanbul ignore if */
-    if (error.code !== "ENOENT") {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
       // If there is an error other than the file not
       // being available (anymore) it is thrown
       throw error;

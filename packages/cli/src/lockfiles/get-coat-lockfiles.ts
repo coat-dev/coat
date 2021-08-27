@@ -50,7 +50,7 @@ export async function getCoatGlobalLockfile(
     lockfile = yaml.load(lockfileRaw) as CoatGlobalLockfile;
   } catch (error) {
     // Throw if error is anything other than "not found"
-    if (error.code !== "ENOENT") {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
       throw error;
     }
   }
@@ -91,7 +91,7 @@ export async function getCoatLocalLockfile(
     lockfile = yaml.load(lockfileRaw) as CoatGlobalLockfileStrict;
   } catch (error) {
     // Throw if error is anything other than "not found"
-    if (error.code !== "ENOENT") {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
       throw error;
     }
   }

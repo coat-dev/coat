@@ -122,7 +122,7 @@ export async function mergeFiles(
         await fs.stat(customizationFilePath);
         // File exists
       } catch (error) {
-        if (error.code === "ENOENT") {
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") {
           // File does not exist -> no customization
           return [filePath, file];
         }

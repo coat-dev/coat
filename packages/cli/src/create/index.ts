@@ -97,7 +97,7 @@ export async function create({
     // If this line is reached the coat manifest file already exists
     coatManifestExists = true;
   } catch (error) {
-    if (error.code !== "ENOENT") {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
       // If the error is not due to a missing file, but e.g. due
       // to missing permissions it should be thrown to the user
       throw error;
@@ -122,7 +122,7 @@ export async function create({
     );
     previousPackageJson = JSON.parse(previousPackageJsonRaw);
   } catch (error) {
-    if (error.code !== "ENOENT") {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
       // If the error is not due to a missing file, but e.g. due
       // to missing permissions it should be thrown to the user
       throw error;

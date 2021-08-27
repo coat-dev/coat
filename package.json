@@ -29,7 +29,7 @@
     "prompts": "2.4.1",
     "rimraf": "3.0.2",
     "ts-node": "10.2.1",
-    "typescript": "4.3.5"
+    "typescript": "4.4.2"
   },
   "homepage": "https://github.com/coat-dev/coat#readme",
   "license": "MIT",

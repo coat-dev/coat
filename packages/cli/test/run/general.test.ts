@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { ExecaError } from "execa";
 import { PACKAGE_JSON_FILENAME } from "../../src/constants";
 import { getTmpDir } from "../utils/get-tmp-dir";
 import { runCli } from "../utils/run-cli";
@@ -109,7 +110,7 @@ describe("coat run - general", () => {
       await runTask;
       throw new Error("should not be reached");
     } catch (error) {
-      expect(error.exitCode).toBe(5);
+      expect((error as ExecaError).exitCode).toBe(5);
     }
   });
 
@@ -138,8 +139,8 @@ describe("coat run - general", () => {
       await runTask;
       throw new Error("should not be reached");
     } catch (error) {
-      expect(error.stdout).not.toContain("Done");
-      expect(error.exitCode).toBe(5);
+      expect((error as ExecaError).stdout).not.toContain("Done");
+      expect((error as ExecaError).exitCode).toBe(5);
     }
   });
 });

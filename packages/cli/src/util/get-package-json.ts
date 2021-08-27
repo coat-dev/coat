@@ -18,7 +18,7 @@ export async function getPackageJson(
     );
     return JSON.parse(packageJsonRaw);
   } catch (error) {
-    if (error.code !== "ENOENT") {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
       throw error;
     }
     // If the file is not available, packageJson will

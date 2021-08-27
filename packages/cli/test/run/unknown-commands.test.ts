@@ -1,3 +1,4 @@
+import { ExecaError } from "execa";
 import { runCli } from "../utils/run-cli";
 import { runSyncTest } from "../utils/run-cli-test";
 
@@ -70,7 +71,7 @@ describe("run/unknown-commands", () => {
       await runTask;
       throw new Error("Line should not be reached");
     } catch (error) {
-      expect(error.exitCode).toBe(5);
+      expect((error as ExecaError).exitCode).toBe(5);
     }
   });
 
@@ -99,8 +100,8 @@ describe("run/unknown-commands", () => {
       await runTask;
       throw new Error("Line should not be reached");
     } catch (error) {
-      expect(error.stdout).not.toContain("Done");
-      expect(error.exitCode).toBe(5);
+      expect((error as ExecaError).stdout).not.toContain("Done");
+      expect((error as ExecaError).exitCode).toBe(5);
     }
   });
 
@@ -108,8 +109,8 @@ describe("run/unknown-commands", () => {
     try {
       await runCli(["test-script"]).task;
     } catch (error) {
-      expect(error.exitCode).toBe(1);
-      expect(error.stderr).toMatchInlineSnapshot(
+      expect((error as ExecaError).exitCode).toBe(1);
+      expect((error as ExecaError).stderr).toMatchInlineSnapshot(
         `"error: unknown script or command 'test-script'. See 'coat --help'"`
       );
     }

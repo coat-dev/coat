@@ -20,7 +20,8 @@
     "task.quickOpen.history": 0,
     "files.exclude": {
       "packages": true
-    }
+    },
+    "typescript.tsdk": "✨ coat/node_modules/typescript/lib"
   },
   "extensions": {
     "recommendations": [

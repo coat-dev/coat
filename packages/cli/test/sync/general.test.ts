@@ -66,7 +66,7 @@ describe("coat sync - general", () => {
         "Code should not be reached, stat call should throw error"
       );
     } catch (error) {
-      expect(error.message).toContain(
+      expect((error as Error).message).toContain(
         "ENOENT: no such file or directory, stat"
       );
     }

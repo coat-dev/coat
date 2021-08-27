@@ -1,3 +1,4 @@
+import { ExecaError } from "execa";
 import { version } from "../../package.json";
 import { createProgram } from "./cli";
 import { create } from "../create";
@@ -45,7 +46,7 @@ describe("coat cli", () => {
     } catch (error) {
       expect(stdoutMock).toHaveBeenCalledTimes(1);
       expect(stdoutMock).toHaveBeenCalledWith(`${version}\n`);
-      expect(error.exitCode).toBe(0);
+      expect((error as ExecaError).exitCode).toBe(0);
     }
   });
 
