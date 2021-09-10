@@ -43,7 +43,7 @@
     "@babel/preset-typescript": "7.15.0",
     "@types/babel__code-frame": "7.0.3",
     "@types/fs-extra": "9.0.12",
-    "@types/inquirer": "7.3.3",
+    "@types/inquirer": "8.1.1",
     "@types/jest": "27.0.1",
     "@types/js-yaml": "4.0.3",
     "@types/json-stable-stringify": "1.0.33",
