@@ -8,11 +8,7 @@ import { CoatTemplate } from "../types/coat-template";
 import { CoatContext } from "../types/coat-context";
 import { getStrictCoatManifest } from "../util/get-strict-coat-manifest";
 import { validateCoatManifest } from "../validation/coat-manifest";
-import {
-  ValidationIssueError,
-  ValidationIssueType,
-  ValidationIssueWarning,
-} from "../validation/validation-issue";
+import { ValidationIssueType } from "../validation/validation-issue";
 
 type NestedManifests = Array<NestedManifests | CoatManifestStrict>;
 
@@ -85,10 +81,7 @@ function getTemplates(
     const {
       [ValidationIssueType.Error]: errors = [],
       [ValidationIssueType.Warning]: warnings = [],
-    } = groupBy(issues, "type") as {
-      [ValidationIssueType.Error]: ValidationIssueError[];
-      [ValidationIssueType.Warning]: ValidationIssueWarning[];
-    };
+    } = groupBy(issues, "type");
     const validationMessages = [
       chalk`The extended template "{green ${template}}" has the following issue${
         issues.length > 1 ? "s" : ""

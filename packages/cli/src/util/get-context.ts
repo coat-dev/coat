@@ -19,7 +19,6 @@ import { validateCoatManifest } from "../validation/coat-manifest";
 import {
   ValidationIssueType,
   ValidationIssueError,
-  ValidationIssueWarning,
 } from "../validation/validation-issue";
 
 /**
@@ -48,10 +47,7 @@ export async function getContext(cwd: string): Promise<CoatContext> {
     const {
       [ValidationIssueType.Error]: errors = [],
       [ValidationIssueType.Warning]: warnings = [],
-    } = groupBy(issues, "type") as {
-      [ValidationIssueType.Error]: ValidationIssueError[];
-      [ValidationIssueType.Warning]: ValidationIssueWarning[];
-    };
+    } = groupBy(issues, "type");
     const validationMessages = [
       chalk`The coat manifest file ({green ${COAT_MANIFEST_FILENAME}}) has the following issue${
         issues.length > 1 ? "s" : ""
@@ -72,7 +68,7 @@ export async function getContext(cwd: string): Promise<CoatContext> {
     );
 
     if (issues.length === 1 && errors.length === 1) {
-      const [error] = errors;
+      const [error] = errors as ValidationIssueError[];
       const coatManifestAst = parse(coatManifestRaw);
       const location = getLocationInJSONAst(
         coatManifestAst,
