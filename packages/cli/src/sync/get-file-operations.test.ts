@@ -98,18 +98,21 @@ describe("sync/get-file-operations", () => {
         b: true,
       }),
     };
-    const context: CoatContext = produce(testContext, (newContext) => {
-      newContext.coatGlobalLockfile.files.push({
-        path: "folder-1/a.json",
-        hash: getFileHash(JSON.stringify({ a: true })),
-        once: false,
-      });
-      newContext.coatLocalLockfile.files.push({
-        path: "folder-1/b.json",
-        hash: getFileHash(JSON.stringify({ b: true })),
-        once: false,
-      });
-    });
+    const context: CoatContext = produce(
+      testContext,
+      (newContext: CoatContext) => {
+        newContext.coatGlobalLockfile.files.push({
+          path: "folder-1/a.json",
+          hash: getFileHash(JSON.stringify({ a: true })),
+          once: false,
+        });
+        newContext.coatLocalLockfile.files.push({
+          path: "folder-1/b.json",
+          hash: getFileHash(JSON.stringify({ b: true })),
+          once: false,
+        });
+      }
+    );
 
     const filesToPlace: PolishedFile[] = [
       {
@@ -161,18 +164,21 @@ describe("sync/get-file-operations", () => {
         b: true,
       }),
     };
-    const context: CoatContext = produce(testContext, (newContext) => {
-      newContext.coatGlobalLockfile.files.push({
-        path: "folder-1/a.json",
-        hash: getFileHash(JSON.stringify({ a: true })),
-        once: false,
-      });
-      newContext.coatLocalLockfile.files.push({
-        path: "folder-1/b.json",
-        hash: getFileHash(JSON.stringify({ b: true })),
-        once: false,
-      });
-    });
+    const context: CoatContext = produce(
+      testContext,
+      (newContext: CoatContext) => {
+        newContext.coatGlobalLockfile.files.push({
+          path: "folder-1/a.json",
+          hash: getFileHash(JSON.stringify({ a: true })),
+          once: false,
+        });
+        newContext.coatLocalLockfile.files.push({
+          path: "folder-1/b.json",
+          hash: getFileHash(JSON.stringify({ b: true })),
+          once: false,
+        });
+      }
+    );
 
     const filesToPlace: PolishedFile[] = [
       {
@@ -246,18 +252,21 @@ describe("sync/get-file-operations", () => {
   });
 
   test("should not try to delete files that are no longer on the disk", () => {
-    const context: CoatContext = produce(testContext, (newContext) => {
-      newContext.coatGlobalLockfile.files.push({
-        path: "folder-1/a.json",
-        hash: getFileHash(JSON.stringify({ a: true })),
-        once: false,
-      });
-      newContext.coatLocalLockfile.files.push({
-        path: "folder-1/b.json",
-        hash: getFileHash(JSON.stringify({ b: true })),
-        once: false,
-      });
-    });
+    const context: CoatContext = produce(
+      testContext,
+      (newContext: CoatContext) => {
+        newContext.coatGlobalLockfile.files.push({
+          path: "folder-1/a.json",
+          hash: getFileHash(JSON.stringify({ a: true })),
+          once: false,
+        });
+        newContext.coatLocalLockfile.files.push({
+          path: "folder-1/b.json",
+          hash: getFileHash(JSON.stringify({ b: true })),
+          once: false,
+        });
+      }
+    );
 
     const filesToPlace: PolishedFile[] = [];
     const filesToRemove = [
@@ -297,18 +306,21 @@ describe("sync/get-file-operations", () => {
       }),
     };
 
-    const context: CoatContext = produce(testContext, (newContext) => {
-      newContext.coatGlobalLockfile.files.push({
-        path: "folder-1/a.json",
-        hash: getFileHash(JSON.stringify({ a: true })),
-        once: false,
-      });
-      newContext.coatLocalLockfile.files.push({
-        path: "folder-1/b.json",
-        hash: getFileHash(JSON.stringify({ b: true })),
-        once: false,
-      });
-    });
+    const context: CoatContext = produce(
+      testContext,
+      (newContext: CoatContext) => {
+        newContext.coatGlobalLockfile.files.push({
+          path: "folder-1/a.json",
+          hash: getFileHash(JSON.stringify({ a: true })),
+          once: false,
+        });
+        newContext.coatLocalLockfile.files.push({
+          path: "folder-1/b.json",
+          hash: getFileHash(JSON.stringify({ b: true })),
+          once: false,
+        });
+      }
+    );
 
     const filesToPlace: PolishedFile[] = [];
     const filesToRemove = [
@@ -352,14 +364,17 @@ describe("sync/get-file-operations", () => {
         a: "local",
       }),
     };
-    const context: CoatContext = produce(testContext, (newContext) => {
-      newContext.coatLocalLockfile.files.push({
-        path: "folder-1/a.json",
-        hash: getFileHash(JSON.stringify({ a: "local" })),
-        once: false,
-        local: true,
-      });
-    });
+    const context: CoatContext = produce(
+      testContext,
+      (newContext: CoatContext) => {
+        newContext.coatLocalLockfile.files.push({
+          path: "folder-1/a.json",
+          hash: getFileHash(JSON.stringify({ a: "local" })),
+          once: false,
+          local: true,
+        });
+      }
+    );
 
     const filesToPlace: PolishedFile[] = [
       {
@@ -408,18 +423,21 @@ describe("sync/get-file-operations", () => {
         b: false,
       }),
     };
-    const context: CoatContext = produce(testContext, (newContext) => {
-      newContext.coatGlobalLockfile.files.push({
-        path: "folder-1/a.json",
-        hash: getFileHash(JSON.stringify({ a: true })),
-        once: false,
-      });
-      newContext.coatLocalLockfile.files.push({
-        path: "folder-1/b.json",
-        hash: getFileHash(JSON.stringify({ b: true })),
-        once: false,
-      });
-    });
+    const context: CoatContext = produce(
+      testContext,
+      (newContext: CoatContext) => {
+        newContext.coatGlobalLockfile.files.push({
+          path: "folder-1/a.json",
+          hash: getFileHash(JSON.stringify({ a: true })),
+          once: false,
+        });
+        newContext.coatLocalLockfile.files.push({
+          path: "folder-1/b.json",
+          hash: getFileHash(JSON.stringify({ b: true })),
+          once: false,
+        });
+      }
+    );
 
     const filesToPlace: PolishedFile[] = [];
     const filesToRemove = [
@@ -574,7 +592,7 @@ describe("sync/get-file-operations", () => {
       },
     ];
 
-    const context = produce(testContext, (newContext) => {
+    const context = produce(testContext, (newContext: CoatContext) => {
       newContext.coatGlobalLockfile.files.push({
         path: filesToPlace[0].relativePath,
         once: false,
