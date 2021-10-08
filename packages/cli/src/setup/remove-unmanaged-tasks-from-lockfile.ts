@@ -1,5 +1,4 @@
 import produce from "immer";
-import { WritableDraft } from "immer/dist/internal";
 import { JsonObject } from "type-fest";
 import {
   CoatGlobalLockfileStrict,
@@ -24,10 +23,10 @@ export function removeUnmanagedTasksFromLockfile<
 ): CoatLockfileType {
   const taskIds = new Set(tasks.map((task) => task.id));
 
-  return produce(lockfile, (draft) => {
-    draft.setup = Object.entries(draft.setup).reduce<{
-      [taskId: string]: WritableDraft<JsonObject>;
-    }>((accumulator, [taskId, taskResult]) => {
+  return produce(lockfile, (draft: CoatLockfileType) => {
+    draft.setup = Object.entries(draft.setup).reduce<
+      Record<string, JsonObject>
+    >((accumulator, [taskId, taskResult]) => {
       if (taskIds.has(taskId)) {
         accumulator[taskId] = taskResult;
       }
