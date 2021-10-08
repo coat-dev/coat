@@ -42,6 +42,7 @@ import {
   createFileOperationLogMessage,
   Tense,
 } from "./create-file-operation-log-message";
+import { CoatContext } from "..";
 
 /**
  * Generates all files from the current coat project.
@@ -390,7 +391,7 @@ export async function sync({
       process.exit(1);
     }
 
-    context = produce(context, (draft) => {
+    context = produce(context, (draft: CoatContext) => {
       draft.coatGlobalLockfile = newGlobalLockfile;
     });
     await writeGlobalLockfile(newGlobalLockfile, context);
@@ -405,7 +406,7 @@ export async function sync({
       files: newLocalLockFiles,
     });
     if (!isEqual(context.coatLocalLockfile, newLocalLockfile)) {
-      context = produce(context, (draft) => {
+      context = produce(context, (draft: CoatContext) => {
         draft.coatLocalLockfile = newLocalLockfile;
       });
       await writeLocalLockfile(newLocalLockfile, context);

@@ -94,7 +94,7 @@ export async function setup({
             context.coatGlobalLockfile,
             partialLockfileUpdate
           );
-          context = produce(context, (draft) => {
+          context = produce(context, (draft: CoatContext) => {
             draft.coatGlobalLockfile = newGlobalLockfile;
           });
           await writeGlobalLockfile(newGlobalLockfile, context);
@@ -105,7 +105,7 @@ export async function setup({
             context.coatLocalLockfile,
             partialLockfileUpdate
           );
-          context = produce(context, (draft) => {
+          context = produce(context, (draft: CoatContext) => {
             draft.coatLocalLockfile = newLocalLockfile;
           });
           await writeLocalLockfile(newLocalLockfile, context);
@@ -147,7 +147,7 @@ export async function setup({
       process.exit(1);
     }
 
-    context = produce(context, (draft) => {
+    context = produce(context, (draft: CoatContext) => {
       draft.coatGlobalLockfile = newGlobalLockfile;
     });
     await writeGlobalLockfile(newGlobalLockfile, context);
@@ -161,7 +161,7 @@ export async function setup({
       allTasks.filter((task) => task.type === CoatTaskType.Local)
     );
     if (!isEqual(context.coatLocalLockfile, newLocalLockfile)) {
-      context = produce(context, (draft) => {
+      context = produce(context, (draft: CoatContext) => {
         draft.coatLocalLockfile = newLocalLockfile;
       });
       await writeLocalLockfile(newLocalLockfile, context);
