@@ -105,9 +105,9 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
   // Shared dependencies
   const devDependencies: Record<string, string> = {
     // Eslint
-    eslint: "^7.13.0",
-    "@typescript-eslint/eslint-plugin": "^4.8.1",
-    "@typescript-eslint/parser": "^4.8.1",
+    eslint: "^8.0.1",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
     "eslint-config-prettier": "^8.1.0",
 
     // Jest

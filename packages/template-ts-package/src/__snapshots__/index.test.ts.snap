@@ -270,9 +270,9 @@ exports[`@coat/template-ts-package template verification - babel compiler 8`] = 
     \\"@babel/preset-env\\": \\"^7.12.1\\",
     \\"@babel/preset-typescript\\": \\"^7.12.1\\",
     \\"@types/jest\\": \\"^27.0.1\\",
-    \\"@typescript-eslint/eslint-plugin\\": \\"^4.8.1\\",
-    \\"@typescript-eslint/parser\\": \\"^4.8.1\\",
-    \\"eslint\\": \\"^7.13.0\\",
+    \\"@typescript-eslint/eslint-plugin\\": \\"^5.0.0\\",
+    \\"@typescript-eslint/parser\\": \\"^5.0.0\\",
+    \\"eslint\\": \\"^8.0.1\\",
     \\"eslint-config-prettier\\": \\"^8.1.0\\",
     \\"jest\\": \\"^27.0.1\\",
     \\"prettier\\": \\"^2.2.0\\",
@@ -599,9 +599,9 @@ exports[`@coat/template-ts-package template verification - default config 7`] = 
 {
   \\"devDependencies\\": {
     \\"@types/jest\\": \\"^27.0.1\\",
-    \\"@typescript-eslint/eslint-plugin\\": \\"^4.8.1\\",
-    \\"@typescript-eslint/parser\\": \\"^4.8.1\\",
-    \\"eslint\\": \\"^7.13.0\\",
+    \\"@typescript-eslint/eslint-plugin\\": \\"^5.0.0\\",
+    \\"@typescript-eslint/parser\\": \\"^5.0.0\\",
+    \\"eslint\\": \\"^8.0.1\\",
     \\"eslint-config-prettier\\": \\"^8.1.0\\",
     \\"jest\\": \\"^27.0.1\\",
     \\"prettier\\": \\"^2.2.0\\",
@@ -924,9 +924,9 @@ exports[`@coat/template-ts-package template verification - typescript compiler 7
 {
   \\"devDependencies\\": {
     \\"@types/jest\\": \\"^27.0.1\\",
-    \\"@typescript-eslint/eslint-plugin\\": \\"^4.8.1\\",
-    \\"@typescript-eslint/parser\\": \\"^4.8.1\\",
-    \\"eslint\\": \\"^7.13.0\\",
+    \\"@typescript-eslint/eslint-plugin\\": \\"^5.0.0\\",
+    \\"@typescript-eslint/parser\\": \\"^5.0.0\\",
+    \\"eslint\\": \\"^8.0.1\\",
     \\"eslint-config-prettier\\": \\"^8.1.0\\",
     \\"jest\\": \\"^27.0.1\\",
     \\"prettier\\": \\"^2.2.0\\",
