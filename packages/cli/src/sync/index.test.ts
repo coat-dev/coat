@@ -1006,4 +1006,29 @@ describe("sync", () => {
       `);
     });
   });
+
+  describe("--skipInstall flag", () => {
+    test("should install dependencies by default", async () => {
+      await sync({ cwd: testCwd });
+      expect(execa).toHaveBeenCalledTimes(1);
+
+      expect(execa).toHaveBeenCalledWith("npm", ["install"], {
+        cwd: testCwd,
+      });
+    });
+
+    test("should install dependencies if skipInstall is set to false", async () => {
+      await sync({ cwd: testCwd, skipInstall: false });
+      expect(execa).toHaveBeenCalledTimes(1);
+
+      expect(execa).toHaveBeenCalledWith("npm", ["install"], {
+        cwd: testCwd,
+      });
+    });
+
+    test("should not install dependencies if skipInstall is set to true", async () => {
+      await sync({ cwd: testCwd, skipInstall: true });
+      expect(execa).toHaveBeenCalledTimes(0);
+    });
+  });
 });

@@ -57,14 +57,17 @@ import { CoatContext } from "..";
  *
  * @param options.cwd The working directory of the current coat project
  * @param options.check Whether a dry-run should be performed that checks
+ * @param options.skipInstall Whether dependency installation should be skipped
  * and exits if the coat project is out of sync and has pending file updates
  */
 export async function sync({
   cwd,
   check,
+  skipInstall,
 }: {
   cwd: string;
   check?: boolean;
+  skipInstall?: boolean;
 }): Promise<void> {
   const checkFlag = !!check;
   // Run setup tasks that have not been run before
@@ -415,30 +418,32 @@ export async function sync({
     // Update files on disk
     await performFileOperations(fileOperations);
 
-    // Retrieve dependencies after merging to run npm install if they have changed
-    //
-    // If the package.json file still exists, it has to be a JsonObject,
-    // since an altered file type would throw an error during merging
-    const mergedPackageJson = mergedFiles.find(
-      (file) => file.relativePath === PACKAGE_JSON_FILENAME
-    )?.content as PackageJson | undefined;
+    if (!skipInstall) {
+      // Retrieve dependencies after merging to run npm install if they have changed
+      //
+      // If the package.json file still exists, it has to be a JsonObject,
+      // since an altered file type would throw an error during merging
+      const mergedPackageJson = mergedFiles.find(
+        (file) => file.relativePath === PACKAGE_JSON_FILENAME
+      )?.content as PackageJson | undefined;
 
-    if (mergedPackageJson) {
-      const finalDependencies: CoatManifestStrict["dependencies"] = {
-        dependencies: mergedPackageJson.dependencies ?? {},
-        devDependencies: mergedPackageJson.devDependencies ?? {},
-        optionalDependencies: mergedPackageJson.optionalDependencies ?? {},
-        peerDependencies: mergedPackageJson.peerDependencies ?? {},
-      };
+      if (mergedPackageJson) {
+        const finalDependencies: CoatManifestStrict["dependencies"] = {
+          dependencies: mergedPackageJson.dependencies ?? {},
+          devDependencies: mergedPackageJson.devDependencies ?? {},
+          optionalDependencies: mergedPackageJson.optionalDependencies ?? {},
+          peerDependencies: mergedPackageJson.peerDependencies ?? {},
+        };
 
-      if (!isEqual(finalDependencies, currentDependencies)) {
-        const installSpinner = ora("Installing dependencies\n").start();
-        try {
-          await execa("npm", ["install"], { cwd: context.cwd });
-          installSpinner.succeed();
-        } catch (error) {
-          installSpinner.fail();
-          throw error;
+        if (!isEqual(finalDependencies, currentDependencies)) {
+          const installSpinner = ora("Installing dependencies\n").start();
+          try {
+            await execa("npm", ["install"], { cwd: context.cwd });
+            installSpinner.succeed();
+          } catch (error) {
+            installSpinner.fail();
+            throw error;
+          }
         }
       }
     }

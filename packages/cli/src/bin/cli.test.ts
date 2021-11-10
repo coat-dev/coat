@@ -68,9 +68,11 @@ describe("coat cli", () => {
   );
 
   test.each`
-    input                  | args                                 | explanation
-    ${["sync"]}            | ${{ cwd: "mock-cwd", check: false }} | ${"current working directory"}
-    ${["sync", "--check"]} | ${{ cwd: "mock-cwd", check: true }}  | ${"check flag"}
+    input                                   | args                                                     | explanation
+    ${["sync"]}                             | ${{ cwd: "mock-cwd", check: false, skipInstall: false }} | ${"current working directory"}
+    ${["sync", "--check"]}                  | ${{ cwd: "mock-cwd", check: true, skipInstall: false }}  | ${"check flag"}
+    ${["sync", "--skipInstall"]}            | ${{ cwd: "mock-cwd", check: false, skipInstall: true }}  | ${"skipInstall flag"}
+    ${["sync", "--check", "--skipInstall"]} | ${{ cwd: "mock-cwd", check: true, skipInstall: true }}   | ${"check & skipInstall flag"}
   `("should call sync function with $explanation", async ({ input, args }) => {
     const program = createProgram();
 

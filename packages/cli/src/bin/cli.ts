@@ -44,12 +44,17 @@ export function createProgram(): Command {
       "--check",
       "Checks whether the coat project is in sync or whether there are any pending global file operations. Useful on CI systems to determine whether coat sync needs to be run."
     )
+    .option("--skipInstall", "Skips the installation of dependencies.")
     .helpOption(
       undefined,
       '\n\nGathers all files of the extended templates, merges them and places them in the project directory.\n\nGenerated files can be extended by placing a file next to it with the "-custom.js" suffix and exporting a function that returns the customized content.'
     )
     .action(async (options) => {
-      await sync({ cwd: process.cwd(), check: !!options.check });
+      await sync({
+        cwd: process.cwd(),
+        check: !!options.check,
+        skipInstall: !!options.skipInstall,
+      });
     });
 
   program
