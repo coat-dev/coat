@@ -70,9 +70,7 @@ export function createProgram(): Command {
         // Exit immediately with the exitCode if a script has thrown an error
         if (typeof (error as ExecaError).exitCode !== "undefined") {
           const execaError = error as ExecaError;
-          if (execaError.exitCode !== 0) {
-            process.exit(execaError.exitCode);
-          }
+          process.exit(execaError.exitCode);
         }
         // Otherwise rethrow the error directly
         throw error;
@@ -97,9 +95,7 @@ export function createProgram(): Command {
       // been thrown from a script that has been run.
       if (typeof (error as ExecaError).exitCode !== "undefined") {
         const execaError = error as ExecaError;
-        if (execaError.exitCode !== 0) {
-          process.exit(execaError.exitCode);
-        }
+        process.exit(execaError.exitCode);
       } else {
         // If there is no exitCode, the error has to be in an earlier
         // part of the run function, e.g. because no package.json file exists
