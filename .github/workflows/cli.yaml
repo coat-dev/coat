@@ -1,5 +1,14 @@
 name: "@coat/cli"
-on: push
+on:
+  push:
+    branches-ignore:
+      - renovate/boxen-6.x
+      - renovate/chalk-5.x
+      - renovate/execa-6.x
+      - renovate/leven-4.x
+      - renovate/ora-6.x
+      - renovate/strip-ansi-7.x
+      - renovate/wrap-ansi-8.x
 env:
   FORCE_COLOR: 3
 jobs:
