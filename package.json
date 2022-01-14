@@ -16,10 +16,10 @@
     }
   },
   "devDependencies": {
-    "@commitlint/cli": "16.0.1",
+    "@commitlint/cli": "16.0.2",
     "@commitlint/config-conventional": "16.0.0",
     "@commitlint/prompt-cli": "16.0.0",
-    "@types/prettier": "2.4.2",
+    "@types/prettier": "2.4.3",
     "@types/prompts": "2.0.14",
     "@types/rimraf": "3.0.2",
     "execa": "5.1.1",
