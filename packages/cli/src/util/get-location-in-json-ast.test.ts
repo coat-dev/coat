@@ -83,10 +83,12 @@ describe("util/get-location-in-json-ast", () => {
       Object {
         "end": Object {
           "column": 20,
+          "index": undefined,
           "line": 9,
         },
         "start": Object {
           "column": 11,
+          "index": undefined,
           "line": 9,
         },
       }
@@ -107,10 +109,12 @@ describe("util/get-location-in-json-ast", () => {
       Object {
         "end": Object {
           "column": 16,
+          "index": undefined,
           "line": 11,
         },
         "start": Object {
           "column": 13,
+          "index": undefined,
           "line": 11,
         },
       }
@@ -131,10 +135,12 @@ describe("util/get-location-in-json-ast", () => {
       Object {
         "end": Object {
           "column": 7,
+          "index": undefined,
           "line": 15,
         },
         "start": Object {
           "column": 7,
+          "index": undefined,
           "line": 4,
         },
       }
@@ -155,10 +161,12 @@ describe("util/get-location-in-json-ast", () => {
       Object {
         "end": Object {
           "column": 1,
+          "index": undefined,
           "line": 18,
         },
         "start": Object {
           "column": 1,
+          "index": undefined,
           "line": 1,
         },
       }
@@ -193,10 +201,12 @@ describe("util/get-location-in-json-ast", () => {
       Object {
         "end": Object {
           "column": 13,
+          "index": undefined,
           "line": 3,
         },
         "start": Object {
           "column": 9,
+          "index": undefined,
           "line": 3,
         },
       }
