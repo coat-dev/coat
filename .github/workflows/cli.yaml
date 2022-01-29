@@ -20,6 +20,8 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16
+      - name: Install latest npm version
+        run: npm install --global npm
       - uses: bahmutov/npm-install@v1
       - name: Build
         run: npm run --ws build
@@ -58,6 +60,8 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
+      - name: Install latest npm version
+        run: npm install --global npm
       - uses: bahmutov/npm-install@v1
       - name: Setup git config for e2e tests
         run: |
