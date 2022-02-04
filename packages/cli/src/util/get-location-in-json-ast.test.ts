@@ -83,12 +83,12 @@ describe("util/get-location-in-json-ast", () => {
       Object {
         "end": Object {
           "column": 20,
-          "index": undefined,
+          "index": 97,
           "line": 9,
         },
         "start": Object {
           "column": 11,
-          "index": undefined,
+          "index": 88,
           "line": 9,
         },
       }
@@ -109,12 +109,12 @@ describe("util/get-location-in-json-ast", () => {
       Object {
         "end": Object {
           "column": 16,
-          "index": undefined,
+          "index": 127,
           "line": 11,
         },
         "start": Object {
           "column": 13,
-          "index": undefined,
+          "index": 124,
           "line": 11,
         },
       }
@@ -135,12 +135,12 @@ describe("util/get-location-in-json-ast", () => {
       Object {
         "end": Object {
           "column": 7,
-          "index": undefined,
+          "index": 174,
           "line": 15,
         },
         "start": Object {
           "column": 7,
-          "index": undefined,
+          "index": 28,
           "line": 4,
         },
       }
@@ -161,12 +161,12 @@ describe("util/get-location-in-json-ast", () => {
       Object {
         "end": Object {
           "column": 1,
-          "index": undefined,
+          "index": 186,
           "line": 18,
         },
         "start": Object {
           "column": 1,
-          "index": undefined,
+          "index": 0,
           "line": 1,
         },
       }
@@ -201,12 +201,12 @@ describe("util/get-location-in-json-ast", () => {
       Object {
         "end": Object {
           "column": 13,
-          "index": undefined,
+          "index": 25,
           "line": 3,
         },
         "start": Object {
           "column": 9,
-          "index": undefined,
+          "index": 21,
           "line": 3,
         },
       }
