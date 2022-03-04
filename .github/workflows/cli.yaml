@@ -44,7 +44,7 @@ jobs:
         run: bash <(curl -s https://codecov.io/bash)
       - name: Build package artifacts
         run: npm pack --ws
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: coat
           path: "*.tgz"
