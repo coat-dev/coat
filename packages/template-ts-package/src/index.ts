@@ -115,7 +115,7 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
     "@types/jest": "^27.0.1",
 
     prettier: "^2.2.0",
-    typescript: "~4.5.2",
+    typescript: "~4.6.2",
     rimraf: "^3.0.2",
   };
 
