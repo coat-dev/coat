@@ -10,7 +10,7 @@ exports[`@coat/template-ts-package template verification - babel compiler 1`] = 
       \\"@babel/preset-env\\",
       {
         \\"targets\\": {
-          \\"node\\": \\"12.13\\"
+          \\"node\\": \\"14.15\\"
         }
       }
     ]
@@ -211,7 +211,7 @@ dependencies:
     - typescript
 files:
   - hash: >-
-      VKrM58CBcZN83c8DJkLlK1LycSDfyQiL6rPU2DMubB58OAQV4xR61GEB2Xxm9YW1gZvuc/Kse0GYmCqSzi4I1w==
+      7jF6ezi/wTKgt8gWGzu15+tf6MFbU13aRFMpy16Lm+0LtcrxwNPNAteI3WBq2CeJTUnxAVGxG5u7QEanYb4dAg==
     path: .babelrc
   - hash: >-
       n1uS6ajZMpOfiWQhE24L1oIsASvT63ay5GkxYOiYFBgF2SiwUbHQVMxdtPq9a5KyBtaZkpUtk7A/9frYkb1nzw==
@@ -232,7 +232,7 @@ files:
       dEjl1diD30UVpPa+Eqopj6sUzG4fZFuRB3Yw9DRQMnrlFJzFralwcjSjCph7gJT89UmQiE/UO6zwaoKB7e5jEA==
     path: tsconfig.build.json
   - hash: >-
-      hJ6j7yCY25tYeYP5U7xfPlPmTWlkI6yoYOoBB2hyYbyPAf+xiYQ+mkX9QWa2tCTFtYyuwsPQ12VZD3AjV5Rylg==
+      6YFvblFqeBeE4Sl4dyD16Aq57hb3DhclUSJldMKVrYpFenrXNTQoERqXjAqBBYklgaLXeodtlD2IbJ8GLgGhFg==
     path: tsconfig.json
 scripts:
   - build
@@ -347,7 +347,7 @@ exports[`@coat/template-ts-package template verification - babel compiler 12`] =
     \\"esModuleInterop\\": true,
     \\"forceConsistentCasingInFileNames\\": true,
     \\"isolatedModules\\": true,
-    \\"lib\\": [\\"DOM\\", \\"ES5\\", \\"ScriptHost\\", \\"ES2015\\"],
+    \\"lib\\": [\\"DOM\\", \\"ES5\\", \\"ScriptHost\\", \\"ES2020\\"],
     \\"module\\": \\"commonjs\\",
     \\"moduleResolution\\": \\"node\\",
     \\"noEmit\\": true,
@@ -566,7 +566,7 @@ files:
       zN51ATJNBuF7EqPvKtnvN8DjhfuWBsojjSkOl2y67qI9j8LmkNmsh0DBkLk3qDJm8dQ025+bGUNNfZBmxx81Gg==
     path: tsconfig.build.json
   - hash: >-
-      /ZZOw3mK3MdFX4A+sub907oSJhFoe3BQmYyari7fhovY79lln8Oz8oeumwU4+ORYjtmpe1RCltqltkeENPrq+w==
+      JJeYU1HPTvwmHwyN4lSNtinTFSfil9g5qBI1G4iq3U+n4xMoqbT3Um6d7IPZkp6fNWpb4k6JmJdbj6U1DGTO4w==
     path: tsconfig.json
 scripts:
   - build
@@ -672,7 +672,7 @@ exports[`@coat/template-ts-package template verification - default config 11`] =
   \\"compilerOptions\\": {
     \\"esModuleInterop\\": true,
     \\"forceConsistentCasingInFileNames\\": true,
-    \\"lib\\": [\\"DOM\\", \\"ES5\\", \\"ScriptHost\\", \\"ES2015\\"],
+    \\"lib\\": [\\"DOM\\", \\"ES5\\", \\"ScriptHost\\", \\"ES2020\\"],
     \\"module\\": \\"commonjs\\",
     \\"moduleResolution\\": \\"node\\",
     \\"noEmit\\": true,
@@ -891,7 +891,7 @@ files:
       zN51ATJNBuF7EqPvKtnvN8DjhfuWBsojjSkOl2y67qI9j8LmkNmsh0DBkLk3qDJm8dQ025+bGUNNfZBmxx81Gg==
     path: tsconfig.build.json
   - hash: >-
-      /ZZOw3mK3MdFX4A+sub907oSJhFoe3BQmYyari7fhovY79lln8Oz8oeumwU4+ORYjtmpe1RCltqltkeENPrq+w==
+      JJeYU1HPTvwmHwyN4lSNtinTFSfil9g5qBI1G4iq3U+n4xMoqbT3Um6d7IPZkp6fNWpb4k6JmJdbj6U1DGTO4w==
     path: tsconfig.json
 scripts:
   - build
@@ -997,7 +997,7 @@ exports[`@coat/template-ts-package template verification - typescript compiler 1
   \\"compilerOptions\\": {
     \\"esModuleInterop\\": true,
     \\"forceConsistentCasingInFileNames\\": true,
-    \\"lib\\": [\\"DOM\\", \\"ES5\\", \\"ScriptHost\\", \\"ES2015\\"],
+    \\"lib\\": [\\"DOM\\", \\"ES5\\", \\"ScriptHost\\", \\"ES2020\\"],
     \\"module\\": \\"commonjs\\",
     \\"moduleResolution\\": \\"node\\",
     \\"noEmit\\": true,
