@@ -4,7 +4,7 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "strict": true,
-    "lib": ["DOM", "ES5", "ScriptHost", "ES2015"],
+    "lib": ["DOM", "ES5", "ScriptHost", "ES2020"],
     "noEmit": true,
     "outDir": "build",
     "forceConsistentCasingInFileNames": true
