@@ -19,7 +19,7 @@
     "@commitlint/cli": "16.2.4",
     "@commitlint/config-conventional": "16.2.4",
     "@commitlint/prompt-cli": "16.2.4",
-    "@types/prettier": "2.6.0",
+    "@types/prettier": "2.6.1",
     "@types/prompts": "2.0.14",
     "@types/rimraf": "3.0.2",
     "execa": "5.1.1",
