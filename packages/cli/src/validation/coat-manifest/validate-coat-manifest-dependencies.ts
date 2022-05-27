@@ -5,7 +5,7 @@ import { handleUnknownProperties } from "../handle-unknown-properties";
 import { ValidationIssue, ValidationIssueType } from "../validation-issue";
 
 function* validateDependenciesType(
-  dependencies: Record<string, string> | undefined,
+  dependencies: Partial<Record<string, string>> | undefined,
   propertyName: string
 ): Generator<ValidationIssue, void, void> {
   if (typeof dependencies === "undefined") {
