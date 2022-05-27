@@ -139,5 +139,8 @@ export function gatherExtendedTemplates(
     getTemplates(context.cwd, context, template)
   );
 
+  // TODO: Temporary error due to TypeScript regression bug in 4.7
+  // See https://github.com/microsoft/TypeScript/issues/49280
+  // @ts-expect-error Temporary error due to TypeScript regression bug in 4.7
   return results.flat(Infinity);
 }

@@ -34,6 +34,34 @@ describe("sync/merge-dependencies", () => {
     });
   });
 
+  test("should throw error if a dependency has no valid string range", () => {
+    expect(() =>
+      mergeDependencies([
+        {
+          dependencies: {
+            fakeDep: "1.0.0",
+          },
+
+          devDependencies: {},
+          optionalDependencies: {},
+          peerDependencies: {},
+        },
+
+        {
+          dependencies: {
+            fakeDep: undefined,
+          },
+
+          devDependencies: {},
+          optionalDependencies: {},
+          peerDependencies: {},
+        },
+      ])
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"dependency version must be defined"`
+    );
+  });
+
   // Tests should be done for all four dependency groups
   describe.each`
     dependencyGroup

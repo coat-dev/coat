@@ -10,8 +10,8 @@ import { SemVer } from "semver";
 //
 /* eslint-disable no-param-reassign */
 function applyDependencies(
-  target: Record<string, string>,
-  source: Record<string, string>
+  target: Partial<Record<string, string>>,
+  source: Partial<Record<string, string>>
 ): void {
   if (!source) {
     return;
@@ -22,6 +22,10 @@ function applyDependencies(
     if (!currentVersionRange) {
       target[dependencyName] = versionRange;
       return;
+    }
+
+    if (!versionRange) {
+      throw new Error("dependency version must be defined");
     }
 
     // Compare whether currentVersionRange is compatible with versionRange
