@@ -2,7 +2,7 @@ name: "@coat/cli"
 on:
   push:
     branches-ignore:
-      - renovate/boxen-6.x
+      - renovate/boxen-7.x
       - renovate/chalk-5.x
       - renovate/execa-6.x
       - renovate/leven-4.x
