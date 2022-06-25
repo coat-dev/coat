@@ -9,6 +9,7 @@ on:
       - renovate/ora-6.x
       - renovate/strip-ansi-7.x
       - renovate/wrap-ansi-8.x
+      - renovate/inquirer-9.x
 env:
   FORCE_COLOR: 3
 jobs:
