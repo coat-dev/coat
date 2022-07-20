@@ -62,9 +62,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - name: Install latest npm version
-        # TEMP: Force npm to a version < 8.13, until the following issue is fixed:
-        # https://github.com/npm/cli/issues/5075
-        run: npm install --global npm@8.12
+        run: npm install --global npm
       - uses: bahmutov/npm-install@v1
       - name: Setup git config for e2e tests
         run: |
