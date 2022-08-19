@@ -47,7 +47,7 @@
     "@types/jest": "28.1.7",
     "@types/js-yaml": "4.0.5",
     "@types/json-stable-stringify": "1.0.34",
-    "@types/lodash": "4.14.183",
+    "@types/lodash": "4.14.184",
     "@types/semver": "7.3.12",
     "@types/single-trailing-newline": "1.0.0",
     "@types/tmp": "0.2.3",
