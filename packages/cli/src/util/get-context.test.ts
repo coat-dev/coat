@@ -297,7 +297,7 @@ describe("util/get-context", () => {
          ERROR  - name is wrong
 
           1 | {
-        > 2 |   \\"name\\": \\"hi\\"
+        > 2 |   "name": "hi"
             |   ^^^^^^^^^^^^ name is wrong
           3 | }
         "

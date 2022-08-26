@@ -80,13 +80,13 @@ describe("util/get-location-in-json-ast", () => {
     const location = getLocationInJSONAst(ast, ["a", "b", "c", 3, "d"]);
 
     expect(location).toMatchInlineSnapshot(`
-      Object {
-        "end": Object {
+      {
+        "end": {
           "column": 20,
           "index": 97,
           "line": 9,
         },
-        "start": Object {
+        "start": {
           "column": 11,
           "index": 88,
           "line": 9,
@@ -106,13 +106,13 @@ describe("util/get-location-in-json-ast", () => {
     const location = getLocationInJSONAst(ast, ["a", "b", "c", 3, "d", 1]);
 
     expect(location).toMatchInlineSnapshot(`
-      Object {
-        "end": Object {
+      {
+        "end": {
           "column": 16,
           "index": 127,
           "line": 11,
         },
-        "start": Object {
+        "start": {
           "column": 13,
           "index": 124,
           "line": 11,
@@ -132,13 +132,13 @@ describe("util/get-location-in-json-ast", () => {
     const location = getLocationInJSONAst(ast, ["a", "b", "c"]);
 
     expect(location).toMatchInlineSnapshot(`
-      Object {
-        "end": Object {
+      {
+        "end": {
           "column": 7,
           "index": 174,
           "line": 15,
         },
-        "start": Object {
+        "start": {
           "column": 7,
           "index": 28,
           "line": 4,
@@ -158,13 +158,13 @@ describe("util/get-location-in-json-ast", () => {
     const location = getLocationInJSONAst(ast, []);
 
     expect(location).toMatchInlineSnapshot(`
-      Object {
-        "end": Object {
+      {
+        "end": {
           "column": 1,
           "index": 186,
           "line": 18,
         },
-        "start": Object {
+        "start": {
           "column": 1,
           "index": 0,
           "line": 1,
@@ -198,13 +198,13 @@ describe("util/get-location-in-json-ast", () => {
 
     const location = getLocationInJSONAst(ast, ["a", "b"]);
     expect(location).toMatchInlineSnapshot(`
-      Object {
-        "end": Object {
+      {
+        "end": {
           "column": 13,
           "index": 25,
           "line": 3,
         },
-        "start": Object {
+        "start": {
           "column": 9,
           "index": 21,
           "line": 3,

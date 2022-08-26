@@ -74,12 +74,12 @@ describe("file-types/json", () => {
       );
       expect(polished).toMatchInlineSnapshot(`
         "{
-          \\"a\\": 1,
-          \\"n\\": {
-            \\"a\\": 1,
-            \\"c\\": 1
+          "a": 1,
+          "n": {
+            "a": 1,
+            "c": 1
           },
-          \\"z\\": 1
+          "z": 1
         }
         "
       `);
@@ -103,14 +103,14 @@ describe("file-types/json", () => {
       );
       expect(polished).toMatchInlineSnapshot(`
         "{
-          \\"name\\": \\"name\\",
-          \\"version\\": \\"1.0.0\\",
-          \\"a\\": 1,
-          \\"n\\": {
-            \\"a\\": 1,
-            \\"c\\": 1
+          "name": "name",
+          "version": "1.0.0",
+          "a": 1,
+          "n": {
+            "a": 1,
+            "c": 1
           },
-          \\"z\\": 1
+          "z": 1
         }
         "
       `);
@@ -139,19 +139,19 @@ describe("file-types/json", () => {
       );
       expect(polished).toMatchInlineSnapshot(`
         "{
-          \\"name\\": \\"name\\",
-          \\"version\\": \\"1.0.0\\",
-          \\"a\\": 1,
-          \\"n\\": {
-            \\"a\\": 1,
-            \\"c\\": 1,
-            \\"deep\\": {
-              \\"deep-a\\": 1,
-              \\"version\\": \\"deeper-version\\"
+          "name": "name",
+          "version": "1.0.0",
+          "a": 1,
+          "n": {
+            "a": 1,
+            "c": 1,
+            "deep": {
+              "deep-a": 1,
+              "version": "deeper-version"
             },
-            \\"name\\": \\"deep-name\\"
+            "name": "deep-name"
           },
-          \\"z\\": 1
+          "z": 1
         }
         "
       `);
@@ -174,13 +174,13 @@ describe("file-types/json", () => {
       );
       expect(polished).toMatchInlineSnapshot(`
         "{
-          \\"name\\": \\"name\\",
-          \\"a\\": 1,
-          \\"n\\": {
-            \\"a\\": 1,
-            \\"c\\": 1
+          "name": "name",
+          "a": 1,
+          "n": {
+            "a": 1,
+            "c": 1
           },
-          \\"z\\": 1
+          "z": 1
         }
         "
       `);
@@ -203,13 +203,13 @@ describe("file-types/json", () => {
       );
       expect(polished).toMatchInlineSnapshot(`
         "{
-          \\"version\\": \\"1.0.0\\",
-          \\"a\\": 1,
-          \\"n\\": {
-            \\"a\\": 1,
-            \\"c\\": 1
+          "version": "1.0.0",
+          "a": 1,
+          "n": {
+            "a": 1,
+            "c": 1
           },
-          \\"z\\": 1
+          "z": 1
         }
         "
       `);
@@ -236,21 +236,21 @@ describe("file-types/json", () => {
 
       expect(polished1).toMatchInlineSnapshot(`
         "{
-          \\"a\\": 1,
-          \\"b\\": {
-            \\"c\\": [1, 2]
+          "a": 1,
+          "b": {
+            "c": [1, 2]
           },
-          \\"z\\": 1
+          "z": 1
         }
         "
       `);
       expect(polished2).toMatchInlineSnapshot(`
         "{
-          \\"a\\": 1,
-          \\"b\\": {
-            \\"c\\": [1, 2]
+          "a": 1,
+          "b": {
+            "c": [1, 2]
           },
-          \\"z\\": 1
+          "z": 1
         }
         "
       `);
