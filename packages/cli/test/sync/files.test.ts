@@ -57,7 +57,7 @@ describe("coat sync - files", () => {
     ]);
 
     expect(folderContent).toMatchInlineSnapshot(`
-      Array [
+      [
         ".gitignore",
         "a.json",
         "b.txt",
@@ -69,8 +69,8 @@ describe("coat sync - files", () => {
     `);
 
     expect(JSON.parse(aJson)).toMatchInlineSnapshot(`
-      Object {
-        "firstProperty": Object {
+      {
+        "firstProperty": {
           "a": true,
           "b": true,
           "c": true,
@@ -123,8 +123,8 @@ describe("coat sync - files", () => {
 
     const aJson = await fs.readFile(path.join(cwd, "a.json"), "utf8");
     expect(JSON.parse(aJson)).toMatchInlineSnapshot(`
-      Object {
-        "firstProperty": Object {
+      {
+        "firstProperty": {
           "b": true,
           "c": true,
         },
@@ -177,8 +177,8 @@ describe("coat sync - files", () => {
     ]);
 
     expect(JSON.parse(aJson)).toMatchInlineSnapshot(`
-      Object {
-        "firstProperty": Object {
+      {
+        "firstProperty": {
           "customa": false,
           "customb": false,
           "customc": false,
@@ -241,12 +241,12 @@ describe("coat sync - files", () => {
     ]);
 
     expect(JSON.parse(aJson)).toMatchInlineSnapshot(`
-      Object {
-        "arrayProperty": Array [
+      {
+        "arrayProperty": [
           null,
           "d",
         ],
-        "firstProperty": Object {
+        "firstProperty": {
           "a": true,
           "b": true,
           "c": true,
@@ -380,26 +380,26 @@ describe("coat sync - files", () => {
     // JSON files are formatted via prettier
     expect(aJson).toMatchInlineSnapshot(`
       "{
-        \\"bool\\": true,
-        \\"long array\\": [
+        "bool": true,
+        "long array": [
           {
-            \\"x\\": 1,
-            \\"y\\": 2
+            "x": 1,
+            "y": 2
           },
           {
-            \\"x\\": 2,
-            \\"y\\": 1
+            "x": 2,
+            "y": 1
           },
           {
-            \\"x\\": 1,
-            \\"y\\": 1
+            "x": 1,
+            "y": 1
           },
           {
-            \\"x\\": 2,
-            \\"y\\": 2
+            "x": 2,
+            "y": 2
           }
         ],
-        \\"short array\\": [1, 2, 3]
+        "short array": [1, 2, 3]
       }
       "
     `);
@@ -419,13 +419,13 @@ describe("coat sync - files", () => {
       "bool: true
       long array:
         - x: 1
-          \\"y\\": 2
+          "y": 2
         - x: 2
-          \\"y\\": 1
+          "y": 1
         - x: 1
-          \\"y\\": 1
+          "y": 1
         - x: 2
-          \\"y\\": 2
+          "y": 2
       short array:
         - 1
         - 2
@@ -480,13 +480,13 @@ describe("coat sync - files", () => {
       fs.readFile(path.join(cwd, "b.json"), "utf-8"),
     ]);
     expect(JSON.parse(aRaw)).toMatchInlineSnapshot(`
-      Object {
+      {
         "modifiedGlobal": true,
       }
     `);
 
     expect(JSON.parse(bRaw)).toMatchInlineSnapshot(`
-      Object {
+      {
         "modifiedLocal": true,
       }
     `);
@@ -524,13 +524,13 @@ describe("coat sync - files", () => {
       fs.readFile(path.join(cwd, "b.json"), "utf-8"),
     ]);
     expect(JSON.parse(aRaw)).toMatchInlineSnapshot(`
-      Object {
+      {
         "globalBeforeSync": true,
       }
     `);
 
     expect(JSON.parse(bRaw)).toMatchInlineSnapshot(`
-      Object {
+      {
         "localBeforeSync": true,
       }
     `);

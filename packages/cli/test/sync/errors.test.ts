@@ -82,12 +82,12 @@ describe("coat sync - errors", () => {
       expect(stripAnsi(errorMessage)).toMatchInlineSnapshot(`
         "The coat manifest file (coat.json) has the following issue:
 
-         ERROR  - files[0].type: must be either \\"JSON\\", \\"YAML\\" or \\"TEXT\\".
+         ERROR  - files[0].type: must be either "JSON", "YAML" or "TEXT".
 
            7 |       },
-           8 |       \\"file\\": \\"file.json\\",
-        >  9 |       \\"type\\": \\"UNSUPPORTED_FILE_TYPE\\"
-             |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ must be either \\"JSON\\", \\"YAML\\" or \\"TEXT\\".
+           8 |       "file": "file.json",
+        >  9 |       "type": "UNSUPPORTED_FILE_TYPE"
+             |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ must be either "JSON", "YAML" or "TEXT".
           10 |     }
           11 |   ]
           12 | }
