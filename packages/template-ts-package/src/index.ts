@@ -112,7 +112,7 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
 
     // Jest
     jest: "^29.0.0",
-    "@types/jest": "^28.1.0",
+    "@types/jest": "^29.0.0",
 
     prettier: "^2.2.0",
     typescript: "~4.8.2",
