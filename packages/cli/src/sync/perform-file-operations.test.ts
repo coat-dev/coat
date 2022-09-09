@@ -109,17 +109,17 @@ describe("sync/perform-file-operations", () => {
     ]);
 
     expect(JSON.parse(aRaw)).toMatchInlineSnapshot(`
-      Object {
+      {
         "a": false,
       }
     `);
     expect(JSON.parse(bRaw)).toMatchInlineSnapshot(`
-      Object {
+      {
         "b": false,
       }
     `);
     expect(JSON.parse(cRaw)).toMatchInlineSnapshot(`
-      Object {
+      {
         "c": false,
       }
     `);

@@ -129,7 +129,7 @@ describe("lockfiles/generate-lockfile-files", () => {
 
     const result = generateLockfileFiles(files);
     expect(result.map((file) => file.path)).toMatchInlineSnapshot(`
-      Array [
+      [
         "file.json",
         "file2.json",
         "file3.json",

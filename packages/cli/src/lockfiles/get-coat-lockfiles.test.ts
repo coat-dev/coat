@@ -49,19 +49,19 @@ describe("lockfiles/get-coat-lockfiles", () => {
     test("should return empty lockfile if it doesn't exist", async () => {
       await expect(getCoatGlobalLockfile(testCwd)).resolves
         .toMatchInlineSnapshot(`
-              Object {
-                "dependencies": Object {
-                  "dependencies": Array [],
-                  "devDependencies": Array [],
-                  "optionalDependencies": Array [],
-                  "peerDependencies": Array [],
-                },
-                "files": Array [],
-                "scripts": Array [],
-                "setup": Object {},
-                "version": 1,
-              }
-            `);
+        {
+          "dependencies": {
+            "dependencies": [],
+            "devDependencies": [],
+            "optionalDependencies": [],
+            "peerDependencies": [],
+          },
+          "files": [],
+          "scripts": [],
+          "setup": {},
+          "version": 1,
+        }
+      `);
     });
 
     test("should return parsed lockfile if it exists", async () => {
@@ -82,25 +82,25 @@ describe("lockfiles/get-coat-lockfiles", () => {
 
       await expect(getCoatGlobalLockfile(testCwd)).resolves
         .toMatchInlineSnapshot(`
-              Object {
-                "dependencies": Object {
-                  "dependencies": Array [],
-                  "devDependencies": Array [],
-                  "optionalDependencies": Array [],
-                  "peerDependencies": Array [],
-                },
-                "files": Array [
-                  Object {
-                    "hash": "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
-                    "once": false,
-                    "path": "a.json",
-                  },
-                ],
-                "scripts": Array [],
-                "setup": Object {},
-                "version": 1,
-              }
-            `);
+        {
+          "dependencies": {
+            "dependencies": [],
+            "devDependencies": [],
+            "optionalDependencies": [],
+            "peerDependencies": [],
+          },
+          "files": [
+            {
+              "hash": "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
+              "once": false,
+              "path": "a.json",
+            },
+          ],
+          "scripts": [],
+          "setup": {},
+          "version": 1,
+        }
+      `);
     });
 
     test(`should throw error if lockfile can't be accessed`, async () => {
@@ -158,12 +158,12 @@ describe("lockfiles/get-coat-lockfiles", () => {
     test("should return empty lockfile if it doesn't exist", async () => {
       await expect(getCoatLocalLockfile(testCwd)).resolves
         .toMatchInlineSnapshot(`
-              Object {
-                "files": Array [],
-                "setup": Object {},
-                "version": 1,
-              }
-            `);
+        {
+          "files": [],
+          "setup": {},
+          "version": 1,
+        }
+      `);
     });
 
     test("should return parsed lockfile if it exists", async () => {
@@ -184,18 +184,18 @@ describe("lockfiles/get-coat-lockfiles", () => {
 
       await expect(getCoatLocalLockfile(testCwd)).resolves
         .toMatchInlineSnapshot(`
-              Object {
-                "files": Array [
-                  Object {
-                    "hash": "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
-                    "once": false,
-                    "path": "a.json",
-                  },
-                ],
-                "setup": Object {},
-                "version": 1,
-              }
-            `);
+        {
+          "files": [
+            {
+              "hash": "pp9zzKI6msXItWfcGFp1bpfJghZP4lhZ4NHcwUdcgKYVshI68fX5TBHj6UAsOsVY9QAZnZW20+MBdYWGKB3NJg==",
+              "once": false,
+              "path": "a.json",
+            },
+          ],
+          "setup": {},
+          "version": 1,
+        }
+      `);
     });
 
     test(`should throw error if lockfile can't be accessed`, async () => {

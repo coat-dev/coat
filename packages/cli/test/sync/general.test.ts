@@ -91,8 +91,8 @@ describe("coat sync - general", () => {
 
     expect(packageJsonOnDisk).toMatchInlineSnapshot(`
       "{
-        \\"name\\": \\"test-project\\",
-        \\"version\\": \\"1.0.0\\"
+        "name": "test-project",
+        "version": "1.0.0"
       }
       "
     `);

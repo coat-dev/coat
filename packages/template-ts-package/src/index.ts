@@ -111,7 +111,7 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
     "eslint-config-prettier": "^8.1.0",
 
     // Jest
-    jest: "^28.0.3",
+    jest: "^29.0.0",
     "@types/jest": "^28.1.0",
 
     prettier: "^2.2.0",
@@ -169,7 +169,7 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
       // Dependencies
       //
       // Jest
-      devDependencies["ts-jest"] = "^28.0.0";
+      devDependencies["ts-jest"] = "^29.0.0";
 
       // Scripts
       scripts.push({

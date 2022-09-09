@@ -428,13 +428,13 @@ describe("sync/gather-extended-templates", () => {
       expect(() =>
         gatherExtendedTemplates(coatContext)
       ).toThrowErrorMatchingInlineSnapshot(
-        `"Validation of template \\"template\\" threw errors."`
+        `"Validation of template "template" threw errors."`
       );
 
       expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
       const errorMessage = stripAnsi(consoleErrorSpy.mock.calls[0][0]);
       expect(errorMessage).toMatchInlineSnapshot(`
-        "The extended template \\"template\\" has the following issues:
+        "The extended template "template" has the following issues:
 
          WARNING  - a warning
          ERROR  - an error
@@ -471,13 +471,13 @@ describe("sync/gather-extended-templates", () => {
       expect(() =>
         gatherExtendedTemplates(coatContext)
       ).toThrowErrorMatchingInlineSnapshot(
-        `"Validation of template \\"template\\" threw an error."`
+        `"Validation of template "template" threw an error."`
       );
 
       expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
       const errorMessage = stripAnsi(consoleErrorSpy.mock.calls[0][0]);
       expect(errorMessage).toMatchInlineSnapshot(`
-        "The extended template \\"template\\" has the following issue:
+        "The extended template "template" has the following issue:
 
          ERROR  - an error
         "
@@ -518,7 +518,7 @@ describe("sync/gather-extended-templates", () => {
       expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
       const errorMessage = stripAnsi(consoleErrorSpy.mock.calls[0][0]);
       expect(errorMessage).toMatchInlineSnapshot(`
-        "The extended template \\"template\\" has the following issues:
+        "The extended template "template" has the following issues:
 
          WARNING  - a warning
          WARNING  - second warning
