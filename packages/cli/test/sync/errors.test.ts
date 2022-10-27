@@ -167,12 +167,9 @@ describe("coat sync - errors", () => {
       } catch (error) {
         expect(
           (error as ExecaError).stderr.includes(
-            "Error: EACCES: permission denied,"
+            "Cannot read or parse package.json"
           )
         ).toBe(true);
-        expect((error as ExecaError).stderr.includes("package.json")).toBe(
-          true
-        );
       }
     }
   );
