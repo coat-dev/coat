@@ -19,7 +19,7 @@ export async function getPackageJson(
     return JSON.parse(packageJsonRaw);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-      throw error;
+      throw new Error("Cannot read or parse package.json");
     }
     // If the file is not available, packageJson will
     // be undefined in the coatManifest

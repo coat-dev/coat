@@ -161,7 +161,7 @@ describe("util/get-context", () => {
 
     await expect(() => getContext(testCwd)).rejects.toHaveProperty(
       "message",
-      "Unexpected token u in JSON at position 0"
+      "Cannot read or parse package.json"
     );
   });
 

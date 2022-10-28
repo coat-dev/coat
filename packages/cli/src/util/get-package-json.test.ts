@@ -38,7 +38,7 @@ describe("util/get-package-json", () => {
 
     await expect(getPackageJson(testCwd)).rejects.toHaveProperty(
       "message",
-      expect.stringMatching(/EACCES: permission denied, open '.*package.json'/)
+      "Cannot read or parse package.json"
     );
   });
 
@@ -47,7 +47,7 @@ describe("util/get-package-json", () => {
 
     await expect(getPackageJson(testCwd)).rejects.toHaveProperty(
       "message",
-      "Unexpected token u in JSON at position 0"
+      "Cannot read or parse package.json"
     );
   });
 });
