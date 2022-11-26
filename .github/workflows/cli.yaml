@@ -61,6 +61,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
+      - name: "[Workaround] Install npm@8 on Windows with Node.js 14"
+        run: npm install --global npm@8
+        if: matrix.os == 'windows-latest' && matrix.node == 14
       - name: Install latest npm version
         run: npm install --global npm
       - uses: bahmutov/npm-install@v1
