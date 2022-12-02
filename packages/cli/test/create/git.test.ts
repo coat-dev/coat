@@ -2,7 +2,6 @@ import execa from "execa";
 import { promises as fs } from "fs";
 import path from "path";
 import os from "os";
-// @ts-expect-error
 import which from "which";
 import { getTmpDir } from "../utils/get-tmp-dir";
 import { runCli } from "../utils/run-cli";
