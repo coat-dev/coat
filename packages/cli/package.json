@@ -22,7 +22,7 @@
     "js-yaml": "4.1.0",
     "json-colorizer": "2.2.2",
     "json-stable-stringify": "1.0.2",
-    "json5": "2.2.1",
+    "json5": "2.2.2",
     "leven": "3.1.0",
     "lodash": "4.17.21",
     "ora": "5.4.1",
