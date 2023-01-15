@@ -78,7 +78,7 @@ export async function mergeFiles(
   const allFilesFiltered = Object.values(allFiles).reduce<{
     [filePath: string]: CoatManifestGroupedFile;
   }>((accumulator, file) => {
-    const filteredContent = file.content.reduce<typeof file["content"]>(
+    const filteredContent = file.content.reduce<(typeof file)["content"]>(
       (accumulator, contentEntry) => {
         if (contentEntry === null) {
           return [];

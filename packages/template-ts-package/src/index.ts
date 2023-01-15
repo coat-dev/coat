@@ -116,7 +116,7 @@ const createTemplate: CoatTemplate = ({ coatContext, config: userConfig }) => {
 
     prettier: "^2.2.0",
     typescript: "~4.9.3",
-    rimraf: "^3.0.2",
+    rimraf: "^4.0.5",
   };
 
   // Shared scripts
