@@ -1,6 +1,6 @@
 {
   "name": "@coat/template-ts-package",
-  "version": "0.0.43",
+  "version": "0.0.44",
   "author": "Peter Juras <me@peterjuras.com>",
   "devDependencies": {
     "@babel/cli": "7.20.7",
