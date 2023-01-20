@@ -1,6 +1,6 @@
 import mergeWith from "lodash/mergeWith";
 import jsonStableStringify from "json-stable-stringify";
-import { JsonObject } from "type-fest";
+import { JsonifiableObject } from "../types/jsonifiable-object";
 import { FileTypeFunctions } from ".";
 import { CoatContext } from "../types/coat-context";
 import { getPrettier } from "../util/get-prettier";
@@ -13,9 +13,9 @@ function mergeWithArrayReplacement(source: unknown, target: unknown): unknown {
 }
 
 function merge(
-  source: JsonObject | null | undefined,
-  target: JsonObject
-): JsonObject | null {
+  source: JsonifiableObject | null | undefined,
+  target: JsonifiableObject
+): JsonifiableObject | null {
   // Default object merge behavior is covered by lodash's
   // merge function. Properties will be merged deeply,
   // newer arrays will replace existing ones
@@ -23,7 +23,7 @@ function merge(
 }
 
 export function polish(
-  source: JsonObject,
+  source: JsonifiableObject,
   filePath: string,
   context?: CoatContext
 ): string {
@@ -67,7 +67,7 @@ export function polish(
   });
 }
 
-export const jsonFileFunctions: FileTypeFunctions<JsonObject> = {
+export const jsonFileFunctions: FileTypeFunctions<JsonifiableObject> = {
   merge,
   polish,
 };

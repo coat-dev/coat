@@ -1,10 +1,10 @@
-import { JsonObject } from "type-fest";
 import { CoatContext } from "./coat-context";
+import { JsonifiableObject } from "./jsonifiable-object";
 
 export interface CoatTaskRunOptions {
   previousResults: {
-    global: { [taskId: string]: JsonObject };
-    local: { [taskId: string]: JsonObject };
+    global: { [taskId: string]: JsonifiableObject };
+    local: { [taskId: string]: JsonifiableObject };
   };
   context: CoatContext;
 }
@@ -28,7 +28,7 @@ interface CoatTask {
    */
   run: (
     options: CoatTaskRunOptions
-  ) => JsonObject | Promise<JsonObject | void> | void;
+  ) => JsonifiableObject | Promise<JsonifiableObject | void> | void;
   /**
    * An optional function to determine whether a task should be run or not.
    *

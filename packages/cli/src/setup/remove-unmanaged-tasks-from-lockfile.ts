@@ -1,5 +1,5 @@
 import produce from "immer";
-import { JsonObject } from "type-fest";
+import { JsonifiableObject } from "../types/jsonifiable-object";
 import {
   CoatGlobalLockfileStrict,
   CoatLocalLockfileStrict,
@@ -25,7 +25,7 @@ export function removeUnmanagedTasksFromLockfile<
 
   return produce(lockfile, (draft: CoatLockfileType) => {
     draft.setup = Object.entries(draft.setup).reduce<
-      Record<string, JsonObject>
+      Record<string, JsonifiableObject>
     >((accumulator, [taskId, taskResult]) => {
       if (taskIds.has(taskId)) {
         accumulator[taskId] = taskResult;

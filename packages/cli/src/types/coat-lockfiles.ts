@@ -1,11 +1,11 @@
-import { JsonObject } from "type-fest";
+import { JsonifiableObject } from "./jsonifiable-object";
 
 /**
  * @minLength 1
  */
 type NonEmptyString = string;
 
-interface CoatLockfileFileEntryBase extends JsonObject {
+interface CoatLockfileFileEntryBase extends JsonifiableObject {
   /**
    * The relative path from the coat project root directory
    */
@@ -48,7 +48,7 @@ export type CoatLockfileFileEntryStrict =
   | CoatLockfileOnceFileEntryStrict
   | CoatLockfileContinuousFileEntryStrict;
 
-export interface CoatGlobalLockfile extends JsonObject {
+export interface CoatGlobalLockfile extends JsonifiableObject {
   /**
    * The lockfile version
    *
@@ -61,7 +61,7 @@ export interface CoatGlobalLockfile extends JsonObject {
    * Global setup task results, stored as
    * taskId: { taskResultProperty: A }
    */
-  setup?: Record<NonEmptyString, JsonObject>;
+  setup?: Record<NonEmptyString, JsonifiableObject>;
   /**
    * package.json script names that are managed by coat
    */
@@ -98,7 +98,7 @@ export interface CoatGlobalLockfileStrict extends Required<CoatGlobalLockfile> {
   dependencies: Required<Required<CoatGlobalLockfile>["dependencies"]>;
 }
 
-export interface CoatLocalLockfile extends JsonObject {
+export interface CoatLocalLockfile extends JsonifiableObject {
   /**
    * The lockfile version
    *
@@ -111,7 +111,7 @@ export interface CoatLocalLockfile extends JsonObject {
    * Local setup task results, stored as
    * taskId: { taskResultProperty: A }
    */
-  setup?: Record<NonEmptyString, JsonObject>;
+  setup?: Record<NonEmptyString, JsonifiableObject>;
 }
 export interface CoatLocalLockfileStrict extends Required<CoatLocalLockfile> {
   /**

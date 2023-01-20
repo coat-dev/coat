@@ -1,4 +1,5 @@
-import { JsonObject, ValueOf } from "type-fest";
+import { ValueOf } from "type-fest";
+import { JsonifiableObject } from "./jsonifiable-object";
 
 export enum CoatManifestFileType {
   Json = "JSON",
@@ -7,9 +8,9 @@ export enum CoatManifestFileType {
 }
 
 export interface CoatManifestFileContentTypesMap {
-  [CoatManifestFileType.Json]: JsonObject;
+  [CoatManifestFileType.Json]: JsonifiableObject;
   [CoatManifestFileType.Text]: string;
-  [CoatManifestFileType.Yaml]: JsonObject;
+  [CoatManifestFileType.Yaml]: JsonifiableObject;
 }
 
 export type CoatManifestFileContentType =
