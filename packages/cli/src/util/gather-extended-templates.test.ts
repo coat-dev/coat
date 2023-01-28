@@ -38,9 +38,14 @@ let testExtendedTemplates: {
 };
 
 const validateCoatManifestMock = validateCoatManifest as unknown as jest.Mock;
-const consoleErrorSpy = jest.spyOn(console, "error");
 
 describe("sync/gather-extended-templates", () => {
+  let consoleErrorSpy: jest.SpyInstance<
+    ReturnType<typeof console.error>,
+    Parameters<typeof console.error>,
+    unknown
+  >;
+
   beforeEach(() => {
     resolveFromMock.mockImplementation(
       (cwd, template) => `${cwd}/${template}/index.js`
@@ -48,7 +53,7 @@ describe("sync/gather-extended-templates", () => {
     importFromMock.mockImplementation((cwd, template) => {
       return testExtendedTemplates[`${cwd}/${template}`];
     });
-    consoleErrorSpy.mockImplementation(() => {
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {
       // Ignore error messages
     });
     validateCoatManifestMock.mockReturnValue([]);
