@@ -14,12 +14,16 @@ jest.mock("fs").mock("../validation/coat-manifest");
 
 const validateCoatManifestMock = validateCoatManifest as unknown as jest.Mock;
 
-const consoleErrorSpy = jest.spyOn(console, "error");
+let consoleErrorSpy: jest.SpyInstance<
+  ReturnType<typeof console.error>,
+  Parameters<typeof console.error>,
+  unknown
+>;
 
 describe("util/get-context", () => {
   beforeEach(() => {
     validateCoatManifestMock.mockReturnValue([]);
-    consoleErrorSpy.mockImplementation(() => {
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {
       // Empty mock function
     });
   });
