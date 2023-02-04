@@ -63,8 +63,7 @@ describe("coat sync - gathering", () => {
       templates.map((template) =>
         fsExtra.copy(
           path.join(__dirname, "..", "utils", "test-packages", template),
-          path.join(tmpDir, template),
-          { recursive: true }
+          path.join(tmpDir, template)
         )
       )
     );
