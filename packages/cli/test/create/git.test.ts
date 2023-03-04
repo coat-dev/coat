@@ -83,17 +83,9 @@ describe("create/git", () => {
 
     let pathTmp: string;
     if (os.platform() === "win32") {
-      // Windows will receive the direct path to Node.js and npm,
-      // since npm.cmd relies on relative files in its directory
       pathTmp = `${path.dirname(nodePath)};${path.dirname(npmPath)}`;
     } else {
-      // Create a folder where node and npm are symlinked
-      pathTmp = getTmpDir();
-
-      await Promise.all([
-        fs.symlink(nodePath, path.join(pathTmp, path.basename(nodePath))),
-        fs.symlink(npmPath, path.join(pathTmp, path.basename(npmPath))),
-      ]);
+      pathTmp = `${path.dirname(nodePath)}:${path.dirname(npmPath)}`;
     }
 
     const { cwd, task } = runCli(
