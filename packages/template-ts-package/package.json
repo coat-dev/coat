@@ -42,7 +42,7 @@
   },
   "main": "build/index.js",
   "peerDependencies": {
-    "@coat/cli": "^0.0.26"
+    "@coat/cli": "^0.0.27"
   },
   "scripts": {
     "build": "coat run build:*",
