@@ -17,10 +17,8 @@ export function createProgram(): Command {
 
   program
     .command("create <template> [dir] [projectName]")
-    .description("Create a new project based on the coat template.")
-    .helpOption(
-      undefined,
-      '\n\nArguments:\ntemplate (required): The name of coat template from the npm registry (e.g. "@coat/template-ts-package")\n\ndir (optional): The directory where coat should create a project. Resolves to a relative path from the current working directory\n\nprojectName (optional): The name of your new project. Will use the trailing folder name of the project directory by default'
+    .description(
+      'Create a new project based on the coat template.\n\nArguments:\ntemplate (required): The name of coat template from the npm registry (e.g. "@coat/template-ts-package")\n\ndir (optional): The directory where coat should create a project. Resolves to a relative path from the current working directory\n\nprojectName (optional): The name of your new project. Will use the trailing folder name of the project directory by default'
     )
     .action(async (template, directory, projectName) => {
       await create({ template, directory, projectName });
@@ -29,26 +27,20 @@ export function createProgram(): Command {
   program
     .command("setup")
     .description("Runs all setup tasks of the current coat project")
-    .helpOption(
-      undefined,
-      "\n\nGathers all setup tasks of the extended templates and runs them in sequential order."
-    )
     .action(async () => {
       await setup({ cwd: process.cwd(), force: true });
     });
 
   program
     .command("sync")
-    .description("Generates all files of the current coat project.")
+    .description(
+      'Generates all files of the current coat project.\nGathers all files of the extended templates, merges them and places them in the project directory.\n\nGenerated files can be extended by placing a file next to it with the "-custom.js" suffix and exporting a function that returns the customized content.'
+    )
     .option(
       "--check",
       "Checks whether the coat project is in sync or whether there are any pending global file operations. Useful on CI systems to determine whether coat sync needs to be run."
     )
     .option("--skipInstall", "Skips the installation of dependencies.")
-    .helpOption(
-      undefined,
-      '\n\nGathers all files of the extended templates, merges them and places them in the project directory.\n\nGenerated files can be extended by placing a file next to it with the "-custom.js" suffix and exporting a function that returns the customized content.'
-    )
     .action(async (options) => {
       await sync({
         cwd: process.cwd(),
@@ -59,12 +51,10 @@ export function createProgram(): Command {
 
   program
     .command("run <scriptPattern> [otherScriptPatterns...]")
-    .description("Runs one or multiple package.json scripts in parallel")
-    .allowUnknownOption()
-    .helpOption(
-      undefined,
-      '\n\nYou can run multiple scripts by specifying a wildcard, e.g. coat run build:* will run all scripts that are prefixed with build: inside the package.json scripts object.\n\nAll arguments after the first dash ("-") will be passed to each script, e.g. "coat run build --watch" will call the build script with "--watch"'
+    .description(
+      'Runs one or multiple package.json scripts in parallel\n\nYou can run multiple scripts by specifying a wildcard, e.g. coat run build:* will run all scripts that are prefixed with build: inside the package.json scripts object.\n\nAll arguments after the first dash ("-") will be passed to each script, e.g. "coat run build --watch" will call the build script with "--watch"'
     )
+    .allowUnknownOption()
     .action(async (scriptPattern, otherScriptPatterns) => {
       try {
         await run({

@@ -24,7 +24,6 @@ describe("setup - general", () => {
     const helpLines = [
       "Usage: coat setup [options]",
       "Runs all setup tasks of the current coat project",
-      "Gathers all setup tasks of the extended templates and runs them in sequential order.",
     ];
     helpLines.forEach((helpLine) => {
       expect(helpArgument.stdout).toContain(helpLine);
