@@ -276,7 +276,7 @@ exports[`@coat/template-ts-package template verification - babel compiler 8`] = 
     "eslint-config-prettier": "^8.1.0",
     "jest": "^29.0.0",
     "prettier": "^2.2.0",
-    "rimraf": "^4.0.5",
+    "rimraf": "^5.0.0",
     "typescript": "~5.0.2"
   },
   "files": [
@@ -605,7 +605,7 @@ exports[`@coat/template-ts-package template verification - default config 7`] = 
     "eslint-config-prettier": "^8.1.0",
     "jest": "^29.0.0",
     "prettier": "^2.2.0",
-    "rimraf": "^4.0.5",
+    "rimraf": "^5.0.0",
     "ts-jest": "^29.0.0",
     "typescript": "~5.0.2"
   },
@@ -930,7 +930,7 @@ exports[`@coat/template-ts-package template verification - typescript compiler 7
     "eslint-config-prettier": "^8.1.0",
     "jest": "^29.0.0",
     "prettier": "^2.2.0",
-    "rimraf": "^4.0.5",
+    "rimraf": "^5.0.0",
     "ts-jest": "^29.0.0",
     "typescript": "~5.0.2"
   },
