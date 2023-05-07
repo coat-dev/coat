@@ -1,4 +1,4 @@
-import produce from "immer";
+import { produce } from "immer";
 import { JsonObject } from "type-fest";
 import {
   CoatGlobalLockfileStrict,

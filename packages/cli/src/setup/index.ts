@@ -14,7 +14,7 @@ import {
   writeLocalLockfile,
 } from "../lockfiles/write-lockfiles";
 import { isEqual } from "lodash";
-import produce from "immer";
+import { produce } from "immer";
 import chalk from "chalk";
 
 /**
