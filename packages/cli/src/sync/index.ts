@@ -24,7 +24,7 @@ import {
   updateLocalLockfile,
 } from "../lockfiles/update-lockfile";
 import { setup } from "../setup";
-import produce from "immer";
+import { produce } from "immer";
 import { groupFiles } from "./group-files";
 import { getDefaultFiles } from "./get-default-files";
 import { getCurrentFiles } from "./get-current-files";

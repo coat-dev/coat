@@ -1,4 +1,4 @@
-import produce from "immer";
+import { produce } from "immer";
 import path from "path";
 import {
   COAT_GLOBAL_LOCKFILE_VERSION,

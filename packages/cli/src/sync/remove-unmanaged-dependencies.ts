@@ -1,4 +1,4 @@
-import produce from "immer";
+import { produce } from "immer";
 import { difference } from "lodash";
 import { CoatContext } from "../types/coat-context";
 import { CoatManifestStrict } from "../types/coat-manifest";
