@@ -81,3 +81,14 @@ jobs:
       - name: Run all tests
         run: npm run test:all -- --ci --no-cache --runInBand --verbose
         working-directory: ./packages/cli
+  notify-on-failure:
+    needs:
+      - build
+      - e2e-tests
+    runs-on: ubuntu-latest
+    if: failure() # only run this job when any of the previous jobs fail.
+    steps:
+      - name: Notify through commit comment
+        uses: peter-evans/commit-comment@v2
+        with:
+          body: "@peterjuras: The workflow failed!"
