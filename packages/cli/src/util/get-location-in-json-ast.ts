@@ -28,6 +28,8 @@ function shiftLocation(location: SourceLocation): SourceLocation {
       ...location.end,
       column: singleLine ? location.end.column + 1 : location.end.column,
     },
+    identifierName: undefined,
+    filename: "unknown",
   };
 }
 

@@ -86,6 +86,8 @@ describe("util/get-location-in-json-ast", () => {
           "index": 97,
           "line": 9,
         },
+        "filename": "unknown",
+        "identifierName": undefined,
         "start": {
           "column": 11,
           "index": 88,
@@ -112,6 +114,8 @@ describe("util/get-location-in-json-ast", () => {
           "index": 127,
           "line": 11,
         },
+        "filename": "unknown",
+        "identifierName": undefined,
         "start": {
           "column": 13,
           "index": 124,
@@ -138,6 +142,8 @@ describe("util/get-location-in-json-ast", () => {
           "index": 174,
           "line": 15,
         },
+        "filename": "unknown",
+        "identifierName": undefined,
         "start": {
           "column": 7,
           "index": 28,
@@ -164,6 +170,8 @@ describe("util/get-location-in-json-ast", () => {
           "index": 186,
           "line": 18,
         },
+        "filename": "unknown",
+        "identifierName": undefined,
         "start": {
           "column": 1,
           "index": 0,
@@ -204,6 +212,8 @@ describe("util/get-location-in-json-ast", () => {
           "index": 25,
           "line": 3,
         },
+        "filename": "unknown",
+        "identifierName": undefined,
         "start": {
           "column": 9,
           "index": 21,
