@@ -34,7 +34,7 @@
     "tmp": "0.2.1",
     "type-fest": "2.19.0",
     "unquoted-property-validator": "1.1.0",
-    "wrap-ansi": "7.0.0"
+    "wrap-ansi": "8.1.0"
   },
   "devDependencies": {
     "@babel/cli": "7.22.15",
@@ -52,7 +52,7 @@
     "@types/single-trailing-newline": "1.0.0",
     "@types/tmp": "0.2.3",
     "@types/which": "3.0.0",
-    "@types/wrap-ansi": "3.0.0",
+    "@types/wrap-ansi": "8.0.2",
     "@typescript-eslint/eslint-plugin": "6.6.0",
     "@typescript-eslint/parser": "6.6.0",
     "concurrently": "8.2.1",
