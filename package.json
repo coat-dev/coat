@@ -16,19 +16,19 @@
     }
   },
   "devDependencies": {
-    "@commitlint/cli": "17.7.1",
-    "@commitlint/config-conventional": "17.7.0",
-    "@commitlint/prompt-cli": "17.7.1",
+    "@commitlint/cli": "17.8.1",
+    "@commitlint/config-conventional": "17.8.1",
+    "@commitlint/prompt-cli": "17.8.1",
     "@types/prettier": "2.7.3",
-    "@types/prompts": "2.4.4",
+    "@types/prompts": "2.4.9",
     "execa": "5.1.1",
     "husky": "8.0.3",
     "is-ci": "3.0.1",
     "prettier": "2.8.8",
     "prompts": "2.4.2",
-    "rimraf": "5.0.1",
-    "ts-node": "10.9.1",
-    "typescript": "5.2.2"
+    "rimraf": "5.0.5",
+    "ts-node": "10.9.2",
+    "typescript": "5.3.3"
   },
   "homepage": "https://github.com/coat-dev/coat#readme",
   "license": "MIT",
